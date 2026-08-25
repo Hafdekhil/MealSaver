@@ -1,26 +1,23 @@
-# MealSaver — version commerciale statique v4
+# MealSaver — site statique multi-pages v5
 
-Cette version remplace le prototype scolaire par un site plus commercialisable :
+Cette version remplace la landing page unique par un vrai mini-site commercial en plusieurs pages.
 
-- `index.html` : landing page commerciale complète avec sections Solution, Produit, Écrans, Impact et Offre.
-- `app.html` : prototype applicatif interactif.
-- `styles.css` : design premium responsive sans débordement horizontal.
-- `app.js` : navigation, inventaire, scan MVP, recettes, liste collaborative et stockage local.
-- `assets/` : logo horizontal, logo icône et captures de maquettes.
-- `.nojekyll` : publication GitHub Pages.
+## Pages incluses
+
+- `index.html` : accueil commercial
+- `solution.html` : problème et solution
+- `produit.html` : fonctionnalités du produit
+- `ecrans.html` : maquettes Web et mobile
+- `impact.html` : impact économique et environnemental
+- `offre.html` : offre, modèle commercial et contact visuel
+- `app.html` : démo applicative interactive
 
 ## Déploiement GitHub Pages
 
-Copier tous les fichiers à la racine du dépôt `MealSaver`, puis :
+Copier tout le contenu du dossier à la racine du dépôt GitHub, puis :
 
 ```powershell
 git add .
-git commit -m "Refonte commerciale premium MealSaver v4"
+git commit -m "Passage au site multi-pages commercial MealSaver v5"
 git push
-```
-
-URL attendue :
-
-```text
-https://hafdekhil.github.io/MealSaver/
 ```
