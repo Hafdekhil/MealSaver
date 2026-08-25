@@ -3,166 +3,179 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MealSaver — Inventaire intelligent anti-gaspillage</title>
-  <meta name="description" content="MealSaver aide les familles à réduire le gaspillage alimentaire avec inventaire collaboratif, scan intelligent, recettes anti-gaspillage et liste d'épicerie partagée." />
-  <link rel="icon" href="assets/logo-mealsaver.png" />
+  <title>MealSaver — Inventaire intelligent, recettes anti-gaspillage et foyer collaboratif</title>
+  <meta name="description" content="MealSaver aide les foyers à réduire le gaspillage alimentaire grâce à un inventaire collaboratif, un scan intelligent MVP, des recettes adaptées et une liste d'épicerie partagée." />
+  <meta property="og:title" content="MealSaver — Réduire le gaspillage, une recette à la fois" />
+  <meta property="og:description" content="Un MVP Web + mobile commercialisable pour gérer le frigo, cuisiner avec les restes et économiser." />
+  <link rel="icon" href="assets/logo-icon.png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="landing-page">
-  <header class="site-header">
-    <a class="site-brand" href="index.html" aria-label="MealSaver accueil">
-      <img src="assets/logo-mealsaver.png" alt="MealSaver" />
-      <span><strong>Meal</strong><em>Saver</em></span>
+<body>
+  <div class="page-bg"></div>
+  <header class="site-header" id="top">
+    <a class="brand" href="#top" aria-label="Accueil MealSaver">
+      <img src="assets/logo-horizontal.png" alt="MealSaver" />
     </a>
-    <nav class="site-nav" aria-label="Navigation commerciale">
+    <nav class="desktop-nav" aria-label="Navigation principale">
       <a href="#solution">Solution</a>
       <a href="#produit">Produit</a>
+      <a href="#screens">Écrans</a>
       <a href="#impact">Impact</a>
-      <a href="#prix">Offre</a>
+      <a href="#offre">Offre</a>
     </nav>
-    <div class="site-actions">
-      <a class="btn btn-soft" href="app.html">Voir la démo</a>
+    <div class="header-actions">
+      <a class="btn btn-ghost" href="app.html">Voir la démo</a>
       <a class="btn btn-primary" href="#contact">Demander l’accès</a>
     </div>
+    <button class="menu-toggle" aria-label="Ouvrir le menu">☰</button>
   </header>
 
   <main>
-    <section class="hero-section">
-      <div class="hero-bg-orb orb-a"></div>
-      <div class="hero-bg-orb orb-b"></div>
-      <div class="hero-content">
-        <p class="kicker">MVP commercialisable • Web + mobile</p>
+    <section class="hero section-wrap">
+      <div class="hero-copy reveal">
+        <p class="kicker">MVP commercialisable · Web + mobile · Foyer collaboratif</p>
         <h1>Réduire le gaspillage, une recette à la fois.</h1>
-        <p class="hero-lead">MealSaver transforme l’inventaire du foyer en décisions simples : aliments à consommer, recettes adaptées, liste d’épicerie partagée et alertes personnalisées.</p>
-        <div class="hero-cta">
+        <p class="lead">MealSaver transforme l’inventaire du foyer en décisions simples : aliments à consommer, recettes adaptées, liste d’épicerie partagée et alertes personnalisées.</p>
+        <div class="hero-actions">
           <a class="btn btn-primary btn-xl" href="app.html">Explorer le prototype</a>
-          <a class="btn btn-glass btn-xl" href="#produit">Voir les écrans</a>
+          <a class="btn btn-soft btn-xl" href="#screens">Voir les écrans</a>
         </div>
-        <div class="proof-row">
+        <div class="trust-row" aria-label="Points clés">
           <span>🥬 Inventaire collaboratif</span>
           <span>📷 Scan intelligent MVP</span>
-          <span>🍽️ Recettes anti-gaspillage</span>
+          <span>🍽️ Recettes anti-gaspi</span>
         </div>
       </div>
-
-      <div class="hero-product-showcase" aria-label="Aperçu produit MealSaver">
-        <div class="app-window premium-window">
-          <div class="window-dots"><span></span><span></span><span></span></div>
-          <div class="window-grid">
-            <aside class="mini-sidebar">
-              <img src="assets/logo-mealsaver.png" alt="" />
-              <b>MealSaver</b>
-              <nav><span class="active">Dashboard</span><span>Inventaire</span><span>Scan</span><span>Recettes</span><span>Liste</span></nav>
+      <div class="hero-visual reveal delay-1" aria-label="Aperçu MealSaver">
+        <div class="browser-shell hero-shell">
+          <div class="browser-dots"><i></i><i></i><i></i></div>
+          <div class="mini-app">
+            <aside>
+              <img src="assets/logo-icon.png" alt="" />
+              <strong>MealSaver</strong>
+              <span class="active">Dashboard</span><span>Inventaire</span><span>Scan</span><span>Recettes</span><span>Liste</span>
             </aside>
-            <section class="mini-dashboard">
-              <div class="mini-topline"><b>Bonjour famille Durand 👋</b><span>25 août 2026</span></div>
-              <div class="mini-stats"><article><b>7</b><span>à consommer</span></article><article><b>48$</b><span>économisés</span></article><article><b>12.4kg</b><span>CO₂ évité</span></article></div>
-              <div class="mini-main-grid">
-                <div class="mini-card food-card"><img src="assets/food-pasta.svg" alt="Pâtes aux légumes"/><b>Pâtes aux légumes</b><small>avec vos restes • 20 min</small></div>
-                <div class="mini-card scan-preview"><img src="assets/scan-milk.svg" alt="Scan du lait"/><b>Lait demi-écrémé</b><small>Expire dans 2 jours</small></div>
+            <section>
+              <div class="mini-top"><h3>Bonjour famille Durand 👋</h3><b>25 août 2026</b></div>
+              <div class="mini-stats"><article><strong>7</strong><span>à consommer</span></article><article><strong>48$</strong><span>économisés</span></article><article><strong>12,4 kg</strong><span>CO₂ évité</span></article></div>
+              <div class="mini-grid">
+                <article class="photo-card"><img src="assets/shot-dashboard.png" alt="Dashboard MealSaver" /></article>
+                <article class="scan-card"><img src="assets/shot-scan.png" alt="Scan intelligent MealSaver" /></article>
               </div>
             </section>
           </div>
         </div>
-        <div class="phone-mock hero-phone">
-          <div class="phone-notch"></div>
-          <div class="phone-screen">
-            <div class="mobile-head"><span>MealSaver</span><b>7</b></div>
-            <img src="assets/hero-produce.svg" alt="Panier MealSaver" />
-            <h3>À consommer bientôt</h3>
-            <div class="mobile-alert"><span>🍅</span><div><b>Tomates</b><small>Expire demain</small></div></div>
-            <div class="mobile-alert"><span>🥛</span><div><b>Lait</b><small>Expire dans 2 jours</small></div></div>
-            <button>Scanner un aliment</button>
-          </div>
+        <div class="phone-shell">
+          <div class="notch"></div>
+          <div class="phone-head"><strong>MealSaver</strong><span>7</span></div>
+          <img src="assets/logo-icon.png" alt="MealSaver mobile" />
+          <h4>À consommer bientôt</h4>
+          <div class="phone-item"><span>🍅</span><b>Tomates</b><small>Expire demain</small></div>
+          <div class="phone-item"><span>🥛</span><b>Lait</b><small>Expire dans 2 jours</small></div>
         </div>
       </div>
     </section>
 
-    <section class="logo-strip" aria-label="Bénéfices">
-      <div><b>Moins de pertes</b><span>priorités de consommation</span></div>
-      <div><b>Plus d’économies</b><span>liste d’épicerie intelligente</span></div>
-      <div><b>Foyer synchronisé</b><span>membres et responsabilités</span></div>
-      <div><b>Expérience moderne</b><span>web, mobile et hors ligne</span></div>
+    <section class="photo-band section-wrap" aria-label="Photos produit">
+      <article class="photo-tile large reveal" style="--img:url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80')">
+        <span>Foyer connecté</span><h2>Un frigo lisible par toute la famille.</h2>
+      </article>
+      <article class="photo-tile reveal delay-1" style="--img:url('https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=80')">
+        <span>Recettes utiles</span><h3>Cuisiner avec ce qui existe déjà.</h3>
+      </article>
+      <article class="photo-tile reveal delay-2" style="--img:url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=900&q=80')">
+        <span>Organisation</span><h3>Planifier sans perdre de temps.</h3>
+      </article>
     </section>
 
-    <section id="solution" class="section solution-section">
-      <div class="section-heading">
-        <p class="kicker">Problème → solution</p>
-        <h2>Une plateforme claire pour gérer les aliments avant qu’ils deviennent des déchets.</h2>
-        <p>MealSaver remplace les listes dispersées, les oublis dans le frigo et les achats doublés par un espace collaboratif unique.</p>
+    <section id="solution" class="section-wrap split-section">
+      <div class="section-title reveal">
+        <p class="kicker">Le problème</p>
+        <h2>Les foyers achètent souvent avant de savoir ce qu’ils ont déjà.</h2>
       </div>
-      <div class="feature-grid">
-        <article class="feature-card elevated"><span class="feature-icon">📷</span><h3>Scan intelligent développé</h3><p>Photo ou téléversement, reconnaissance assistée, validation manuelle, ajout rapide à l’inventaire.</p></article>
-        <article class="feature-card elevated"><span class="feature-icon">🥬</span><h3>Inventaire priorisé</h3><p>Frigo, congélateur et garde-manger avec dates d’expiration, propriétaires et statuts de consommation.</p></article>
-        <article class="feature-card elevated"><span class="feature-icon">🍽️</span><h3>Recettes anti-gaspi</h3><p>Suggestions basées sur les ingrédients disponibles et ajout automatique des ingrédients manquants à la liste.</p></article>
-        <article class="feature-card elevated"><span class="feature-icon">👥</span><h3>Collaboration foyer</h3><p>Chaque membre peut ajouter, valider, acheter ou consommer les aliments en temps réel.</p></article>
-      </div>
-    </section>
-
-    <section id="produit" class="section product-section">
-      <div class="section-heading compact">
-        <p class="kicker">Écrans produit</p>
-        <h2>Une interface conçue pour être codée, pas seulement dessinée.</h2>
-        <p>Les composants sont réutilisables : cartes, sidebar, alertes, formulaires, recettes, liste et tableau de bord.</p>
-      </div>
-      <div class="product-tabs" role="tablist" aria-label="Écrans MealSaver">
-        <button class="tab active" data-shot="dashboard">Dashboard</button>
-        <button class="tab" data-shot="inventory">Inventaire</button>
-        <button class="tab" data-shot="scan">Scan</button>
-        <button class="tab" data-shot="recipes">Recettes</button>
-      </div>
-      <div class="screen-showcase">
-        <aside class="screen-copy">
-          <h3 id="shot-title">Dashboard commercial</h3>
-          <p id="shot-text">Vue d’ensemble du foyer : priorités, économies, impact environnemental et suggestions immédiates.</p>
-          <ul id="shot-list"><li>Indicateurs clairs</li><li>Alertes visibles</li><li>CTA vers scan et recettes</li></ul>
-          <a class="btn btn-primary" href="app.html">Ouvrir la démo interactive</a>
-        </aside>
-        <div class="shot-frame" id="shot-frame">
-          <div class="coded-screen coded-dashboard"></div>
-        </div>
+      <div class="problem-grid">
+        <article class="glass-card reveal"><strong>1</strong><h3>Inventaire invisible</h3><p>Les aliments sont dispersés entre frigo, congélateur et garde-manger.</p></article>
+        <article class="glass-card reveal delay-1"><strong>2</strong><h3>Dates oubliées</h3><p>Les produits proches de l’expiration ne sont pas priorisés.</p></article>
+        <article class="glass-card reveal delay-2"><strong>3</strong><h3>Achats doublés</h3><p>La liste d’épicerie n’est pas toujours synchronisée entre les membres.</p></article>
       </div>
     </section>
 
-    <section id="impact" class="section impact-section">
-      <div class="impact-panel">
+    <section id="produit" class="section-wrap product-section">
+      <div class="section-title centered reveal">
+        <p class="kicker">Produit</p>
+        <h2>Une expérience complète, pas seulement une page vitrine.</h2>
+        <p>Le site contient une landing page commerciale et une démo applicative codée en HTML/CSS/JS pour montrer le parcours utilisateur.</p>
+      </div>
+      <div class="product-grid">
+        <article class="product-card reveal">
+          <img src="assets/shot-inventory.png" alt="Inventaire MealSaver" />
+          <div><span>Inventaire</span><h3>Voir ce qui est disponible</h3><p>Recherche, catégories, dates, membres et priorités de consommation.</p></div>
+        </article>
+        <article class="product-card reveal delay-1">
+          <img src="assets/shot-scan.png" alt="Scan intelligent" />
+          <div><span>Scan MVP</span><h3>Identifier puis valider</h3><p>Photo ou téléversement, proposition de produit, validation humaine et ajout au foyer.</p></div>
+        </article>
+        <article class="product-card reveal delay-2">
+          <img src="assets/shot-recipes.png" alt="Recettes MealSaver" />
+          <div><span>Recettes</span><h3>Transformer les restes</h3><p>Suggestions adaptées selon les aliments disponibles et les ingrédients manquants.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="screens" class="section-wrap screen-showcase">
+      <div class="section-title reveal">
+        <p class="kicker">Design system</p>
+        <h2>Écrans Web et mobile au niveau attendu pour une présentation commerciale.</h2>
+      </div>
+      <div class="showcase-board reveal delay-1">
+        <img src="assets/style-reference-board.png" alt="Planche de maquettes MealSaver Web et mobile" />
+      </div>
+      <div class="screen-grid">
+        <article class="screen-card reveal"><img src="assets/shot-dashboard.png" alt="Tableau de bord" /><h3>Dashboard Web</h3></article>
+        <article class="screen-card reveal delay-1"><img src="assets/shot-inventory.png" alt="Inventaire" /><h3>Inventaire Web</h3></article>
+        <article class="screen-card reveal delay-2"><img src="assets/shot-mobile-strip.png" alt="Écrans mobile" /><h3>Parcours mobile</h3></article>
+      </div>
+    </section>
+
+    <section id="impact" class="section-wrap impact-section">
+      <div class="impact-copy reveal">
+        <p class="kicker">Impact</p>
+        <h2>Une valeur claire : moins de gaspillage, moins d’achats inutiles, plus de coordination.</h2>
+        <p>MealSaver peut être présenté comme un service pour familles, colocations, étudiants et foyers qui veulent mieux consommer.</p>
+      </div>
+      <div class="metrics-grid reveal delay-1">
+        <article><strong>-28%</strong><span>objectif gaspillage mensuel</span></article>
+        <article><strong>48$</strong><span>économies estimées</span></article>
+        <article><strong>12,4 kg</strong><span>CO₂ évité ce mois-ci</span></article>
+        <article><strong>4</strong><span>membres synchronisés</span></article>
+      </div>
+    </section>
+
+    <section id="offre" class="section-wrap offer-section">
+      <article class="offer-card reveal">
         <div>
-          <p class="kicker">Valeur commerciale</p>
-          <h2>Un produit utile pour les familles, les colocations et les foyers connectés.</h2>
-          <p>Le discours commercial est simple : économiser, manger mieux, collaborer et réduire le gaspillage alimentaire sans complexifier le quotidien.</p>
+          <p class="kicker">Offre MVP</p>
+          <h2>Version gratuite pour tester, option premium pour familles organisées.</h2>
+          <p>Le modèle commercial peut évoluer vers un abonnement familial, des rappels avancés, des recommandations personnalisées et des intégrations partenaires.</p>
+          <ul class="check-list"><li>Inventaire collaboratif</li><li>Liste partagée</li><li>Scan intelligent MVP</li><li>Recettes anti-gaspillage</li></ul>
         </div>
-        <div class="impact-metrics">
-          <article><b>-28%</b><span>objectif de gaspillage mensuel</span></article>
-          <article><b>48$</b><span>économies estimées par mois</span></article>
-          <article><b>12.4kg</b><span>déchets évités</span></article>
+        <div class="price-card">
+          <span>À partir de</span><strong>0$</strong><small>MVP scolaire + démonstration</small><a class="btn btn-primary" href="app.html">Tester la démo</a>
         </div>
-      </div>
+      </article>
     </section>
 
-    <section id="prix" class="section pricing-section">
-      <div class="section-heading compact">
-        <p class="kicker">Offre de lancement</p>
-        <h2>Un modèle simple pour présenter le potentiel commercial.</h2>
-      </div>
-      <div class="pricing-grid">
-        <article class="price-card"><span>Découverte</span><h3>0$</h3><p>Pour tester le concept.</p><ul><li>Inventaire limité</li><li>Liste collaborative</li><li>Recettes de base</li></ul></article>
-        <article class="price-card highlighted"><span>Famille</span><h3>6.99$<small>/mois</small></h3><p>Pour un foyer complet.</p><ul><li>Inventaire illimité</li><li>Scan intelligent</li><li>Alertes avancées</li><li>4 à 6 membres</li></ul></article>
-        <article class="price-card"><span>Premium</span><h3>9.99$<small>/mois</small></h3><p>Pour plus d’automatisation.</p><ul><li>Statistiques d’impact</li><li>Suggestions personnalisées</li><li>Export des données</li></ul></article>
-      </div>
-    </section>
-
-    <section id="contact" class="final-cta">
-      <div>
-        <p class="kicker">Prototype prêt pour GitHub Pages</p>
-        <h2>MealSaver peut maintenant être présenté comme un produit, pas seulement comme un devoir.</h2>
-      </div>
-      <a class="btn btn-light btn-xl" href="app.html">Lancer la démonstration</a>
+    <section id="contact" class="section-wrap final-cta">
+      <img src="assets/logo-icon.png" alt="MealSaver" />
+      <h2>Prêt à présenter MealSaver comme un vrai produit ?</h2>
+      <p>La prochaine étape est de transformer cette version statique en application complète : authentification, base de données, API, scan réel et synchronisation multi-utilisateurs.</p>
+      <div class="hero-actions center"><a class="btn btn-primary btn-xl" href="app.html">Ouvrir la démo interactive</a><a class="btn btn-soft btn-xl" href="#top">Retour en haut</a></div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="site-brand footer-brand"><img src="assets/logo-mealsaver.png" alt="MealSaver" /><span><strong>Meal</strong><em>Saver</em></span></div>
-    <p>Inventaire collaboratif, recettes intelligentes et alertes anti-gaspillage.</p>
+  <footer class="footer section-wrap">
+    <img src="assets/logo-horizontal.png" alt="MealSaver" />
+    <p>© 2026 MealSaver — Prototype commercialisable pour projet académique.</p>
   </footer>
   <script src="app.js"></script>
 </body>

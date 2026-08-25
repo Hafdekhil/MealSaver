@@ -3,79 +3,56 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MealSaver — Démo applicative</title>
-  <meta name="description" content="Démo statique interactive MealSaver." />
-  <link rel="icon" href="assets/logo-mealsaver.png" />
+  <title>Démo MealSaver — Prototype applicatif</title>
+  <meta name="description" content="Démo interactive MealSaver : dashboard, inventaire, scan MVP, recettes et liste collaborative." />
+  <link rel="icon" href="assets/logo-icon.png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="app-body">
-  <div class="app-shell">
-    <aside class="app-sidebar">
-      <a class="app-brand" href="index.html">
-        <img src="assets/logo-mealsaver.png" alt="Logo MealSaver" />
-        <span><strong>Meal</strong><em>Saver</em></span>
-      </a>
-      <div class="family-card">
-        <div class="avatar-stack"><span>H</span><span>J</span><span>K</span><span>D</span></div>
-        <b>Foyer Durand</b>
-        <small>4 membres actifs</small>
+  <aside class="app-sidebar">
+    <a class="app-logo" href="index.html"><img src="assets/logo-icon.png" alt="MealSaver" /><span>Meal<em>Saver</em></span></a>
+    <div class="family-card"><div class="avatars"><b>H</b><b>J</b><b>K</b><b>D</b></div><strong>Foyer Durand</strong><small>4 membres connectés</small></div>
+    <nav class="app-menu">
+      <button class="app-nav active" data-screen="dash">🏠 Tableau de bord</button>
+      <button class="app-nav" data-screen="inventory">🥬 Inventaire</button>
+      <button class="app-nav" data-screen="scan">📷 Scan aliment</button>
+      <button class="app-nav" data-screen="recipes">🍽️ Recettes</button>
+      <button class="app-nav" data-screen="list">🛒 Liste partagée</button>
+      <button class="app-nav" data-screen="group">👥 Groupe</button>
+    </nav>
+    <div class="impact-widget"><small>Objectif anti-gaspillage</small><strong>-28%</strong><span>ce mois-ci</span></div>
+  </aside>
+  <main class="app-main">
+    <header class="app-topbar">
+      <div><p class="kicker">Démo interactive</p><h1 id="app-title">Bonjour famille Durand 👋</h1></div>
+      <div class="app-actions"><a class="btn btn-soft" href="index.html">Retour au site</a><button class="btn btn-primary" id="quickAdd">+ Ajouter</button></div>
+    </header>
+
+    <section class="app-screen active-screen" id="dash">
+      <div class="app-hero-card">
+        <div><p class="kicker">Aujourd’hui</p><h2>7 aliments à consommer bientôt.</h2><p>MealSaver priorise automatiquement les produits proches de l’expiration et propose des recettes utiles.</p><button class="btn btn-primary app-switch" data-screen="scan">Scanner un aliment</button></div>
+        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80" alt="Aliments frais" />
       </div>
-      <nav class="app-menu" aria-label="Navigation prototype">
-        <button class="app-nav active" data-page="dashboard">🏠 Tableau de bord</button>
-        <button class="app-nav" data-page="inventory">🥬 Inventaire</button>
-        <button class="app-nav" data-page="scan">📷 Scan aliment</button>
-        <button class="app-nav" data-page="recipes">🍽️ Recettes</button>
-        <button class="app-nav" data-page="shopping">🛒 Liste partagée</button>
-        <button class="app-nav" data-page="group">👥 Groupe</button>
-        <button class="app-nav" data-page="alerts">🔔 Alertes</button>
-      </nav>
-      <div class="side-impact"><small>Objectif anti-gaspillage</small><b>-28%</b><span>ce mois-ci</span></div>
-    </aside>
+      <div class="app-stats"><article><strong>38</strong><span>aliments</span></article><article><strong>48$</strong><span>économisés</span></article><article><strong>12,4 kg</strong><span>CO₂ évité</span></article><article><strong>4</strong><span>membres</span></article></div>
+      <div class="app-grid two">
+        <article class="panel"><div class="panel-head"><h3>Recettes suggérées</h3><button class="text-link app-switch" data-screen="recipes">Voir tout</button></div><div class="recipe-cards" id="dashRecipes"></div></article>
+        <article class="panel"><div class="panel-head"><h3>Alertes importantes</h3></div><div class="alert-feed" id="dashAlerts"></div></article>
+      </div>
+    </section>
 
-    <main class="app-main">
-      <header class="app-topbar">
-        <div><p class="kicker">MealSaver — prototype commercial</p><h1 id="app-title">Bonjour la famille Durand 👋</h1></div>
-        <div class="app-top-actions"><a class="btn btn-soft" href="index.html">Site vitrine</a><button class="btn btn-primary" data-page-jump="scan">+ Scanner</button></div>
-      </header>
+    <section class="app-screen" id="inventory">
+      <div class="app-grid inventory-layout"><article class="panel"><div class="panel-head"><h2>Inventaire du foyer</h2><span class="pill">Synchronisé</span></div><div class="filters"><button>Tous</button><button>Frigo</button><button>Garde-manger</button><button>Urgent</button></div><div id="inventoryList" class="inventory-feed"></div></article><article class="panel form-panel"><h3>Ajouter un aliment</h3><form id="foodForm"><label>Nom<input name="name" required placeholder="Ex. pommes" /></label><label>Quantité<input name="qty" required placeholder="Ex. 6 unités" /></label><label>Zone<select name="zone"><option>Frigo</option><option>Garde-manger</option><option>Congélateur</option></select></label><label>Expiration<input type="date" name="expiry" required /></label><button class="btn btn-primary" type="submit">Ajouter</button></form></article></div>
+    </section>
 
-      <section class="app-page active" id="dashboard-page">
-        <div class="app-hero-card">
-          <div><span class="pill">Priorité du jour</span><h2>3 aliments à utiliser avant la fin de la semaine.</h2><p>MealSaver priorise les aliments proches de l’expiration et propose des repas concrets à préparer avec ce qui est déjà disponible.</p><div class="inline-actions"><button class="btn btn-primary" data-page-jump="recipes">Voir les recettes</button><button class="btn btn-soft" data-page-jump="inventory">Ouvrir l’inventaire</button></div></div>
-          <img src="assets/hero-produce.svg" alt="Panier MealSaver" />
-        </div>
-        <div class="stats-grid app-stats" id="stats-grid"></div>
-        <div class="dashboard-grid">
-          <article class="app-card wide"><div class="card-head"><div><p class="kicker">Suggestions</p><h3>Recettes avec vos ingrédients</h3></div><button class="text-btn" data-page-jump="recipes">Tout voir →</button></div><div class="recipe-strip" id="dashboard-recipes"></div></article>
-          <article class="app-card"><div class="card-head"><div><p class="kicker">Alertes</p><h3>À consommer bientôt</h3></div></div><div id="dashboard-alerts" class="alert-list"></div></article>
-        </div>
-      </section>
+    <section class="app-screen" id="scan">
+      <div class="app-grid scan-layout"><article class="panel scan-panel"><h2>Scan intelligent MVP</h2><p>Le MVP propose une reconnaissance assistée. L’utilisateur valide toujours avant l’ajout.</p><div class="scan-photo"><img id="scanImg" src="https://images.unsplash.com/photo-1528750997573-59b89d56f4f7?auto=format&fit=crop&w=900&q=80" alt="Produit laitier scanné" /><span></span></div><div class="scan-buttons"><button class="btn btn-soft" id="changeScan">Changer d’image</button><button class="btn btn-primary" id="analyzeScan">Analyser</button></div></article><article class="panel result-panel"><p class="kicker">Résultat</p><h2 id="detectedTitle">En attente d’analyse</h2><p id="detectedMeta">Photo ou téléversement → détection → validation utilisateur → inventaire.</p><div id="detectedTags" class="tag-list"></div><button class="btn btn-primary full" id="addDetected" disabled>Ajouter à l’inventaire</button></article></div>
+    </section>
 
-      <section class="app-page" id="inventory-page">
-        <div class="split-layout">
-          <article class="app-card main-panel"><div class="card-head"><div><p class="kicker">Inventaire partagé</p><h2>Aliments disponibles</h2></div><button class="btn btn-primary" data-page-jump="scan">Scanner</button></div><div class="filter-row"><button class="chip active">Tous</button><button class="chip">Expire bientôt</button><button class="chip">Frigo</button><button class="chip">Garde-manger</button><button class="chip">Congélateur</button></div><div class="inventory-list" id="inventory-list"></div></article>
-          <aside class="app-card form-panel"><h3>Ajouter manuellement</h3><form id="food-form"><label>Nom<input name="name" required placeholder="Ex. lait" /></label><label>Quantité<input name="qty" required placeholder="Ex. 1 L" /></label><label>Zone<select name="zone"><option>Frigo</option><option>Garde-manger</option><option>Congélateur</option></select></label><label>Expiration<input type="date" name="expiry" required /></label><button class="btn btn-primary full" type="submit">Ajouter</button></form></aside>
-        </div>
-      </section>
-
-      <section class="app-page" id="scan-page">
-        <div class="split-layout scan-layout">
-          <article class="app-card scan-panel"><div class="card-head"><div><p class="kicker">Scan intelligent développé en MVP</p><h2>Photo + reconnaissance + validation</h2></div></div><div class="scan-stage"><img id="scan-image" src="assets/scan-milk.svg" alt="Produit à scanner"/><span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span></div><div class="inline-actions"><button class="btn btn-soft" id="switch-scan">Changer d’exemple</button><button class="btn btn-primary" id="analyze-scan">Analyser</button></div></article>
-          <aside class="app-card result-panel"><p class="kicker">Résultat</p><h2 id="detected-name">En attente d’analyse</h2><p id="detected-detail">La reconnaissance propose un aliment. L’utilisateur valide avant l’ajout à l’inventaire.</p><div class="tag-row" id="detected-tags"></div><button class="btn btn-primary full" id="add-detected" disabled>Ajouter à l’inventaire</button></aside>
-        </div>
-      </section>
-
-      <section class="app-page" id="recipes-page"><article class="app-card main-panel"><div class="card-head"><div><p class="kicker">Recettes anti-gaspillage</p><h2>Idées avec les aliments du foyer</h2></div><button class="btn btn-primary" id="shuffle-recipes">Actualiser</button></div><div class="recipe-grid" id="recipe-grid"></div></article></section>
-
-      <section class="app-page" id="shopping-page">
-        <div class="split-layout"><article class="app-card main-panel"><div class="card-head"><div><p class="kicker">Liste collaborative</p><h2>Articles à acheter</h2></div></div><div class="shopping-list" id="shopping-list"></div></article><aside class="app-card form-panel"><h3>Ajouter à la liste</h3><form id="shopping-form"><label>Article<input name="item" required placeholder="Ex. oignons" /></label><label>Membre<select name="member"><option>Hafedh</option><option>Jean Jacques</option><option>Kevin</option><option>Danensky</option></select></label><button class="btn btn-primary full" type="submit">Ajouter</button></form></aside></div>
-      </section>
-
-      <section class="app-page" id="group-page"><article class="app-card main-panel"><div class="card-head"><div><p class="kicker">Foyer collaboratif</p><h2>Membres et responsabilités</h2></div><button class="btn btn-primary">Inviter un membre</button></div><div class="member-grid" id="member-grid"></div></article></section>
-      <section class="app-page" id="alerts-page"><article class="app-card main-panel"><div class="card-head"><div><p class="kicker">Alertes anti-gaspillage</p><h2>Priorités de consommation</h2></div></div><div class="alert-list large" id="alerts-page-list"></div></article></section>
-    </main>
-  </div>
-
-  <nav class="bottom-nav"><button class="app-nav active" data-page="dashboard">🏠<span>Accueil</span></button><button class="app-nav" data-page="inventory">🥬<span>Inventaire</span></button><button class="app-nav" data-page="scan">📷<span>Scan</span></button><button class="app-nav" data-page="recipes">🍽️<span>Recettes</span></button><button class="app-nav" data-page="shopping">🛒<span>Liste</span></button></nav>
+    <section class="app-screen" id="recipes"><article class="panel"><div class="panel-head"><h2>Recettes avec vos aliments</h2><span class="pill">Anti-gaspillage</span></div><div class="recipe-cards large" id="recipeList"></div></article></section>
+    <section class="app-screen" id="list"><div class="app-grid inventory-layout"><article class="panel"><div class="panel-head"><h2>Liste collaborative</h2><span class="pill">Partagée</span></div><div id="shoppingList" class="shopping-feed"></div></article><article class="panel form-panel"><h3>Ajouter un article</h3><form id="shoppingForm"><label>Article<input name="item" required placeholder="Ex. citron" /></label><label>Membre<select name="member"><option>Hafedh</option><option>Jean Jacques</option><option>Kevin</option><option>Danensky</option></select></label><button class="btn btn-primary" type="submit">Ajouter</button></form></article></div></section>
+    <section class="app-screen" id="group"><article class="panel"><div class="panel-head"><h2>Foyer collaboratif</h2><button class="btn btn-primary">Inviter un membre</button></div><div class="member-grid" id="memberGrid"></div></article></section>
+  </main>
+  <nav class="bottom-nav"><button class="app-nav active" data-screen="dash">🏠<span>Accueil</span></button><button class="app-nav" data-screen="inventory">🥬<span>Inventaire</span></button><button class="app-nav" data-screen="scan">📷<span>Scan</span></button><button class="app-nav" data-screen="recipes">🍽️<span>Recettes</span></button><button class="app-nav" data-screen="list">🛒<span>Liste</span></button></nav>
   <script src="app.js"></script>
 </body>
 </html>
