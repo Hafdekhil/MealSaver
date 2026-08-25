@@ -1,31 +1,24 @@
-# MealSaver — site statique GitHub Pages
+# MealSaver — Site statique commercialisable
 
-Prototype statique commercialisable pour le projet MealSaver.
+Version premium du site statique MealSaver pour GitHub Pages.
 
-## Contenu
+## Pages
 
-- `index.html` : application statique complète
-- `styles.css` : design responsive Web + mobile
-- `app.js` : navigation, inventaire, scan démo, recettes, liste collaborative avec `localStorage`
-- `assets/` : logo, illustrations produits et recettes
-- `.nojekyll` : évite les problèmes de publication GitHub Pages
+- `index.html` : vitrine commerciale professionnelle
+- `app.html` : prototype applicatif interactif Web/mobile
+- `styles.css` : design system complet
+- `app.js` : navigation, démo, inventaire, scan, recettes, liste, alertes
+- `assets/` : logo et illustrations SVG
+- `.nojekyll` : publication GitHub Pages sans Jekyll
 
-## Déploiement rapide
+## Déploiement GitHub Pages
 
-1. Créer un dépôt GitHub, par exemple `MealSaver`.
-2. Copier tous les fichiers à la racine du dépôt.
-3. Pousser sur la branche `main`.
-4. Dans GitHub : Settings → Pages → Build and deployment → Deploy from a branch → `main` → `/root`.
-
-## Commandes Git
+Copier tous les fichiers à la racine du dépôt, puis :
 
 ```powershell
-git init
 git add .
-git commit -m "Ajout du site statique MealSaver"
-git branch -M main
-git remote add origin https://github.com/VOTRE_USER/MealSaver.git
-git push -u origin main
+git commit -m "Refonte premium du site MealSaver"
+git push
 ```
 
-Remplacer `VOTRE_USER` par le nom du compte GitHub.
+GitHub Pages publie depuis `main` et `/(root)`.

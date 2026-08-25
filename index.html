@@ -3,191 +3,167 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MealSaver — Réduire le gaspillage, une recette à la fois</title>
-  <meta name="description" content="Prototype statique MealSaver : inventaire collaboratif, scan intelligent, recettes anti-gaspillage et liste d'épicerie partagée." />
+  <title>MealSaver — Inventaire intelligent anti-gaspillage</title>
+  <meta name="description" content="MealSaver aide les familles à réduire le gaspillage alimentaire avec inventaire collaboratif, scan intelligent, recettes anti-gaspillage et liste d'épicerie partagée." />
   <link rel="icon" href="assets/logo-mealsaver.png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <div class="app-shell">
-    <aside class="sidebar" aria-label="Navigation principale">
-      <a class="brand" href="#dashboard" aria-label="MealSaver accueil">
-        <img src="assets/logo-mealsaver.png" alt="Logo MealSaver" />
-        <span><strong>Meal</strong><em>Saver</em></span>
-      </a>
-      <div class="house-card">
-        <div class="avatar-stack" aria-hidden="true">
-          <span>H</span><span>J</span><span>K</span><span>D</span>
-        </div>
-        <p>Foyer Durand</p>
-        <small>4 membres connectés</small>
-      </div>
-      <nav class="menu">
-        <button class="nav active" data-page="dashboard">🏠 Tableau de bord</button>
-        <button class="nav" data-page="inventory">🥬 Inventaire</button>
-        <button class="nav" data-page="scan">📷 Scan aliment</button>
-        <button class="nav" data-page="recipes">🍽️ Recettes</button>
-        <button class="nav" data-page="list">🛒 Liste partagée</button>
-        <button class="nav" data-page="group">👥 Groupe</button>
-        <button class="nav" data-page="alerts">🔔 Alertes</button>
-      </nav>
-      <div class="impact-mini">
-        <small>Objectif anti-gaspillage</small>
-        <strong>-28%</strong>
-        <span>ce mois-ci</span>
-      </div>
-    </aside>
+<body class="landing-page">
+  <header class="site-header">
+    <a class="site-brand" href="index.html" aria-label="MealSaver accueil">
+      <img src="assets/logo-mealsaver.png" alt="MealSaver" />
+      <span><strong>Meal</strong><em>Saver</em></span>
+    </a>
+    <nav class="site-nav" aria-label="Navigation commerciale">
+      <a href="#solution">Solution</a>
+      <a href="#produit">Produit</a>
+      <a href="#impact">Impact</a>
+      <a href="#prix">Offre</a>
+    </nav>
+    <div class="site-actions">
+      <a class="btn btn-soft" href="app.html">Voir la démo</a>
+      <a class="btn btn-primary" href="#contact">Demander l’accès</a>
+    </div>
+  </header>
 
-    <main class="content">
-      <header class="topbar">
-        <div>
-          <p class="eyebrow">MealSaver MVP — Web + mobile</p>
-          <h1 id="page-title">Bonjour la famille Durand 👋</h1>
+  <main>
+    <section class="hero-section">
+      <div class="hero-bg-orb orb-a"></div>
+      <div class="hero-bg-orb orb-b"></div>
+      <div class="hero-content">
+        <p class="kicker">MVP commercialisable • Web + mobile</p>
+        <h1>Réduire le gaspillage, une recette à la fois.</h1>
+        <p class="hero-lead">MealSaver transforme l’inventaire du foyer en décisions simples : aliments à consommer, recettes adaptées, liste d’épicerie partagée et alertes personnalisées.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary btn-xl" href="app.html">Explorer le prototype</a>
+          <a class="btn btn-glass btn-xl" href="#produit">Voir les écrans</a>
         </div>
-        <div class="top-actions">
-          <button class="ghost">Exporter</button>
-          <button class="primary" id="quick-add">+ Ajouter</button>
+        <div class="proof-row">
+          <span>🥬 Inventaire collaboratif</span>
+          <span>📷 Scan intelligent MVP</span>
+          <span>🍽️ Recettes anti-gaspillage</span>
         </div>
-      </header>
+      </div>
 
-      <section id="dashboard" class="page active-page">
-        <div class="hero-grid">
-          <article class="hero-card">
-            <div class="hero-copy">
-              <span class="pill">Réduire le gaspillage</span>
-              <h2>Transformez vos aliments disponibles en repas utiles.</h2>
-              <p>Inventaire collaboratif, scan intelligent, dates d’expiration, recettes avec les restes et liste d’épicerie synchronisée.</p>
-              <div class="hero-actions">
-                <button class="primary nav-shortcut" data-page="scan">Scanner un aliment</button>
-                <button class="secondary nav-shortcut" data-page="recipes">Voir les recettes</button>
+      <div class="hero-product-showcase" aria-label="Aperçu produit MealSaver">
+        <div class="app-window premium-window">
+          <div class="window-dots"><span></span><span></span><span></span></div>
+          <div class="window-grid">
+            <aside class="mini-sidebar">
+              <img src="assets/logo-mealsaver.png" alt="" />
+              <b>MealSaver</b>
+              <nav><span class="active">Dashboard</span><span>Inventaire</span><span>Scan</span><span>Recettes</span><span>Liste</span></nav>
+            </aside>
+            <section class="mini-dashboard">
+              <div class="mini-topline"><b>Bonjour famille Durand 👋</b><span>25 août 2026</span></div>
+              <div class="mini-stats"><article><b>7</b><span>à consommer</span></article><article><b>48$</b><span>économisés</span></article><article><b>12.4kg</b><span>CO₂ évité</span></article></div>
+              <div class="mini-main-grid">
+                <div class="mini-card food-card"><img src="assets/food-pasta.svg" alt="Pâtes aux légumes"/><b>Pâtes aux légumes</b><small>avec vos restes • 20 min</small></div>
+                <div class="mini-card scan-preview"><img src="assets/scan-milk.svg" alt="Scan du lait"/><b>Lait demi-écrémé</b><small>Expire dans 2 jours</small></div>
               </div>
-            </div>
-            <img src="assets/hero-basket.svg" alt="Panier d'aliments et repas anti-gaspillage" />
-          </article>
-          <aside class="mission-panel">
-            <img src="assets/logo-mealsaver.png" alt="MealSaver" />
-            <h3>Réduire le gaspillage, une recette à la fois.</h3>
-            <ul>
-              <li><span>✓</span> Économiser en utilisant ce qui existe déjà</li>
-              <li><span>✓</span> Prioriser les aliments qui expirent bientôt</li>
-              <li><span>✓</span> Collaborer avec tout le foyer</li>
-            </ul>
-          </aside>
-        </div>
-
-        <div class="stats-grid" id="stats-grid"></div>
-
-        <div class="section-grid two-columns">
-          <article class="card wide-card">
-            <div class="card-head">
-              <div><p class="eyebrow">Suggestions pour vous</p><h3>Recettes avec vos ingrédients</h3></div>
-              <button class="text-button nav-shortcut" data-page="recipes">Voir plus →</button>
-            </div>
-            <div class="recipe-row" id="dashboard-recipes"></div>
-          </article>
-          <article class="card">
-            <div class="card-head"><div><p class="eyebrow">Alertes importantes</p><h3>À consommer bientôt</h3></div></div>
-            <div id="dashboard-alerts" class="alert-list"></div>
-          </article>
-        </div>
-      </section>
-
-      <section id="inventory" class="page">
-        <div class="page-layout">
-          <article class="card main-card">
-            <div class="card-head">
-              <div><p class="eyebrow">Inventaire partagé</p><h2>Aliments disponibles</h2></div>
-              <button class="primary" id="open-add-form">+ Ajouter un aliment</button>
-            </div>
-            <div class="filters"><button class="chip active">Tous</button><button class="chip">À consommer</button><button class="chip">Frais</button><button class="chip">Garde-manger</button><button class="chip">Congelé</button></div>
-            <div class="inventory-list" id="inventory-list"></div>
-          </article>
-          <aside class="card form-card">
-            <h3>Ajouter rapidement</h3>
-            <form id="food-form">
-              <label>Nom de l’aliment<input name="name" placeholder="Ex. lait demi-écrémé" required /></label>
-              <label>Quantité<input name="qty" placeholder="Ex. 1 L" required /></label>
-              <label>Zone<select name="zone"><option>Frigo</option><option>Garde-manger</option><option>Congélateur</option></select></label>
-              <label>Expiration<input name="expiry" type="date" required /></label>
-              <button class="primary" type="submit">Ajouter à l’inventaire</button>
-            </form>
-          </aside>
-        </div>
-      </section>
-
-      <section id="scan" class="page">
-        <div class="page-layout scan-layout">
-          <article class="card scan-card">
-            <div class="card-head"><div><p class="eyebrow">Scan intelligent développé en MVP</p><h2>Image + validation utilisateur</h2></div></div>
-            <div class="scan-stage">
-              <img id="scan-image" src="assets/product-milk.svg" alt="Produit scanné" />
-              <div class="scan-frame" aria-hidden="true"></div>
-            </div>
-            <div class="scan-actions">
-              <button class="secondary" id="switch-scan">Changer d’image</button>
-              <button class="primary" id="analyze-scan">Analyser l’image</button>
-            </div>
-          </article>
-          <article class="card result-card">
-            <p class="eyebrow">Résultat détecté</p>
-            <h2 id="detected-name">En attente d’analyse</h2>
-            <p id="detected-detail">Téléversement ou photo de l’aliment, reconnaissance, validation, puis ajout à l’inventaire.</p>
-            <div id="detected-tags" class="tag-row"></div>
-            <button class="primary full" id="add-detected" disabled>Ajouter à l’inventaire</button>
-          </article>
-        </div>
-      </section>
-
-      <section id="recipes" class="page">
-        <article class="card main-card">
-          <div class="card-head">
-            <div><p class="eyebrow">Recettes anti-gaspillage</p><h2>Idées avec les aliments du foyer</h2></div>
-            <button class="primary" id="generate-recipes">Générer des suggestions</button>
+            </section>
           </div>
-          <div class="recipe-grid" id="recipe-grid"></div>
-        </article>
-      </section>
-
-      <section id="list" class="page">
-        <div class="page-layout">
-          <article class="card main-card">
-            <div class="card-head"><div><p class="eyebrow">Liste d’épicerie collaborative</p><h2>À acheter pour compléter les recettes</h2></div></div>
-            <div id="shopping-list" class="shopping-list"></div>
-          </article>
-          <aside class="card form-card">
-            <h3>Ajouter un article</h3>
-            <form id="shopping-form">
-              <label>Article<input name="item" placeholder="Ex. oignons" required /></label>
-              <label>Assigné à<select name="member"><option>Hafedh</option><option>Jean Jacques</option><option>Kevin</option><option>Danensky</option></select></label>
-              <button class="primary" type="submit">Ajouter à la liste</button>
-            </form>
-          </aside>
         </div>
-      </section>
+        <div class="phone-mock hero-phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="mobile-head"><span>MealSaver</span><b>7</b></div>
+            <img src="assets/hero-produce.svg" alt="Panier MealSaver" />
+            <h3>À consommer bientôt</h3>
+            <div class="mobile-alert"><span>🍅</span><div><b>Tomates</b><small>Expire demain</small></div></div>
+            <div class="mobile-alert"><span>🥛</span><div><b>Lait</b><small>Expire dans 2 jours</small></div></div>
+            <button>Scanner un aliment</button>
+          </div>
+        </div>
+      </div>
+    </section>
 
-      <section id="group" class="page">
-        <article class="card main-card">
-          <div class="card-head"><div><p class="eyebrow">Foyer collaboratif</p><h2>Membres et responsabilités</h2></div><button class="primary">Inviter un membre</button></div>
-          <div class="member-grid" id="member-grid"></div>
-        </article>
-      </section>
+    <section class="logo-strip" aria-label="Bénéfices">
+      <div><b>Moins de pertes</b><span>priorités de consommation</span></div>
+      <div><b>Plus d’économies</b><span>liste d’épicerie intelligente</span></div>
+      <div><b>Foyer synchronisé</b><span>membres et responsabilités</span></div>
+      <div><b>Expérience moderne</b><span>web, mobile et hors ligne</span></div>
+    </section>
 
-      <section id="alerts" class="page">
-        <article class="card main-card">
-          <div class="card-head"><div><p class="eyebrow">Alertes anti-gaspillage</p><h2>Priorités de consommation</h2></div></div>
-          <div id="alerts-page-list" class="alert-list large"></div>
-        </article>
-      </section>
-    </main>
-  </div>
+    <section id="solution" class="section solution-section">
+      <div class="section-heading">
+        <p class="kicker">Problème → solution</p>
+        <h2>Une plateforme claire pour gérer les aliments avant qu’ils deviennent des déchets.</h2>
+        <p>MealSaver remplace les listes dispersées, les oublis dans le frigo et les achats doublés par un espace collaboratif unique.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card elevated"><span class="feature-icon">📷</span><h3>Scan intelligent développé</h3><p>Photo ou téléversement, reconnaissance assistée, validation manuelle, ajout rapide à l’inventaire.</p></article>
+        <article class="feature-card elevated"><span class="feature-icon">🥬</span><h3>Inventaire priorisé</h3><p>Frigo, congélateur et garde-manger avec dates d’expiration, propriétaires et statuts de consommation.</p></article>
+        <article class="feature-card elevated"><span class="feature-icon">🍽️</span><h3>Recettes anti-gaspi</h3><p>Suggestions basées sur les ingrédients disponibles et ajout automatique des ingrédients manquants à la liste.</p></article>
+        <article class="feature-card elevated"><span class="feature-icon">👥</span><h3>Collaboration foyer</h3><p>Chaque membre peut ajouter, valider, acheter ou consommer les aliments en temps réel.</p></article>
+      </div>
+    </section>
 
-  <nav class="mobile-nav" aria-label="Navigation mobile">
-    <button class="nav active" data-page="dashboard">🏠<span>Accueil</span></button>
-    <button class="nav" data-page="inventory">🥬<span>Inventaire</span></button>
-    <button class="nav" data-page="scan">📷<span>Scan</span></button>
-    <button class="nav" data-page="recipes">🍽️<span>Recettes</span></button>
-    <button class="nav" data-page="list">🛒<span>Liste</span></button>
-  </nav>
+    <section id="produit" class="section product-section">
+      <div class="section-heading compact">
+        <p class="kicker">Écrans produit</p>
+        <h2>Une interface conçue pour être codée, pas seulement dessinée.</h2>
+        <p>Les composants sont réutilisables : cartes, sidebar, alertes, formulaires, recettes, liste et tableau de bord.</p>
+      </div>
+      <div class="product-tabs" role="tablist" aria-label="Écrans MealSaver">
+        <button class="tab active" data-shot="dashboard">Dashboard</button>
+        <button class="tab" data-shot="inventory">Inventaire</button>
+        <button class="tab" data-shot="scan">Scan</button>
+        <button class="tab" data-shot="recipes">Recettes</button>
+      </div>
+      <div class="screen-showcase">
+        <aside class="screen-copy">
+          <h3 id="shot-title">Dashboard commercial</h3>
+          <p id="shot-text">Vue d’ensemble du foyer : priorités, économies, impact environnemental et suggestions immédiates.</p>
+          <ul id="shot-list"><li>Indicateurs clairs</li><li>Alertes visibles</li><li>CTA vers scan et recettes</li></ul>
+          <a class="btn btn-primary" href="app.html">Ouvrir la démo interactive</a>
+        </aside>
+        <div class="shot-frame" id="shot-frame">
+          <div class="coded-screen coded-dashboard"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="impact" class="section impact-section">
+      <div class="impact-panel">
+        <div>
+          <p class="kicker">Valeur commerciale</p>
+          <h2>Un produit utile pour les familles, les colocations et les foyers connectés.</h2>
+          <p>Le discours commercial est simple : économiser, manger mieux, collaborer et réduire le gaspillage alimentaire sans complexifier le quotidien.</p>
+        </div>
+        <div class="impact-metrics">
+          <article><b>-28%</b><span>objectif de gaspillage mensuel</span></article>
+          <article><b>48$</b><span>économies estimées par mois</span></article>
+          <article><b>12.4kg</b><span>déchets évités</span></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="prix" class="section pricing-section">
+      <div class="section-heading compact">
+        <p class="kicker">Offre de lancement</p>
+        <h2>Un modèle simple pour présenter le potentiel commercial.</h2>
+      </div>
+      <div class="pricing-grid">
+        <article class="price-card"><span>Découverte</span><h3>0$</h3><p>Pour tester le concept.</p><ul><li>Inventaire limité</li><li>Liste collaborative</li><li>Recettes de base</li></ul></article>
+        <article class="price-card highlighted"><span>Famille</span><h3>6.99$<small>/mois</small></h3><p>Pour un foyer complet.</p><ul><li>Inventaire illimité</li><li>Scan intelligent</li><li>Alertes avancées</li><li>4 à 6 membres</li></ul></article>
+        <article class="price-card"><span>Premium</span><h3>9.99$<small>/mois</small></h3><p>Pour plus d’automatisation.</p><ul><li>Statistiques d’impact</li><li>Suggestions personnalisées</li><li>Export des données</li></ul></article>
+      </div>
+    </section>
+
+    <section id="contact" class="final-cta">
+      <div>
+        <p class="kicker">Prototype prêt pour GitHub Pages</p>
+        <h2>MealSaver peut maintenant être présenté comme un produit, pas seulement comme un devoir.</h2>
+      </div>
+      <a class="btn btn-light btn-xl" href="app.html">Lancer la démonstration</a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-brand footer-brand"><img src="assets/logo-mealsaver.png" alt="MealSaver" /><span><strong>Meal</strong><em>Saver</em></span></div>
+    <p>Inventaire collaboratif, recettes intelligentes et alertes anti-gaspillage.</p>
+  </footer>
   <script src="app.js"></script>
 </body>
 </html>
