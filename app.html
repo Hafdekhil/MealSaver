@@ -4,14 +4,925 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Démo MealSaver — Prototype applicatif</title>
-  <meta name="description" content="Démo interactive MealSaver : dashboard, inventaire, scan MVP, recettes et liste collaborative." />
+  <meta
+    name="description"
+    content="Démo interactive MealSaver : tableau de bord, inventaire, scan MVP, recettes et liste collaborative."
+  />
   <link rel="icon" href="assets/logo-icon.png" />
   <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    /* =========================================================
+       Démo MealSaver — améliorations du prototype
+       ========================================================= */
+
+    .app-body {
+      grid-template-columns: 265px minmax(0, 1fr);
+    }
+
+    .app-sidebar {
+      padding: 24px 18px;
+      gap: 18px;
+      overflow-y: auto;
+    }
+
+    .app-logo img {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+    }
+
+    .app-logo span {
+      font-size: 23px;
+    }
+
+    .family-card {
+      padding: 16px;
+      border-radius: 18px;
+    }
+
+    .app-menu {
+      gap: 6px;
+    }
+
+    .app-nav {
+      padding: 12px 13px;
+      border-radius: 12px;
+      font-size: 15px;
+    }
+
+    .impact-widget {
+      margin-top: 12px;
+      padding: 15px 16px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 16px;
+      background: #0b3f30;
+      color: #ffffff;
+      box-shadow: none;
+    }
+
+    .impact-widget small {
+      display: block;
+      margin-bottom: 6px;
+      color: #bfe7d6;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .impact-widget strong {
+      display: block;
+      margin: 0 0 7px;
+      color: #ffffff;
+      font-size: 15px;
+      line-height: 1.3;
+    }
+
+    .impact-widget span {
+      display: block;
+      color: #cfeee0;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .app-main {
+      padding: 22px 24px 54px;
+    }
+
+    .app-topbar {
+      margin-bottom: 20px;
+      padding: 16px 20px;
+      border-radius: 22px;
+    }
+
+    .app-topbar h1 {
+      font-size: 28px;
+    }
+
+    .demo-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 8px;
+      padding: 7px 10px;
+      border-radius: 9px;
+      background: #eef7f2;
+      color: #45675a;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    /* ---------- Tableau de bord ---------- */
+
+    #dash .app-hero-card {
+      min-height: 300px;
+      grid-template-columns: minmax(0, .95fr) minmax(360px, .8fr);
+      gap: 30px;
+      padding: 30px;
+      border-radius: 24px;
+      align-items: center;
+    }
+
+    #dash .app-hero-card h2 {
+      max-width: 560px;
+      margin-bottom: 14px;
+      font-size: clamp(38px, 4vw, 54px);
+      line-height: 1.02;
+      letter-spacing: -1.8px;
+    }
+
+    #dash .app-hero-card p:not(.kicker) {
+      max-width: 620px;
+      margin-bottom: 22px;
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    #dash .app-hero-card img {
+      height: 250px;
+      border-radius: 20px;
+      object-fit: cover;
+    }
+
+    #dash .app-stats {
+      gap: 14px;
+      margin: 18px 0;
+    }
+
+    #dash .app-stats article {
+      min-height: 118px;
+      padding: 20px;
+      border-radius: 18px;
+      box-shadow: 0 7px 22px rgba(3,39,28,.06);
+    }
+
+    #dash .app-stats strong {
+      font-size: 36px;
+      line-height: 1;
+    }
+
+    #dash .app-stats span {
+      display: block;
+      margin-top: 8px;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    #dash .app-grid.two {
+      grid-template-columns: minmax(0, 1.45fr) minmax(300px, .75fr);
+      gap: 18px;
+    }
+
+    #dash .panel {
+      padding: 22px;
+      border-radius: 22px;
+    }
+
+    #dash .recipe-cards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    #dash .recipe-item {
+      min-width: 0;
+      border-radius: 16px;
+    }
+
+    #dash .recipe-item img {
+      height: 155px;
+    }
+
+    #dash .recipe-item div {
+      padding: 14px;
+      overflow: hidden;
+    }
+
+    #dash .recipe-item h4 {
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    #dash .recipe-item p,
+    #dash .recipe-item small {
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    #dash .recipe-item .btn,
+    #dash .recipe-item button {
+      width: 100%;
+      max-width: 100%;
+      padding: 11px 12px;
+      border-radius: 10px;
+      white-space: normal;
+      text-align: center;
+      line-height: 1.25;
+      font-size: 13px;
+    }
+
+    #dash .alert-row {
+      padding: 13px;
+      border-radius: 16px;
+    }
+
+    #dash .food-left img {
+      width: 58px;
+      height: 54px;
+      border-radius: 12px;
+    }
+
+    /* ---------- Inventaire ---------- */
+
+    #inventory .inventory-layout {
+      grid-template-columns: minmax(0, 1fr) 385px;
+      align-items: start;
+      gap: 18px;
+    }
+
+    #inventory .panel {
+      border-radius: 22px;
+    }
+
+    #inventory .form-panel {
+      align-self: start;
+      position: sticky;
+      top: 22px;
+      min-height: 0;
+      height: auto;
+    }
+
+    #inventory .filters {
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    #inventory .filters button {
+      padding: 9px 14px;
+      border-radius: 10px;
+      background: #f3f8f5;
+      border: 1px solid #dce8e1;
+      color: #315a4b;
+      box-shadow: none;
+    }
+
+    #inventory .filters button.active,
+    #inventory .filters button[aria-pressed="true"] {
+      background: #08794e;
+      border-color: #08794e;
+      color: #fff;
+    }
+
+    #inventory .food-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 18px;
+      padding: 14px 16px;
+      border-radius: 16px;
+    }
+
+    #inventory .food-left {
+      min-width: 0;
+    }
+
+    #inventory .food-left img {
+      width: 70px;
+      height: 62px;
+      flex: 0 0 auto;
+      object-fit: cover;
+      border-radius: 14px;
+    }
+
+    #inventory .food-left > div {
+      min-width: 0;
+    }
+
+    #inventory .food-left strong {
+      font-size: 16px;
+      line-height: 1.3;
+    }
+
+    #inventory .food-left small {
+      margin-top: 4px;
+      line-height: 1.45;
+    }
+
+    #inventory .inventory-actions {
+      min-width: 145px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    #inventory .inventory-actions .status {
+      white-space: nowrap;
+    }
+
+    #inventory .remove-food {
+      border: 1px solid #d8e6df;
+      border-radius: 9px;
+      padding: 7px 11px;
+      background: #fff;
+      color: #315a4b;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    #inventory .remove-food:hover {
+      background: #f4f8f6;
+      border-color: #bfd5ca;
+    }
+
+    #inventory .inventory-empty {
+      padding: 28px;
+      border: 1px dashed #cbded5;
+      border-radius: 14px;
+      background: #f8fbf9;
+      color: #5b746a;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    #inventory .form-panel form {
+      margin-top: 14px;
+    }
+
+    #inventory .form-panel input,
+    #inventory .form-panel select {
+      border-radius: 11px;
+    }
+
+
+    /* ---------- Scan ---------- */
+
+    #scan .scan-layout {
+      grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    #scan .panel {
+      border-radius: 22px;
+    }
+
+    #scan .scan-panel,
+    #scan .result-panel {
+      min-height: 0;
+      height: auto;
+    }
+
+    #scan .scan-photo {
+      height: 360px;
+      margin-top: 18px;
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    #scan .scan-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    #scan .scan-photo span {
+      inset: 14%;
+      border-width: 3px;
+      border-radius: 24px;
+    }
+
+    #scan .scan-buttons {
+      margin-top: 14px;
+      gap: 10px;
+    }
+
+    #scan .result-panel {
+      position: sticky;
+      top: 22px;
+      padding: 28px;
+    }
+
+    #scan .result-panel h2 {
+      margin: 8px 0 12px;
+      font-size: 30px;
+      line-height: 1.15;
+    }
+
+    #scan .result-panel > p:not(.kicker) {
+      margin-bottom: 18px;
+      line-height: 1.65;
+    }
+
+    #scan #detectedTags {
+      margin-bottom: 18px;
+    }
+
+    #scan #addDetected:disabled {
+      background: #e5ece8;
+      color: #81968d;
+      border: 1px solid #d7e2dc;
+      box-shadow: none;
+      cursor: not-allowed;
+      opacity: 1;
+    }
+
+    #scan #addDetected:not(:disabled) {
+      background: #08794e;
+      color: #fff;
+    }
+
+    @media (max-width: 1180px) {
+      #scan .scan-layout {
+        grid-template-columns: 1fr;
+      }
+
+      #scan .result-panel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      #scan .scan-photo {
+        height: 300px;
+      }
+    }
+
+
+    /* ---------- Recettes ---------- */
+
+    #recipes .panel {
+      padding: 26px;
+      border-radius: 22px;
+    }
+
+    #recipes .panel-head {
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    #recipes .recipe-intro {
+      max-width: 760px;
+    }
+
+    #recipes .recipe-intro h2 {
+      margin-bottom: 8px;
+      font-size: 30px;
+      line-height: 1.15;
+    }
+
+    #recipes .recipe-intro p {
+      margin: 0;
+      color: #5b746a;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    #recipes .recipe-cards.large {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    #recipes .recipe-item {
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid #dfe9e4;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 7px 22px rgba(3,39,28,.05);
+    }
+
+    #recipes .recipe-item img {
+      width: 100%;
+      height: 205px;
+      object-fit: cover;
+      border-radius: 0;
+    }
+
+    #recipes .recipe-item > div {
+      display: flex;
+      flex-direction: column;
+      min-height: 305px;
+      padding: 18px;
+    }
+
+    #recipes .recipe-item h4 {
+      margin-bottom: 7px;
+      font-size: 20px;
+      line-height: 1.25;
+    }
+
+    #recipes .recipe-item small {
+      display: block;
+      margin-bottom: 14px;
+      color: #577168;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    #recipes .recipe-item p {
+      margin: 0 0 8px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    #recipes .recipe-availability {
+      display: grid;
+      gap: 8px;
+      margin: 10px 0 18px;
+    }
+
+    #recipes .recipe-availability span {
+      display: block;
+      padding: 9px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    #recipes .recipe-availability .available {
+      background: #edf8f2;
+      color: #1d6548;
+      border: 1px solid #d5ebdf;
+    }
+
+    #recipes .recipe-availability .missing {
+      background: #fff7e9;
+      color: #875514;
+      border: 1px solid #f0dfbd;
+    }
+
+    #recipes .recipe-item .add-needs {
+      width: 100%;
+      margin-top: auto;
+      white-space: normal;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    @media (max-width: 1180px) {
+      #recipes .recipe-cards.large {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      #recipes .recipe-cards.large {
+        grid-template-columns: 1fr;
+      }
+
+      #recipes .recipe-item img {
+        height: 220px;
+      }
+    }
+
+
+    /* ---------- Liste partagée ---------- */
+
+    #list .inventory-layout {
+      grid-template-columns: minmax(0, 1fr) 385px;
+      align-items: start;
+      gap: 18px;
+    }
+
+    #list .panel {
+      border-radius: 22px;
+    }
+
+    #list .form-panel {
+      align-self: start;
+      position: sticky;
+      top: 22px;
+      min-height: 0;
+      height: auto;
+    }
+
+    #list .list-helper {
+      margin: -2px 0 18px;
+      color: #5b746a;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    #list .shopping-feed {
+      display: grid;
+      gap: 12px;
+    }
+
+    #list .shop-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      border: 1px solid #dfe9e4;
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    #list .shop-row.done {
+      background: #f7faf8;
+      opacity: .72;
+    }
+
+    #list .shop-row.done strong,
+    #list .shop-row.done small {
+      text-decoration-thickness: 1.5px;
+    }
+
+    #list .shop-row .food-left {
+      min-width: 0;
+      gap: 12px;
+    }
+
+    #list .shop-row .check {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      display: grid;
+      place-items: center;
+      border: 2px solid #b9d4c7;
+      border-radius: 50%;
+      background: #fff;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    #list .shop-row.done .check {
+      background: #67c69a;
+      border-color: #67c69a;
+    }
+
+    #list .shop-row strong {
+      font-size: 16px;
+      line-height: 1.3;
+    }
+
+    #list .shop-row small {
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    #list .remove-shop {
+      border: 1px solid #d8e6df;
+      border-radius: 9px;
+      padding: 7px 11px;
+      background: #fff;
+      color: #315a4b;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    #list .remove-shop:hover {
+      background: #f4f8f6;
+      border-color: #bfd5ca;
+    }
+
+    #list .form-panel form {
+      margin-top: 14px;
+    }
+
+    #list .form-panel input,
+    #list .form-panel select {
+      border-radius: 11px;
+    }
+
+    #list .list-count {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 8px 11px;
+      border-radius: 9px;
+      background: #eef7f2;
+      color: #2d674e;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 1180px) {
+      #list .inventory-layout {
+        grid-template-columns: 1fr;
+      }
+
+      #list .form-panel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      #list .shop-row {
+        grid-template-columns: 1fr;
+      }
+
+      #list .remove-shop {
+        justify-self: start;
+      }
+    }
+
+
+    /* ---------- Groupe / Foyer ---------- */
+
+    #group .panel {
+      padding: 26px;
+      border-radius: 22px;
+    }
+
+    #group .group-heading {
+      max-width: 760px;
+    }
+
+    #group .group-heading h2 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      line-height: 1.15;
+    }
+
+    #group .group-heading p {
+      margin: 0;
+      color: #5b746a;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    #group .member-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    #group .member {
+      min-height: 230px;
+      padding: 22px;
+      border: 1px solid #dfe9e4;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 7px 22px rgba(3,39,28,.05);
+    }
+
+    #group .member b {
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 18px;
+      border-radius: 15px;
+      background: #eaf6ef;
+      color: #08794e;
+      font-size: 22px;
+    }
+
+    #group .member h3 {
+      margin: 0 0 7px;
+      font-size: 20px;
+      line-height: 1.25;
+    }
+
+    #group .member-role {
+      display: inline-flex;
+      margin-bottom: 12px;
+      padding: 6px 9px;
+      border-radius: 8px;
+      background: #f2f7f4;
+      color: #315a4b;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    #group .member p {
+      margin: 0;
+      color: #5a7168;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    #group .group-feedback {
+      display: none;
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #eef7f2;
+      color: #315f4d;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    #group .group-feedback.visible {
+      display: block;
+    }
+
+    @media (max-width: 1180px) {
+      #group .member-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      #group .member-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ---------- Groupe ---------- */
+
+    #group .panel {
+      padding: 26px;
+      border-radius: 22px;
+    }
+
+    #group .member-grid {
+      gap: 16px;
+    }
+
+    #group .member {
+      min-height: 210px;
+      padding: 22px;
+      border-radius: 18px;
+    }
+
+    #group .member b {
+      width: 54px;
+      height: 54px;
+      border-radius: 15px;
+    }
+
+    #group .member h3 {
+      font-size: 20px;
+      line-height: 1.25;
+    }
+
+    #group .member p {
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 1180px) {
+      .app-body {
+        grid-template-columns: 1fr;
+      }
+
+      #dash .app-hero-card,
+      #dash .app-grid.two,
+      #inventory .inventory-layout {
+        grid-template-columns: 1fr;
+      }
+
+      #inventory .form-panel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app-main {
+        padding: 12px 12px 92px;
+      }
+
+      #dash .app-stats,
+      #dash .recipe-cards {
+        grid-template-columns: 1fr;
+      }
+
+      #dash .app-hero-card {
+        padding: 22px;
+      }
+
+      #dash .app-hero-card img {
+        height: 220px;
+      }
+
+      #inventory .food-row {
+        grid-template-columns: 1fr;
+      }
+
+      #inventory .inventory-actions {
+        min-width: 0;
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+  </style>
 </head>
+
 <body class="app-body">
   <aside class="app-sidebar">
-    <a class="app-logo" href="index.html"><img src="assets/logo-icon.png" alt="MealSaver" /><span>Meal<em>Saver</em></span></a>
-    <div class="family-card"><div class="avatars"><b>H</b><b>J</b><b>K</b><b>D</b></div><strong>Foyer Durand</strong><small>4 membres connectés</small></div>
+    <a class="app-logo" href="index.html">
+      <img src="assets/logo-icon.png" alt="MealSaver" />
+      <span>Meal<em>Saver</em></span>
+    </a>
+
+    <div class="family-card">
+      <div class="avatars"><b>H</b><b>J</b><b>K</b><b>D</b></div>
+      <strong>Foyer Durand</strong>
+      <small>4 membres dans la démo</small>
+    </div>
+
     <nav class="app-menu">
       <button class="app-nav active" data-screen="dash">🏠 Tableau de bord</button>
       <button class="app-nav" data-screen="inventory">🥬 Inventaire</button>
@@ -20,39 +931,401 @@
       <button class="app-nav" data-screen="list">🛒 Liste partagée</button>
       <button class="app-nav" data-screen="group">👥 Groupe</button>
     </nav>
-    <div class="impact-widget"><small>Objectif anti-gaspillage</small><strong>-28%</strong><span>ce mois-ci</span></div>
+
+    <div class="impact-widget">
+      <small>Mode prototype</small>
+      <strong>Parcours anti-gaspillage</strong>
+      <span>Inventaire → alerte → recette → liste</span>
+    </div>
   </aside>
+
   <main class="app-main">
     <header class="app-topbar">
-      <div><p class="kicker">Démo interactive</p><h1 id="app-title">Bonjour famille Durand 👋</h1></div>
-      <div class="app-actions"><a class="btn btn-soft" href="index.html">Retour accueil</a><a class="btn btn-soft" href="produit.html">Pages produit</a><button class="btn btn-primary" id="quickAdd">+ Ajouter</button></div>
+      <div>
+        <p class="kicker">Démo interactive</p>
+        <h1 id="app-title">Bonjour famille Durand 👋</h1>
+        <span class="demo-note">Données fictives utilisées uniquement pour la démonstration</span>
+      </div>
+
+      <div class="app-actions">
+        <a class="btn btn-soft" href="index.html">Retour accueil</a>
+        <a class="btn btn-soft" href="produit.html">Pages produit</a>
+        <button class="btn btn-primary" id="quickAdd">+ Ajouter</button>
+      </div>
     </header>
 
     <section class="app-screen active-screen" id="dash">
       <div class="app-hero-card">
-        <div><p class="kicker">Aujourd’hui</p><h2>7 aliments à consommer bientôt.</h2><p>MealSaver priorise automatiquement les produits proches de l’expiration et propose des recettes utiles.</p><button class="btn btn-primary app-switch" data-screen="scan">Scanner un aliment</button></div>
-        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80" alt="Aliments frais" />
+        <div>
+          <p class="kicker">Aujourd’hui</p>
+          <h2>7 aliments à consommer bientôt.</h2>
+          <p>
+            MealSaver met en évidence les aliments proches de leur date
+            d’expiration et aide le foyer à trouver des recettes pour les utiliser.
+          </p>
+          <button class="btn btn-primary app-switch" data-screen="scan">Scanner un aliment</button>
+        </div>
+
+        <img
+          src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80"
+          alt="Fruits et légumes frais"
+        />
       </div>
-      <div class="app-stats"><article><strong>38</strong><span>aliments</span></article><article><strong>48$</strong><span>économisés</span></article><article><strong>12,4 kg</strong><span>CO₂ évité</span></article><article><strong>4</strong><span>membres</span></article></div>
+
+      <div class="app-stats">
+        <article><strong>38</strong><span>aliments dans l’inventaire</span></article>
+        <article><strong>7</strong><span>à consommer bientôt</span></article>
+        <article><strong>2</strong><span>alertes prioritaires</span></article>
+        <article><strong>4</strong><span>membres du foyer</span></article>
+      </div>
+
       <div class="app-grid two">
-        <article class="panel"><div class="panel-head"><h3>Recettes suggérées</h3><button class="text-link app-switch" data-screen="recipes">Voir tout</button></div><div class="recipe-cards" id="dashRecipes"></div></article>
-        <article class="panel"><div class="panel-head"><h3>Alertes importantes</h3></div><div class="alert-feed" id="dashAlerts"></div></article>
+        <article class="panel">
+          <div class="panel-head">
+            <h3>Recettes suggérées</h3>
+            <button class="text-link app-switch" data-screen="recipes">Voir tout</button>
+          </div>
+          <div class="recipe-cards" id="dashRecipes"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head"><h3>Alertes importantes</h3></div>
+          <div class="alert-feed" id="dashAlerts"></div>
+        </article>
       </div>
     </section>
 
     <section class="app-screen" id="inventory">
-      <div class="app-grid inventory-layout"><article class="panel"><div class="panel-head"><h2>Inventaire du foyer</h2><span class="pill">Synchronisé</span></div><div class="filters"><button>Tous</button><button>Frigo</button><button>Garde-manger</button><button>Urgent</button></div><div id="inventoryList" class="inventory-feed"></div></article><article class="panel form-panel"><h3>Ajouter un aliment</h3><form id="foodForm"><label>Nom<input name="name" required placeholder="Ex. pommes" /></label><label>Quantité<input name="qty" required placeholder="Ex. 6 unités" /></label><label>Zone<select name="zone"><option>Frigo</option><option>Garde-manger</option><option>Congélateur</option></select></label><label>Expiration<input type="date" name="expiry" required /></label><button class="btn btn-primary" type="submit">Ajouter</button></form></article></div>
+      <div class="app-grid inventory-layout">
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Inventaire du foyer</h2>
+            <span class="pill">Partagé</span>
+          </div>
+
+          <div class="filters" aria-label="Filtrer l’inventaire">
+            <button type="button" class="active" data-filter="all" aria-pressed="true">Tous</button>
+            <button type="button" data-filter="fridge" aria-pressed="false">Frigo</button>
+            <button type="button" data-filter="pantry" aria-pressed="false">Garde-manger</button>
+            <button type="button" data-filter="urgent" aria-pressed="false">À consommer bientôt</button>
+          </div>
+
+          <div id="inventoryList" class="inventory-feed"></div>
+        </article>
+
+        <article class="panel form-panel">
+          <h3>Ajouter un aliment</h3>
+
+          <form id="foodForm">
+            <label>
+              Nom
+              <input name="name" required placeholder="Ex. pommes" />
+            </label>
+
+            <label>
+              Quantité
+              <input name="qty" required placeholder="Ex. 6 unités" />
+            </label>
+
+            <label>
+              Zone
+              <select name="zone">
+                <option>Frigo</option>
+                <option>Garde-manger</option>
+                <option>Congélateur</option>
+              </select>
+            </label>
+
+            <label>
+              Date d’expiration
+              <input type="date" name="expiry" required />
+            </label>
+
+            <button class="btn btn-primary" type="submit">Ajouter à l’inventaire</button>
+          </form>
+        </article>
+      </div>
     </section>
 
     <section class="app-screen" id="scan">
-      <div class="app-grid scan-layout"><article class="panel scan-panel"><h2>Scan intelligent MVP</h2><p>Le MVP propose une reconnaissance assistée. L’utilisateur valide toujours avant l’ajout.</p><div class="scan-photo"><img id="scanImg" src="https://images.unsplash.com/photo-1528750997573-59b89d56f4f7?auto=format&fit=crop&w=900&q=80" alt="Produit laitier scanné" /><span></span></div><div class="scan-buttons"><button class="btn btn-soft" id="changeScan">Changer d’image</button><button class="btn btn-primary" id="analyzeScan">Analyser</button></div></article><article class="panel result-panel"><p class="kicker">Résultat</p><h2 id="detectedTitle">En attente d’analyse</h2><p id="detectedMeta">Photo ou téléversement → détection → validation utilisateur → inventaire.</p><div id="detectedTags" class="tag-list"></div><button class="btn btn-primary full" id="addDetected" disabled>Ajouter à l’inventaire</button></article></div>
+      <div class="app-grid scan-layout">
+        <article class="panel scan-panel">
+          <h2>Scan intelligent MVP</h2>
+          <p>
+            Le prototype simule une reconnaissance assistée à partir d’une image. Le résultat proposé doit toujours être confirmé avant l’ajout à l’inventaire.
+          </p>
+
+          <div class="scan-photo">
+            <img
+              id="scanImg"
+              src="https://images.unsplash.com/photo-1528750997573-59b89d56f4f7?auto=format&fit=crop&w=900&q=80"
+              alt="Produit laitier utilisé pour la simulation du scan"
+            />
+            <span></span>
+          </div>
+
+          <div class="scan-buttons">
+            <button class="btn btn-soft" id="changeScan">Changer d’image</button>
+            <button class="btn btn-primary" id="analyzeScan">Analyser</button>
+          </div>
+        </article>
+
+        <article class="panel result-panel">
+          <p class="kicker">Résultat</p>
+          <h2 id="detectedTitle">En attente d’analyse</h2>
+          <p id="detectedMeta">Choisissez une image, lancez l’analyse, puis confirmez le résultat proposé avant l’ajout.</p>
+          <div id="detectedTags" class="tag-list"></div>
+          <button class="btn btn-primary full" id="addDetected" disabled>Ajouter à l’inventaire</button>
+        </article>
+      </div>
     </section>
 
-    <section class="app-screen" id="recipes"><article class="panel"><div class="panel-head"><h2>Recettes avec vos aliments</h2><span class="pill">Anti-gaspillage</span></div><div class="recipe-cards large" id="recipeList"></div></article></section>
-    <section class="app-screen" id="list"><div class="app-grid inventory-layout"><article class="panel"><div class="panel-head"><h2>Liste collaborative</h2><span class="pill">Partagée</span></div><div id="shoppingList" class="shopping-feed"></div></article><article class="panel form-panel"><h3>Ajouter un article</h3><form id="shoppingForm"><label>Article<input name="item" required placeholder="Ex. citron" /></label><label>Membre<select name="member"><option>Hafedh</option><option>Jean Jacques</option><option>Kevin</option><option>Danensky</option></select></label><button class="btn btn-primary" type="submit">Ajouter</button></form></article></div></section>
-    <section class="app-screen" id="group"><article class="panel"><div class="panel-head"><h2>Foyer collaboratif</h2><button class="btn btn-primary">Inviter un membre</button></div><div class="member-grid" id="memberGrid"></div></article></section>
+    <section class="app-screen" id="recipes">
+      <article class="panel">
+        <div class="panel-head">
+          <div class="recipe-intro">
+            <h2>Cuisiner avec ce que vous avez déjà</h2>
+            <p>
+              Les recettes de la démo utilisent les aliments présents dans l’inventaire.
+              Lorsque certains ingrédients manquent, vous pouvez les ajouter directement
+              à la liste d’épicerie partagée.
+            </p>
+          </div>
+          <span class="pill">Anti-gaspillage</span>
+        </div>
+
+        <div class="recipe-cards large" id="recipeList"></div>
+      </article>
+    </section>
+
+    <section class="app-screen" id="list">
+      <div class="app-grid inventory-layout">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Liste d’épicerie partagée</h2>
+              <p class="list-helper">
+                Ajoutez ce qui manque, assignez un article à un membre et cochez-le une fois acheté.
+              </p>
+            </div>
+            <span class="list-count" id="shoppingCount">Liste du foyer</span>
+          </div>
+
+          <div id="shoppingList" class="shopping-feed"></div>
+        </article>
+
+        <article class="panel form-panel">
+          <h3>Ajouter un article</h3>
+
+          <form id="shoppingForm">
+            <label>
+              Article
+              <input name="item" required placeholder="Ex. citron" />
+            </label>
+
+            <label>
+              Assigné à
+              <select name="member">
+                <option>Hafedh</option>
+                <option>Jean Jacques</option>
+                <option>Kevin</option>
+                <option>Danensky</option>
+              </select>
+            </label>
+
+            <button class="btn btn-primary" type="submit">Ajouter à la liste</button>
+          </form>
+        </article>
+      </div>
+    </section>
+
+    <section class="app-screen" id="group">
+      <article class="panel">
+        <div class="panel-head">
+          <div class="group-heading">
+            <h2>Membres du foyer</h2>
+            <p>
+              Tous les membres utilisent le même inventaire et la même liste d’épicerie.
+              Les droits présentés ici sont fictifs et servent uniquement à illustrer le fonctionnement du foyer partagé.
+            </p>
+          </div>
+
+          <button class="btn btn-primary" type="button" id="inviteMember">
+            Inviter un membre
+          </button>
+        </div>
+
+        <div class="member-grid" id="memberGrid"></div>
+
+        <p class="group-feedback" id="groupFeedback" role="status">
+          Mode prototype : l’invitation d’un nouveau membre sera connectée au système de comptes dans le MVP fonctionnel.
+        </p>
+      </article>
+    </section>
   </main>
-  <nav class="bottom-nav"><button class="app-nav active" data-screen="dash">🏠<span>Accueil</span></button><button class="app-nav" data-screen="inventory">🥬<span>Inventaire</span></button><button class="app-nav" data-screen="scan">📷<span>Scan</span></button><button class="app-nav" data-screen="recipes">🍽️<span>Recettes</span></button><button class="app-nav" data-screen="list">🛒<span>Liste</span></button></nav>
+
+  <nav class="bottom-nav">
+    <button class="app-nav active" data-screen="dash">🏠<span>Accueil</span></button>
+    <button class="app-nav" data-screen="inventory">🥬<span>Inventaire</span></button>
+    <button class="app-nav" data-screen="scan">📷<span>Scan</span></button>
+    <button class="app-nav" data-screen="recipes">🍽️<span>Recettes</span></button>
+    <button class="app-nav" data-screen="list">🛒<span>Liste</span></button>
+  </nav>
+
   <script src="app.js"></script>
+
+  <script>
+    /* Rend les cartes Recettes plus explicatives sans modifier app.js. */
+    (function () {
+      const list = document.getElementById("recipeList");
+      if (!list) return;
+
+      function enhanceRecipes() {
+        list.querySelectorAll(".recipe-item").forEach((card) => {
+          if (card.dataset.recipeEnhanced === "1") return;
+
+          const button = card.querySelector(".add-needs");
+          const usesLine = [...card.querySelectorAll("p")].find((p) =>
+            p.textContent.trim().startsWith("Utilise")
+          );
+
+          if (!button || !usesLine) return;
+
+          const uses = usesLine.textContent.replace(/^Utilise\s*:\s*/i, "").trim();
+          const needs = (button.dataset.needs || "")
+            .split("|")
+            .map((item) => item.trim())
+            .filter(Boolean);
+
+          const details = document.createElement("div");
+          details.className = "recipe-availability";
+
+          const available = document.createElement("span");
+          available.className = "available";
+          available.innerHTML = "<strong>Déjà disponible :</strong> " + uses;
+
+          const missing = document.createElement("span");
+          missing.className = "missing";
+          missing.innerHTML =
+            "<strong>À ajouter :</strong> " +
+            (needs.length ? needs.join(", ") : "Aucun ingrédient manquant");
+
+          details.appendChild(available);
+          details.appendChild(missing);
+
+          usesLine.replaceWith(details);
+
+          button.textContent = needs.length
+            ? "Ajouter les ingrédients manquants"
+            : "Aucun ingrédient à ajouter";
+
+          if (!needs.length) button.disabled = true;
+
+          card.dataset.recipeEnhanced = "1";
+        });
+      }
+
+      enhanceRecipes();
+
+      new MutationObserver(enhanceRecipes).observe(list, {
+        childList: true,
+        subtree: true
+      });
+    })();
+  </script>
+
+
+  <script>
+    /* Met à jour le résumé de la liste d’épicerie dans la démo. */
+    (function () {
+      const list = document.getElementById("shoppingList");
+      const count = document.getElementById("shoppingCount");
+
+      if (!list || !count) return;
+
+      function updateShoppingCount() {
+        const rows = [...list.querySelectorAll(".shop-row")];
+        const done = rows.filter((row) => row.classList.contains("done")).length;
+        const remaining = rows.length - done;
+
+        count.textContent =
+          remaining + (remaining > 1 ? " à acheter" : " à acheter") +
+          " · " +
+          done + (done > 1 ? " achetés" : " acheté");
+      }
+
+      updateShoppingCount();
+
+      new MutationObserver(updateShoppingCount).observe(list, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["class"]
+      });
+    })();
+  </script>
+
+
+  <script>
+    /* Présente un vrai foyer fictif plutôt que les rôles de l’équipe de développement. */
+    (function () {
+      const grid = document.getElementById("memberGrid");
+      const inviteButton = document.getElementById("inviteMember");
+      const feedback = document.getElementById("groupFeedback");
+
+      const householdMembers = [
+        {
+          initial: "H",
+          name: "Hélène Durand",
+          role: "Administratrice du foyer",
+          detail: "Peut gérer l’inventaire, la liste d’épicerie et les invitations."
+        },
+        {
+          initial: "J",
+          name: "Julien Durand",
+          role: "Membre",
+          detail: "Peut consulter et mettre à jour l’inventaire et la liste partagée."
+        },
+        {
+          initial: "K",
+          name: "Karim Durand",
+          role: "Membre",
+          detail: "Peut ajouter des aliments, consulter les recettes et participer aux achats."
+        },
+        {
+          initial: "D",
+          name: "Diane Durand",
+          role: "Membre",
+          detail: "Peut suivre les alertes et mettre à jour la liste d’épicerie."
+        }
+      ];
+
+      function renderHousehold() {
+        if (!grid) return;
+
+        grid.innerHTML = householdMembers.map((member) => `
+          <article class="member">
+            <b>${member.initial}</b>
+            <h3>${member.name}</h3>
+            <span class="member-role">${member.role}</span>
+            <p>${member.detail}</p>
+          </article>
+        `).join("");
+      }
+
+      renderHousehold();
+
+      if (grid) {
+        new MutationObserver(renderHousehold).observe(grid, {
+          childList: true
+        });
+      }
+
+      inviteButton?.addEventListener("click", () => {
+        feedback?.classList.add("visible");
+      });
+    })();
+  </script>
+
 </body>
 </html>

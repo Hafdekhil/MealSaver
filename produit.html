@@ -4,51 +4,463 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MealSaver — Produit</title>
-  <meta name="description" content="Fonctionnalités produit MealSaver." />
+  <meta
+    name="description"
+    content="Découvrez les principales fonctionnalités de MealSaver : inventaire alimentaire partagé, alertes d’expiration, recettes anti-gaspillage, liste d’épicerie et scan intelligent MVP."
+  />
   <link rel="icon" href="assets/logo-icon.png" />
   <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    /* =========================================================
+       Page Produit
+       ========================================================= */
+
+    .product-page .page-main {
+      padding-top: 0;
+    }
+
+    /* Hero */
+    .product-page .product-hero {
+      min-height: auto;
+      grid-template-columns: minmax(0, 0.95fr) minmax(500px, 1.05fr);
+      gap: 58px;
+      padding-top: 28px;
+      padding-bottom: 58px;
+      align-items: center;
+    }
+
+    .product-page .product-hero h1 {
+      max-width: 690px;
+      font-size: clamp(42px, 4.2vw, 60px);
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 22px;
+    }
+
+    .product-page .product-hero .lead {
+      max-width: 680px;
+      font-size: 18px;
+      line-height: 1.65;
+    }
+
+    .product-page .product-hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    /* Product visual */
+    .product-page .product-visual {
+      display: grid;
+      grid-template-columns: 1.35fr 0.65fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 12px;
+      height: 420px;
+      padding: 12px;
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid #e0e8e4;
+      border-radius: 22px;
+      box-shadow: 0 18px 48px rgba(24, 60, 46, .10);
+    }
+
+    .product-page .product-visual figure {
+      margin: 0;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      border-radius: 14px;
+      background: #f3f7f5;
+    }
+
+    .product-page .product-visual figure:first-child {
+      grid-row: 1 / 3;
+    }
+
+    .product-page .product-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Section title */
+    .product-page .product-section-heading {
+      max-width: 760px;
+      margin: 18px 0 30px;
+    }
+
+    .product-page .product-section-heading h2 {
+      margin: 0 0 12px;
+      font-size: clamp(32px, 3.4vw, 46px);
+      line-height: 1.08;
+      letter-spacing: -1.5px;
+      color: #12382a;
+    }
+
+    .product-page .product-section-heading p {
+      margin: 0;
+      max-width: 720px;
+      color: #587168;
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    /* Feature cards */
+    .product-page .product-feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 54px;
+    }
+
+    .product-page .product-feature-card {
+      min-height: 255px;
+      padding: 28px;
+      background: #fff;
+      border: 1px solid #e0e9e4;
+      border-radius: 18px;
+      box-shadow: 0 8px 28px rgba(24, 60, 46, .06);
+    }
+
+    .product-page .product-feature-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .product-page .product-feature-icon {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: #eaf6ef;
+      font-size: 22px;
+    }
+
+    .product-page .product-feature-number {
+      color: #0a8157;
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: .13em;
+    }
+
+    .product-page .product-feature-card h3 {
+      margin: 0 0 10px;
+      color: #15392d;
+      font-size: 25px;
+      line-height: 1.18;
+      letter-spacing: -.5px;
+    }
+
+    .product-page .product-feature-card strong {
+      display: block;
+      margin-bottom: 10px;
+      color: #08794e;
+      font-size: 16px;
+    }
+
+    .product-page .product-feature-card p {
+      margin: 0;
+      color: #5a7168;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* Flow */
+    .product-page .product-flow {
+      margin-bottom: 58px;
+      padding: 34px;
+      background: #123a2b;
+      color: #fff;
+      border-radius: 20px;
+      box-shadow: 0 12px 36px rgba(24, 60, 46, .10);
+    }
+
+    .product-page .product-flow .kicker {
+      color: #9de4c2;
+    }
+
+    .product-page .product-flow h2 {
+      max-width: 760px;
+      margin: 0 0 14px;
+      font-size: clamp(30px, 3vw, 42px);
+      line-height: 1.1;
+      letter-spacing: -1.2px;
+    }
+
+    .product-page .product-flow > p:not(.kicker) {
+      max-width: 800px;
+      margin: 0;
+      color: #d8ebe3;
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .product-page .product-flow-steps {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .product-page .product-flow-steps span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 10px 14px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 10px;
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      font-weight: 750;
+    }
+
+    .product-page .product-flow-steps b {
+      color: #9de4c2;
+      font-size: 18px;
+    }
+
+    @media (max-width: 1180px) {
+      .product-page .product-hero {
+        grid-template-columns: 1fr;
+      }
+
+      .product-page .product-visual {
+        height: 500px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .product-page .product-hero {
+        padding-top: 18px;
+        padding-bottom: 44px;
+      }
+
+      .product-page .product-hero h1 {
+        font-size: 40px;
+        letter-spacing: -1.5px;
+      }
+
+      .product-page .product-visual {
+        height: auto;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+      }
+
+      .product-page .product-visual figure,
+      .product-page .product-visual figure:first-child {
+        grid-row: auto;
+        height: 230px;
+      }
+
+      .product-page .product-feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .product-page .product-feature-card {
+        min-height: auto;
+        padding: 22px;
+      }
+
+      .product-page .product-flow {
+        padding: 24px;
+      }
+    }
+  </style>
 </head>
-<body class="multi-page-body">
+
+<body class="multi-page-body product-page">
   <div class="page-bg"></div>
+
   <header class="site-header" id="top">
     <a class="brand" href="index.html" aria-label="Accueil MealSaver">
       <img src="assets/logo-horizontal.png" alt="MealSaver" />
     </a>
+
     <nav class="desktop-nav" aria-label="Navigation principale">
-      <a class="" href="index.html">Accueil</a>
-      <a class="" href="solution.html">Solution</a>
+      <a href="index.html">Accueil</a>
+      <a href="solution.html">Solution</a>
       <a class="active" href="produit.html">Produit</a>
-      <a class="" href="ecrans.html">Écrans</a>
-      <a class="" href="impact.html">Impact</a>
-      <a class="" href="offre.html">Offre</a>
+      <a href="ecrans.html">Écrans</a>
+      <a href="impact.html">Impact</a>
+      <a href="offre.html">Offre</a>
     </nav>
+
     <div class="header-actions">
       <a class="btn btn-ghost" href="app.html">Voir la démo</a>
       <a class="btn btn-primary" href="offre.html#contact">Demander l’accès</a>
     </div>
+
     <button class="menu-toggle" aria-label="Ouvrir le menu">☰</button>
   </header>
+
   <main class="page-main">
 
-    <section class="mp-page-hero section-wrap compact">
+    <section class="mp-page-hero section-wrap product-hero">
       <div>
         <p class="kicker">Produit</p>
-        <h1>Chaque fonctionnalité correspond à une vraie page à développer.</h1>
-        <p class="lead">Cette version est structurée pour faciliter le passage du site statique vers une application complète.</p>
+
+        <h1>Tout ce qu’il faut pour mieux gérer les aliments du foyer.</h1>
+
+        <p class="lead">
+          MealSaver réunit l’inventaire alimentaire, les alertes d’expiration,
+          les recettes, la liste d’épicerie et le scan intelligent dans un seul
+          espace partagé et simple à utiliser.
+        </p>
+
+        <div class="product-hero-actions">
+          <a class="btn btn-primary btn-xl" href="app.html">Ouvrir la démo</a>
+          <a class="btn btn-soft btn-xl" href="ecrans.html">Découvrir les écrans</a>
+        </div>
       </div>
-      <img src="assets/shot-commercial-panel.png" alt="Panneau commercial MealSaver" />
+
+      <div class="product-visual" aria-label="Aperçu des principales fonctions MealSaver">
+        <figure>
+          <img src="assets/shot-inventory.png" alt="Inventaire alimentaire MealSaver" />
+        </figure>
+        <figure>
+          <img src="assets/shot-scan.png" alt="Scan intelligent MealSaver" />
+        </figure>
+        <figure>
+          <img src="assets/shot-recipes.png" alt="Recettes MealSaver" />
+        </figure>
+      </div>
     </section>
-    <section class="section-wrap mp-feature-list">
-      <article><img src="assets/shot-inventory.png" alt="Inventaire" /><div><span>Inventaire</span><h2>Voir les aliments du foyer</h2><p>Recherche, catégories, quantités, lieux de stockage, dates et propriétaire de l’ajout.</p><a href="app.html" class="btn btn-soft">Ouvrir dans la démo</a></div></article>
-      <article><img src="assets/shot-scan.png" alt="Scan" /><div><span>Scan intelligent MVP</span><h2>Scanner, détecter, valider</h2><p>Le système propose un aliment détecté, mais l’utilisateur valide avant l’ajout final.</p><a href="app.html" class="btn btn-soft">Tester le scan</a></div></article>
-      <article><img src="assets/shot-recipes.png" alt="Recettes" /><div><span>Recettes</span><h2>Cuisiner avec ce qui existe déjà</h2><p>Les recettes utilisent les aliments disponibles et ajoutent automatiquement les ingrédients manquants à la liste.</p><a href="app.html" class="btn btn-soft">Voir les recettes</a></div></article>
+
+    <section class="section-wrap">
+      <div class="product-section-heading">
+        <p class="kicker">Fonctionnalités du MVP</p>
+        <h2>Un parcours simple, de l’inventaire jusqu’à la liste d’épicerie.</h2>
+        <p>
+          Chaque fonctionnalité répond à une situation concrète du quotidien :
+          savoir ce que l’on possède, consommer au bon moment, cuisiner avec ce
+          qui est disponible et acheter seulement ce qui manque.
+        </p>
+      </div>
+
+      <div class="product-feature-grid">
+
+        <article class="product-feature-card">
+          <div class="product-feature-top">
+            <span class="product-feature-icon">🥬</span>
+            <span class="product-feature-number">01</span>
+          </div>
+          <h3>Inventaire alimentaire partagé</h3>
+          <strong>Savoir ce que l’on a déjà à la maison.</strong>
+          <p>
+            Les membres du foyer peuvent consulter les aliments disponibles,
+            leur quantité, leur lieu de conservation et leur date d’expiration.
+            L’inventaire aide à éviter les oublis et les achats inutiles.
+          </p>
+        </article>
+
+        <article class="product-feature-card">
+          <div class="product-feature-top">
+            <span class="product-feature-icon">🔔</span>
+            <span class="product-feature-number">02</span>
+          </div>
+          <h3>Alertes d’expiration</h3>
+          <strong>Repérer ce qu’il faut consommer en priorité.</strong>
+          <p>
+            Les aliments qui approchent de leur date d’expiration sont signalés
+            afin que le foyer puisse les utiliser avant qu’ils ne soient oubliés
+            ou gaspillés.
+          </p>
+        </article>
+
+        <article class="product-feature-card">
+          <div class="product-feature-top">
+            <span class="product-feature-icon">🍽️</span>
+            <span class="product-feature-number">03</span>
+          </div>
+          <h3>Recettes anti-gaspillage</h3>
+          <strong>Cuisiner avec ce qui est déjà disponible.</strong>
+          <p>
+            MealSaver propose des idées de recettes selon les aliments présents
+            dans l’inventaire et ceux à consommer bientôt. Les ingrédients
+            manquants peuvent ensuite être ajoutés à la liste d’épicerie.
+          </p>
+        </article>
+
+        <article class="product-feature-card">
+          <div class="product-feature-top">
+            <span class="product-feature-icon">🛒</span>
+            <span class="product-feature-number">04</span>
+          </div>
+          <h3>Liste d’épicerie partagée</h3>
+          <strong>Acheter seulement ce qui manque.</strong>
+          <p>
+            Les membres du foyer préparent ensemble la liste d’épicerie.
+            L’information partagée facilite les courses et limite les achats
+            en double.
+          </p>
+        </article>
+
+        <article class="product-feature-card">
+          <div class="product-feature-top">
+            <span class="product-feature-icon">📷</span>
+            <span class="product-feature-number">05</span>
+          </div>
+          <h3>Scan intelligent MVP</h3>
+          <strong>Ajouter un aliment plus facilement.</strong>
+          <p>
+            Une photo permet de proposer l’aliment détecté. Avant l’ajout à
+            l’inventaire, l’utilisateur confirme ou corrige le résultat.
+            Une saisie manuelle reste possible si le scan ne convient pas.
+          </p>
+        </article>
+
+        <article class="product-feature-card">
+          <div class="product-feature-top">
+            <span class="product-feature-icon">👥</span>
+            <span class="product-feature-number">06</span>
+          </div>
+          <h3>Foyer collaboratif</h3>
+          <strong>La même information pour tous les membres.</strong>
+          <p>
+            L’inventaire et la liste d’épicerie sont partagés afin que les
+            membres du foyer puissent mieux coordonner les aliments disponibles
+            et les achats à effectuer.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="section-wrap product-flow">
+      <p class="kicker">Le parcours MealSaver</p>
+      <h2>De ce que vous avez déjà à ce que vous devez réellement acheter.</h2>
+      <p>
+        L’objectif est de garder un parcours simple et compréhensible pour le foyer.
+        L’inventaire sert de point de départ, les alertes indiquent les priorités,
+        les recettes aident à utiliser les aliments et la liste d’épicerie complète
+        seulement ce qui manque.
+      </p>
+
+      <div class="product-flow-steps" aria-label="Parcours MealSaver">
+        <span>Inventaire</span>
+        <b>→</b>
+        <span>Alerte</span>
+        <b>→</b>
+        <span>Recette</span>
+        <b>→</b>
+        <span>Liste d’épicerie</span>
+      </div>
     </section>
 
   </main>
+
   <footer class="footer section-wrap">
     <img src="assets/logo-horizontal.png" alt="MealSaver" />
-    <p>MealSaver · Inventaire collaboratif · Recettes anti-gaspillage · MVP Web + mobile</p>
+    <p>MealSaver · Inventaire partagé · Alertes · Recettes anti-gaspillage · Liste d’épicerie</p>
   </footer>
+
   <script src="app.js"></script>
 </body>
 </html>

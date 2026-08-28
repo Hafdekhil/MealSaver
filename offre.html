@@ -4,66 +4,532 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MealSaver — Offre</title>
-  <meta name="description" content="Offre et modèle commercial MealSaver." />
+  <meta
+    name="description"
+    content="Découvrez le prototype MealSaver, le périmètre du MVP et les évolutions prévues du projet."
+  />
   <link rel="icon" href="assets/logo-icon.png" />
   <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    /* =========================================================
+       Page Offre
+       ========================================================= */
+
+    .offer-page .page-main {
+      padding-top: 0;
+    }
+
+    /* Hero */
+    .offer-page .offer-hero {
+      min-height: auto;
+      grid-template-columns: minmax(0, .95fr) minmax(440px, .85fr);
+      gap: 58px;
+      padding-top: 28px;
+      padding-bottom: 54px;
+      align-items: center;
+    }
+
+    .offer-page .offer-hero h1 {
+      max-width: 700px;
+      margin-bottom: 22px;
+      font-size: clamp(42px, 4.2vw, 60px);
+      line-height: 1.05;
+      letter-spacing: -2px;
+    }
+
+    .offer-page .offer-hero .lead {
+      max-width: 690px;
+      font-size: 18px;
+      line-height: 1.65;
+    }
+
+    .offer-page .offer-hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .offer-page .offer-hero-visual {
+      min-height: 380px;
+      display: grid;
+      place-items: center;
+      padding: 34px;
+      background: #fff;
+      border: 1px solid #e0e8e4;
+      border-radius: 22px;
+      box-shadow: 0 18px 48px rgba(24, 60, 46, .10);
+    }
+
+    .offer-page .offer-hero-visual img {
+      width: min(100%, 420px);
+      height: auto;
+      object-fit: contain;
+    }
+
+    /* Intro */
+    .offer-page .offer-heading {
+      max-width: 820px;
+      margin: 12px 0 28px;
+    }
+
+    .offer-page .offer-heading h2 {
+      margin: 0 0 12px;
+      color: #12382a;
+      font-size: clamp(32px, 3.4vw, 46px);
+      line-height: 1.08;
+      letter-spacing: -1.5px;
+    }
+
+    .offer-page .offer-heading p {
+      margin: 0;
+      color: #587168;
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    /* Offer cards */
+    .offer-page .offer-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 52px;
+    }
+
+    .offer-page .offer-stage {
+      display: flex;
+      flex-direction: column;
+      min-height: 420px;
+      padding: 28px;
+      background: #fff;
+      border: 1px solid #e0e9e4;
+      border-radius: 18px;
+      box-shadow: 0 8px 28px rgba(24, 60, 46, .06);
+    }
+
+    .offer-page .offer-stage.current {
+      border-color: #bcd9ca;
+      box-shadow: 0 12px 34px rgba(8, 121, 78, .09);
+    }
+
+    .offer-page .offer-stage.future {
+      background: #f9fbfa;
+    }
+
+    .offer-page .offer-status {
+      display: inline-flex;
+      align-self: flex-start;
+      align-items: center;
+      min-height: 30px;
+      margin-bottom: 18px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      background: #eaf6ef;
+      color: #08794e;
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+    }
+
+    .offer-page .offer-stage.future .offer-status {
+      background: #f1f3f2;
+      color: #62736c;
+    }
+
+    .offer-page .offer-stage h3 {
+      margin: 0 0 12px;
+      color: #15392d;
+      font-size: 27px;
+      line-height: 1.15;
+    }
+
+    .offer-page .offer-stage > p {
+      margin: 0 0 18px;
+      color: #5a7168;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .offer-page .offer-stage ul {
+      margin: 0 0 24px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .offer-page .offer-stage li {
+      position: relative;
+      margin-bottom: 11px;
+      padding-left: 24px;
+      color: #35564b;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .offer-page .offer-stage li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: #08794e;
+      font-weight: 900;
+    }
+
+    .offer-page .offer-stage .btn {
+      align-self: flex-start;
+      margin-top: auto;
+    }
+
+    /* Commercial clarity */
+    .offer-page .pricing-note {
+      margin-bottom: 52px;
+      padding: 32px 34px;
+      background: #123a2b;
+      color: #fff;
+      border-radius: 20px;
+    }
+
+    .offer-page .pricing-note .kicker {
+      color: #9de4c2;
+    }
+
+    .offer-page .pricing-note h2 {
+      max-width: 820px;
+      margin: 0 0 14px;
+      font-size: clamp(30px, 3vw, 40px);
+      line-height: 1.1;
+      letter-spacing: -1.2px;
+    }
+
+    .offer-page .pricing-note p:not(.kicker) {
+      max-width: 880px;
+      margin: 0;
+      color: #d8ebe3;
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    /* Contact */
+    .offer-page .offer-contact {
+      grid-template-columns: minmax(0, 1fr) 420px;
+      gap: 46px;
+      margin-bottom: 58px;
+      padding: 36px;
+      align-items: start;
+    }
+
+    .offer-page .offer-contact h2 {
+      max-width: 620px;
+      font-size: clamp(32px, 3.2vw, 42px);
+      line-height: 1.1;
+      letter-spacing: -1.3px;
+    }
+
+    .offer-page .offer-contact .contact-copy {
+      max-width: 700px;
+      color: #587168;
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .offer-page .prototype-note {
+      margin-top: 20px;
+      padding: 16px 18px;
+      background: #f3f8f5;
+      border: 1px solid #dfe9e4;
+      border-radius: 12px;
+      color: #48655a;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .offer-page .offer-contact form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .offer-page .offer-contact label {
+      display: grid;
+      gap: 7px;
+      color: #2f5a4b;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .offer-page .offer-contact input,
+    .offer-page .offer-contact textarea {
+      width: 100%;
+      border: 1px solid #dce7e1;
+      border-radius: 10px;
+      padding: 13px 14px;
+      background: #fff;
+      color: #17352b;
+      font: inherit;
+    }
+
+    .offer-page .offer-contact input:focus,
+    .offer-page .offer-contact textarea:focus {
+      outline: 2px solid rgba(8, 121, 78, .15);
+      border-color: #8fbbaa;
+    }
+
+    .offer-page .offer-contact textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+
+    .offer-page .form-feedback {
+      display: none;
+      margin: 2px 0 0;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #eef7f2;
+      color: #215b45;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .offer-page .form-feedback.visible {
+      display: block;
+    }
+
+    @media (max-width: 1180px) {
+      .offer-page .offer-hero,
+      .offer-page .offer-contact {
+        grid-template-columns: 1fr;
+      }
+
+      .offer-page .offer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .offer-page .offer-stage {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .offer-page .offer-hero {
+        padding-top: 18px;
+        padding-bottom: 42px;
+      }
+
+      .offer-page .offer-hero h1 {
+        font-size: 40px;
+        letter-spacing: -1.5px;
+      }
+
+      .offer-page .offer-hero-visual {
+        min-height: 280px;
+        padding: 24px;
+      }
+
+      .offer-page .pricing-note,
+      .offer-page .offer-contact {
+        padding: 24px;
+      }
+    }
+  </style>
 </head>
-<body class="multi-page-body">
+
+<body class="multi-page-body offer-page">
   <div class="page-bg"></div>
+
   <header class="site-header" id="top">
     <a class="brand" href="index.html" aria-label="Accueil MealSaver">
       <img src="assets/logo-horizontal.png" alt="MealSaver" />
     </a>
+
     <nav class="desktop-nav" aria-label="Navigation principale">
-      <a class="" href="index.html">Accueil</a>
-      <a class="" href="solution.html">Solution</a>
-      <a class="" href="produit.html">Produit</a>
-      <a class="" href="ecrans.html">Écrans</a>
-      <a class="" href="impact.html">Impact</a>
+      <a href="index.html">Accueil</a>
+      <a href="solution.html">Solution</a>
+      <a href="produit.html">Produit</a>
+      <a href="ecrans.html">Écrans</a>
+      <a href="impact.html">Impact</a>
       <a class="active" href="offre.html">Offre</a>
     </nav>
+
     <div class="header-actions">
       <a class="btn btn-ghost" href="app.html">Voir la démo</a>
-      <a class="btn btn-primary" href="offre.html#contact">Demander l’accès</a>
+      <a class="btn btn-primary" href="#contact">Demander l’accès</a>
     </div>
+
     <button class="menu-toggle" aria-label="Ouvrir le menu">☰</button>
   </header>
+
   <main class="page-main">
 
-    <section class="mp-page-hero section-wrap compact">
+    <section class="mp-page-hero section-wrap offer-hero">
       <div>
         <p class="kicker">Offre</p>
-        <h1>Un MVP gratuit pour démontrer, puis une offre premium familiale.</h1>
-        <p class="lead">La version statique permet de présenter le concept. La version complète peut évoluer vers un abonnement ou une offre partenaire.</p>
+
+        <h1>Découvrir le prototype aujourd’hui, construire le MVP étape par étape.</h1>
+
+        <p class="lead">
+          MealSaver est actuellement présenté sous forme de site vitrine et de
+          démo interactive. Le projet évolue ensuite selon les fonctionnalités
+          définies dans le carnet de produit et les sprints prévus.
+        </p>
+
+        <div class="offer-hero-actions">
+          <a class="btn btn-primary btn-xl" href="app.html">Ouvrir la démo</a>
+          <a class="btn btn-soft btn-xl" href="#contact">Demander l’accès</a>
+        </div>
       </div>
-      <img src="assets/logo-original-user.png" alt="Logo MealSaver original" />
+
+      <div class="offer-hero-visual">
+        <img src="assets/logo-original-user.png" alt="Identité visuelle MealSaver" />
+      </div>
     </section>
-    <section class="section-wrap mp-pricing">
-      <article>
-        <span>MVP</span><h2>Gratuit</h2><strong>0$</strong><p>Prototype de démonstration pour le cours et GitHub Pages.</p><ul><li>Landing pages séparées</li><li>Démo interactive</li><li>Inventaire local</li><li>Scan simulé MVP avec validation</li></ul><a class="btn btn-soft" href="app.html">Tester</a>
-      </article>
-      <article class="highlight">
-        <span>Famille</span><h2>Premium</h2><strong>À définir</strong><p>Version commercialisable avec compte, base de données et synchronisation réelle.</p><ul><li>Comptes utilisateurs</li><li>Foyers partagés</li><li>Notifications</li><li>Analyse intelligente</li></ul><a class="btn btn-primary" href="#contact">Demander l’accès</a>
-      </article>
-      <article>
-        <span>Partenaires</span><h2>Commerce</h2><strong>B2B</strong><p>Possibilité future : épiceries, coupons, produits proches de l’expiration.</p><ul><li>Promotions ciblées</li><li>Impact mesurable</li><li>Recettes partenaires</li><li>Offres locales</li></ul><a class="btn btn-soft" href="#contact">Discuter</a>
-      </article>
+
+    <section class="section-wrap">
+      <div class="offer-heading">
+        <p class="kicker">Évolution du projet</p>
+        <h2>Ce qui existe maintenant, ce qui fait partie du MVP et ce qui viendra plus tard.</h2>
+        <p>
+          Cette présentation distingue clairement le prototype actuel des
+          fonctionnalités prévues. Elle évite de présenter comme disponibles
+          des services qui ne sont pas encore développés.
+        </p>
+      </div>
+
+      <div class="offer-grid">
+
+        <article class="offer-stage current">
+          <span class="offer-status">Disponible maintenant</span>
+          <h3>Prototype de démonstration</h3>
+          <p>
+            La version actuelle permet de présenter l’idée, le parcours utilisateur
+            et les principales interfaces de MealSaver.
+          </p>
+          <ul>
+            <li>Site vitrine responsive</li>
+            <li>Démo interactive</li>
+            <li>Maquettes des écrans principaux</li>
+            <li>Présentation de l’inventaire, du scan et des recettes</li>
+            <li>Documentation du projet et du Sprint 0</li>
+          </ul>
+          <a class="btn btn-soft" href="app.html">Voir la démo</a>
+        </article>
+
+        <article class="offer-stage">
+          <span class="offer-status">MVP prévu</span>
+          <h3>Application fonctionnelle</h3>
+          <p>
+            Le MVP doit transformer le prototype en une application Web responsive
+            permettant aux membres d’un foyer d’utiliser les fonctions principales.
+          </p>
+          <ul>
+            <li>Compte utilisateur et foyer partagé</li>
+            <li>Inventaire alimentaire</li>
+            <li>Alertes d’expiration</li>
+            <li>Liste d’épicerie partagée</li>
+            <li>Tableau de bord</li>
+            <li>Scan intelligent avec validation</li>
+            <li>Recettes anti-gaspillage</li>
+          </ul>
+          <a class="btn btn-primary" href="#contact">Suivre le projet</a>
+        </article>
+
+        <article class="offer-stage future">
+          <span class="offer-status">Évolutions futures</span>
+          <h3>Fonctions complémentaires</h3>
+          <p>
+            Certaines idées restent volontairement hors du MVP et pourront être
+            étudiées après validation des fonctions essentielles.
+          </p>
+          <ul>
+            <li>Suivi des dépenses partagées</li>
+            <li>Budget du foyer</li>
+            <li>Fonctions partenaires ou commerciales à évaluer</li>
+            <li>Autres extensions selon les besoins des utilisateurs</li>
+          </ul>
+          <a class="btn btn-soft" href="#contact">Partager un besoin</a>
+        </article>
+
+      </div>
     </section>
-    <section id="contact" class="section-wrap mp-contact">
-      <div><p class="kicker">Contact</p><h2>Demander l’accès au prototype MealSaver</h2><p>Formulaire visuel pour la présentation. Dans une vraie version, il sera connecté à un backend ou à un service courriel.</p></div>
-      <form>
-        <label>Nom complet<input placeholder="Votre nom" /></label>
-        <label>Courriel<input type="email" placeholder="nom@exemple.com" /></label>
-        <label>Message<textarea placeholder="Je veux tester MealSaver..."></textarea></label>
-        <button class="btn btn-primary" type="button">Envoyer la demande</button>
+
+    <section class="section-wrap pricing-note">
+      <p class="kicker">Modèle commercial</p>
+      <h2>Aucun tarif commercial n’est fixé à ce stade du projet.</h2>
+      <p>
+        MealSaver est actuellement un prototype en développement. Une éventuelle
+        tarification, un abonnement ou une offre destinée à des partenaires ne
+        seront définis qu’après validation du MVP, des besoins utilisateurs et
+        du modèle économique. Le site ne présente donc pas de prix comme une
+        offre actuellement disponible.
+      </p>
+    </section>
+
+    <section id="contact" class="section-wrap mp-contact offer-contact">
+      <div>
+        <p class="kicker">Contact</p>
+        <h2>Demander à découvrir le prototype MealSaver.</h2>
+
+        <p class="contact-copy">
+          Cette section permet de présenter le futur parcours de prise de contact
+          pour une personne qui souhaite tester le prototype, suivre le projet ou
+          partager un besoin.
+        </p>
+
+        <div class="prototype-note">
+          <strong>Prototype :</strong> le formulaire ci-contre n’est pas encore
+          connecté à un service d’envoi. Aucune donnée n’est transmise lorsque
+          vous cliquez sur le bouton.
+        </div>
+      </div>
+
+      <form id="prototypeContactForm">
+        <label>
+          Nom complet
+          <input name="name" placeholder="Votre nom" autocomplete="name" />
+        </label>
+
+        <label>
+          Courriel
+          <input name="email" type="email" placeholder="nom@exemple.com" autocomplete="email" />
+        </label>
+
+        <label>
+          Votre intérêt
+          <textarea
+            name="message"
+            placeholder="Je souhaite découvrir MealSaver, tester le prototype ou partager un besoin..."
+          ></textarea>
+        </label>
+
+        <button class="btn btn-primary" type="submit">Envoyer la demande</button>
+
+        <p class="form-feedback" id="prototypeFormFeedback" role="status">
+          Mode prototype : le formulaire est prêt visuellement, mais aucun message
+          n’a été transmis.
+        </p>
       </form>
     </section>
 
   </main>
+
   <footer class="footer section-wrap">
     <img src="assets/logo-horizontal.png" alt="MealSaver" />
-    <p>MealSaver · Inventaire collaboratif · Recettes anti-gaspillage · MVP Web + mobile</p>
+    <p>MealSaver · Inventaire partagé · Alertes · Recettes anti-gaspillage · Liste d’épicerie</p>
   </footer>
+
   <script src="app.js"></script>
+
+  <script>
+    (function () {
+      const form = document.getElementById("prototypeContactForm");
+      const feedback = document.getElementById("prototypeFormFeedback");
+
+      if (!form || !feedback) return;
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        feedback.classList.add("visible");
+      });
+    })();
+  </script>
 </body>
 </html>

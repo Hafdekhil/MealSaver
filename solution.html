@@ -4,55 +4,258 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MealSaver — Solution</title>
-  <meta name="description" content="Problème et solution MealSaver." />
+  <meta
+    name="description"
+    content="MealSaver aide les foyers à réduire les aliments oubliés, les achats en double et le gaspillage alimentaire grâce à un inventaire partagé, des alertes, des recettes et une liste d’épicerie collaborative."
+  />
   <link rel="icon" href="assets/logo-icon.png" />
   <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    /* Ajustements propres à la page Solution */
+    .solution-page .page-main {
+      padding-top: 0;
+    }
+
+    .solution-page .solution-hero {
+      padding-top: 28px;
+      padding-bottom: 54px;
+      min-height: auto;
+      gap: 58px;
+    }
+
+    .solution-page .solution-hero h1 {
+      max-width: 690px;
+      font-size: clamp(42px, 4.2vw, 60px);
+      line-height: 1.05;
+      letter-spacing: -2px;
+    }
+
+    .solution-page .solution-hero .lead {
+      max-width: 690px;
+      font-size: 18px;
+      line-height: 1.65;
+    }
+
+    .solution-page .solution-hero-image {
+      height: 390px;
+      overflow: hidden;
+      border: 1px solid #e0e8e4;
+      border-radius: 22px;
+      background: #fff;
+      box-shadow: 0 18px 48px rgba(24, 60, 46, .10);
+    }
+
+    .solution-page .solution-hero-image img {
+      width: 210%;
+      max-width: none;
+      height: 100%;
+      object-fit: cover;
+      object-position: left center;
+      transform: translateX(-5%);
+    }
+
+    .solution-page .mp-cards-3 {
+      margin-top: 10px;
+    }
+
+    /* Réponse MealSaver */
+    .solution-page .solution-response {
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 42px;
+      padding: 30px 34px;
+      margin-top: 18px;
+      margin-bottom: 54px;
+      align-items: center;
+    }
+
+    .solution-page .solution-response h2 {
+      max-width: 760px;
+      font-size: 38px;
+      line-height: 1.12;
+      letter-spacing: -1.3px;
+    }
+
+    .solution-page .solution-response p:not(.kicker) {
+      max-width: 850px;
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .solution-page .solution-response-image {
+      width: 340px;
+      height: 280px;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid #e1e9e5;
+      background: #f5f8f6;
+    }
+
+    .solution-page .solution-response-image img {
+      width: 100%;
+      height: 100%;
+      max-height: none;
+      object-fit: cover;
+      object-position: center;
+      margin: 0;
+    }
+
+    @media (max-width: 1180px) {
+      .solution-page .solution-hero,
+      .solution-page .solution-response {
+        grid-template-columns: 1fr;
+      }
+
+      .solution-page .solution-hero-image {
+        height: 360px;
+      }
+
+      .solution-page .solution-response-image {
+        width: 100%;
+        height: 320px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .solution-page .solution-hero {
+        padding-top: 18px;
+        padding-bottom: 42px;
+      }
+
+      .solution-page .solution-hero h1 {
+        font-size: 40px;
+        letter-spacing: -1.5px;
+      }
+
+      .solution-page .solution-hero-image {
+        height: 280px;
+      }
+
+      .solution-page .solution-response {
+        padding: 22px;
+        margin-bottom: 42px;
+      }
+
+      .solution-page .solution-response h2 {
+        font-size: 30px;
+      }
+
+      .solution-page .solution-response-image {
+        height: 240px;
+      }
+    }
+  </style>
 </head>
-<body class="multi-page-body">
+
+<body class="multi-page-body solution-page">
   <div class="page-bg"></div>
+
   <header class="site-header" id="top">
     <a class="brand" href="index.html" aria-label="Accueil MealSaver">
       <img src="assets/logo-horizontal.png" alt="MealSaver" />
     </a>
+
     <nav class="desktop-nav" aria-label="Navigation principale">
-      <a class="" href="index.html">Accueil</a>
+      <a href="index.html">Accueil</a>
       <a class="active" href="solution.html">Solution</a>
-      <a class="" href="produit.html">Produit</a>
-      <a class="" href="ecrans.html">Écrans</a>
-      <a class="" href="impact.html">Impact</a>
-      <a class="" href="offre.html">Offre</a>
+      <a href="produit.html">Produit</a>
+      <a href="ecrans.html">Écrans</a>
+      <a href="impact.html">Impact</a>
+      <a href="offre.html">Offre</a>
     </nav>
+
     <div class="header-actions">
       <a class="btn btn-ghost" href="app.html">Voir la démo</a>
       <a class="btn btn-primary" href="offre.html#contact">Demander l’accès</a>
     </div>
+
     <button class="menu-toggle" aria-label="Ouvrir le menu">☰</button>
   </header>
+
   <main class="page-main">
 
-    <section class="mp-page-hero section-wrap">
+    <section class="mp-page-hero section-wrap solution-hero">
       <div>
         <p class="kicker">Solution</p>
-        <h1>MealSaver répond à un problème simple : on oublie ce qu’on possède déjà.</h1>
-        <p class="lead">Le produit transforme le frigo, le garde-manger et la liste d’épicerie en un système collaboratif compréhensible par toute la famille.</p>
+
+        <h1>Des aliments oubliés finissent trop souvent gaspillés.</h1>
+
+        <p class="lead">
+          Quand le contenu du réfrigérateur, du congélateur et du garde-manger
+          n’est pas visible par tout le foyer, on oublie des aliments, on rachète
+          parfois ce que l’on possède déjà et on laisse passer des dates d’expiration.
+        </p>
       </div>
-      <img src="https://images.unsplash.com/photo-1490818387583-1baba5e638af?auto=format&fit=crop&w=1200&q=85" alt="Aliments frais sur une table" />
+
+      <div class="solution-hero-image">
+        <img
+          src="https://images.unsplash.com/photo-1490818387583-1baba5e638af?auto=format&fit=crop&w=1400&q=85"
+          alt="Fruits et aliments frais"
+        />
+      </div>
     </section>
+
     <section class="section-wrap mp-cards-3">
-      <article><b>01</b><h2>Inventaire invisible</h2><p>Les aliments sont répartis entre frigo, congélateur et garde-manger. Personne ne sait exactement ce qui est disponible.</p></article>
-      <article><b>02</b><h2>Dates oubliées</h2><p>Les produits proches de l’expiration ne sont pas visibles au bon moment, donc ils finissent souvent à la poubelle.</p></article>
-      <article><b>03</b><h2>Achats doublés</h2><p>Chaque membre ajoute des articles sans toujours vérifier ce qui existe déjà ou ce qui est déjà acheté.</p></article>
+      <article>
+        <b>01</b>
+        <h2>Aliments oubliés</h2>
+        <p>
+          Des produits restent au fond du réfrigérateur, du congélateur ou du
+          garde-manger parce que les membres du foyer ne savent pas toujours
+          ce qui est encore disponible.
+        </p>
+      </article>
+
+      <article>
+        <b>02</b>
+        <h2>Dates d’expiration dépassées</h2>
+        <p>
+          Sans rappel au bon moment, certains aliments ne sont pas consommés
+          assez tôt et risquent d’être jetés alors qu’ils auraient encore pu
+          être utilisés.
+        </p>
+      </article>
+
+      <article>
+        <b>03</b>
+        <h2>Achats en double</h2>
+        <p>
+          Lorsque l’information n’est pas partagée, un membre du foyer peut
+          acheter un produit déjà présent à la maison ou déjà ajouté par
+          quelqu’un d’autre.
+        </p>
+      </article>
     </section>
-    <section class="section-wrap mp-split-white">
-      <div><p class="kicker">Réponse MealSaver</p><h2>Un foyer connecté autour d’une seule information partagée.</h2><p>MealSaver priorise les aliments urgents, propose des recettes avec les ingrédients disponibles et synchronise la liste d’épicerie.</p></div>
-      <img src="assets/shot-food-basket.png" alt="Panier MealSaver" />
+
+    <section class="section-wrap mp-split-white solution-response">
+      <div>
+        <p class="kicker">Réponse MealSaver</p>
+
+        <h2>Une information partagée pour mieux décider quoi consommer, cuisiner et acheter.</h2>
+
+        <p>
+          MealSaver regroupe l’inventaire alimentaire du foyer, signale les
+          aliments à consommer bientôt, propose des recettes selon les aliments
+          disponibles et permet de préparer une liste d’épicerie partagée.
+          Le parcours reste simple : inventaire → alerte → recette → liste d’épicerie.
+        </p>
+      </div>
+
+      <div class="solution-response-image">
+        <img
+          src="https://images.unsplash.com/photo-1710947949965-8150d227d337?auto=format&fit=crop&w=900&q=85"
+          alt="Réfrigérateur ouvert contenant différents aliments"
+        />
+      </div>
     </section>
 
   </main>
+
   <footer class="footer section-wrap">
     <img src="assets/logo-horizontal.png" alt="MealSaver" />
-    <p>MealSaver · Inventaire collaboratif · Recettes anti-gaspillage · MVP Web + mobile</p>
+    <p>MealSaver · Inventaire partagé · Alertes · Recettes anti-gaspillage · Liste d’épicerie</p>
   </footer>
+
   <script src="app.js"></script>
 </body>
 </html>
