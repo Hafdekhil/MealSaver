@@ -1,6 +1,6 @@
 # MealSaver
 
-**Réduire le gaspillage, une recette à la fois.****
+**Réduire le gaspillage, une recette à la fois.**
 
 MealSaver est une application Web responsive qui aide les foyers à mieux gérer leurs aliments, leurs repas et leurs achats.
 
