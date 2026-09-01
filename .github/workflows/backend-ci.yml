@@ -13,6 +13,24 @@ jobs:
   backend:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: mealsaver_test
+          POSTGRES_PASSWORD: mealsaver_test_password
+          POSTGRES_DB: mealsaver_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U mealsaver_test -d mealsaver_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://mealsaver_test:mealsaver_test_password@127.0.0.1:5432/mealsaver_test?schema=public
+
     defaults:
       run:
         working-directory: backend
@@ -30,6 +48,17 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Apply database migrations
+        run: |
+          if [ -d "prisma/migrations" ]; then
+            npx prisma migrate deploy
+          else
+            echo "No Prisma migrations to apply on this branch."
+          fi
 
       - name: Build backend
         run: npm run build
