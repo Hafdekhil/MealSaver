@@ -14,7 +14,7 @@ function createTestApp(userId?: number) {
   testApp.use(express.json());
 
   testApp.use((_req, res, next) => {
-    if (userId) {
+    if (userId !== undefined) {
       res.locals["userId"] = userId;
     }
 
@@ -89,6 +89,30 @@ describe("POST /api/households", () => {
 
   it("retourne 401 si l'utilisateur n'est pas authentifié", async () => {
     const response = await request(createTestApp())
+      .post("/api/households")
+      .send({
+        name: "Famille Mai",
+      });
+
+    expect(response.status).toBe(401);
+    expect(response.body.error).toBe("Non authentifié");
+  });
+
+  it("retourne 401 si l'identifiant utilisateur est invalide", async () => {
+    const response = await request(createTestApp(0))
+      .post("/api/households")
+      .send({
+        name: "Famille Mai",
+      });
+
+    expect(response.status).toBe(401);
+    expect(response.body.error).toBe("Non authentifié");
+  });
+
+  it("retourne 401 si l'utilisateur authentifié n'existe plus", async () => {
+    const missingUserId = testUserId + 1_000_000;
+
+    const response = await request(createTestApp(missingUserId))
       .post("/api/households")
       .send({
         name: "Famille Mai",
