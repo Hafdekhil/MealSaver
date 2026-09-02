@@ -1,6 +1,7 @@
 import express from "express";
 import { registerRouter } from "./auth/register.route.js";
 import { householdRouter } from "./households/household.route.js";
+import { invitationRouter } from "./households/invitation.route.js";
 
 export const app = express();
 
@@ -15,6 +16,7 @@ app.get("/health", (_req, res) => {
 
 app.use("/api/auth", registerRouter);
 app.use("/api/households", householdRouter);
+app.use("/api/households", invitationRouter);
 
 app.use(
   (
