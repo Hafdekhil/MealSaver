@@ -8,9 +8,36 @@ datasource db {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
-  name         String
-  email        String   @unique
-  passwordHash String
-  createdAt    DateTime @default(now())
+  id                   Int               @id @default(autoincrement())
+  name                 String
+  email                String            @unique
+  passwordHash         String
+  createdAt            DateTime          @default(now())
+  householdMemberships HouseholdMember[]
+}
+
+enum HouseholdRole {
+  OWNER
+  MEMBER
+}
+
+model Household {
+  id        Int               @id @default(autoincrement())
+  name      String
+  createdAt DateTime          @default(now())
+  members   HouseholdMember[]
+}
+
+model HouseholdMember {
+  id          Int           @id @default(autoincrement())
+  householdId Int
+  userId      Int
+  role        HouseholdRole @default(MEMBER)
+  createdAt   DateTime      @default(now())
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([householdId, userId])
+  @@index([userId])
 }
