@@ -8,7 +8,22 @@ householdRouter.post("/", async (req, res, next) => {
   try {
     const userId = Number(res.locals["userId"]);
 
-    if (!userId) {
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(401).json({
+        error: "Non authentifié",
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!user) {
       return res.status(401).json({
         error: "Non authentifié",
       });
