@@ -1,14 +1,7 @@
 ﻿import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
 
-import dashboardImage from "../assets/shot-dashboard.png";
-import inventoryImage from "../assets/shot-inventory.png";
 import styleReferenceBoard from "../assets/style-reference-board.png";
-
-function imageStyle(image: string): CSSProperties {
-  return { "--img": `url("${image}")` } as CSSProperties;
-}
-
 export function HomePage() {
   return (
     <main className="page-main">
@@ -115,6 +108,8 @@ export function HomePage() {
     </main>
   );
 }
+
+
 
 
 

@@ -359,3 +359,43 @@
     border-radius: 24px;
   }
 }
+
+/* Ajustement final desktop — pages Connexion / Inscription */
+@media (min-width: 951px) {
+  .page-shell {
+    padding-top: 42px;
+    padding-bottom: 64px;
+  }
+
+  .auth-layout {
+    min-height: auto;
+    align-items: start;
+    gap: 64px;
+  }
+
+  .auth-intro {
+    padding-top: 54px;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 620px;
+    justify-self: end;
+  }
+}
+
+/* Finition accueil desktop */
+@media (min-width: 1101px) {
+  .mp-hero {
+    padding-top: 34px;
+    padding-bottom: 36px;
+  }
+
+  .mp-device-card {
+    max-width: 780px;
+  }
+
+  .mp-pills {
+    margin-top: 18px;
+  }
+}
