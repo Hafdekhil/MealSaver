@@ -26,6 +26,7 @@ model Household {
   name      String
   createdAt DateTime          @default(now())
   members   HouseholdMember[]
+  foodItems FoodItem[]
 }
 
 model HouseholdMember {
@@ -40,4 +41,15 @@ model HouseholdMember {
 
   @@unique([householdId, userId])
   @@index([userId])
+}
+
+model FoodItem {
+  id          Int      @id @default(autoincrement())
+  name        String
+  householdId Int
+  createdAt   DateTime @default(now())
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@index([householdId])
 }
