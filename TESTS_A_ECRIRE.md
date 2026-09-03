@@ -1,5 +1,8 @@
-# Plan de tests Sprint 1
-- Test 29: Retourne 200 avec la liste des noms
-- Test 29: Retourne 403 si un �tranger essaie de voir
-- Test 30: Retourne 400 si la date est pass�e
-- Test 30: V�rifier l'�criture r�elle en base de donn�es
+# Tests à écrire — MEALSAVER-29
+
+- retourne `200` avec les membres et leurs rôles pour un utilisateur appartenant au foyer ;
+- retourne `403` pour un utilisateur authentifié extérieur au foyer ;
+- couvre le cas du foyer inexistant si la route le distingue ;
+- vérifie qu’aucune donnée sensible inutile n’est exposée ;
+- utilise la session existante via `res.locals.userId` ;
+- laisse MEALSAVER-30 hors de cette branche, car il est attribué à Kevin.
