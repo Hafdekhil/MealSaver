@@ -33,6 +33,7 @@ model Household {
   createdAt   DateTime          @default(now())
   members     HouseholdMember[]
   invitations Invitation[]
+  foodItems   FoodItem[]
 }
 
 model HouseholdMember {
@@ -63,4 +64,20 @@ model Invitation {
   @@unique([householdId, email])
   @@index([email])
   @@index([invitedByUserId])
+}
+
+model FoodItem {
+  id          Int       @id @default(autoincrement())
+  householdId Int
+  name        String
+  quantity    Float?
+  unit        String?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@index([householdId])
+  @@index([expiresAt])
 }
