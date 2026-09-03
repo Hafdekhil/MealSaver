@@ -14,7 +14,7 @@ inventoryUpdateRouter.patch("/:id", async (req, res, next) => {
 
     const id = Number(req.params.id);
     
-    const item = await prisma.food_item.findUnique({ where: { id } });
+    const item = await prisma.foodItem.findUnique({ where: { id } });
     if (!item) {
       res.status(404).json({ error: "Aliment introuvable" });
       return;
@@ -34,7 +34,7 @@ inventoryUpdateRouter.patch("/:id", async (req, res, next) => {
       return;
     }
 
-    const updated = await prisma.food_item.update({ where: { id }, data: parsed.data });
+    const updated = await prisma.foodItem.update({ where: { id }, data: parsed.data });
     res.json({ item: updated });
     return;
   } catch (error) {

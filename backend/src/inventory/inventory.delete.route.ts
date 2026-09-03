@@ -12,7 +12,7 @@ inventoryDeleteRouter.delete("/:id", async (req, res, next) => {
     }
 
     const id = Number(req.params.id);
-    const item = await prisma.food_item.findUnique({ where: { id } });
+    const item = await prisma.foodItem.findUnique({ where: { id } });
     if (!item) {
       res.status(404).json({ error: "Aliment introuvable" });
       return;
@@ -26,7 +26,7 @@ inventoryDeleteRouter.delete("/:id", async (req, res, next) => {
       return;
     }
 
-    await prisma.food_item.delete({ where: { id } });
+    await prisma.foodItem.delete({ where: { id } });
     res.status(204).send();
     return;
   } catch (error) {
