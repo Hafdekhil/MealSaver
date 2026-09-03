@@ -1,0 +1,3 @@
+- [ ] Critères Jira cochés
+- [ ] Pas de secrets (mots de passe) dans Git
+- [ ] Démo testée sur le site en ligne
