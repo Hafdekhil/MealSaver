@@ -5,6 +5,7 @@ import { authRouter } from "./auth/auth.route.js";
 import { registerRouter } from "./auth/register.route.js";
 import { householdRouter } from "./households/household.route.js";
 import { invitationRouter } from "./households/invitation.route.js";
+import { inventoryDeleteRouter } from "./inventory/inventory.delete.route.js";
 import { inventoryUpdateRouter } from "./inventory/inventory.patch.route.js";
 
 export const app = express();
@@ -24,6 +25,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/households", requireAuth, householdRouter);
 app.use("/api/households", requireAuth, invitationRouter);
 app.use("/api/inventory", requireAuth, inventoryUpdateRouter);
+app.use("/api/inventory", requireAuth, inventoryDeleteRouter);
 
 app.use(
   (
