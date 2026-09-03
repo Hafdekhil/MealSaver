@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   Int               @id @default(autoincrement())
+  name                 String
+  email                String            @unique
+  passwordHash         String
+  createdAt            DateTime          @default(now())
+  householdMemberships HouseholdMember[]
+  sentInvitations      Invitation[]      @relation("InvitationsSent")
+}
+
+enum HouseholdRole {
+  OWNER
+  MEMBER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+}
+
+model Household {
+  id          Int               @id @default(autoincrement())
+  name        String
+  createdAt   DateTime          @default(now())
+  members     HouseholdMember[]
+  invitations Invitation[]
+  foodItems   FoodItem[]
+}
+
+model HouseholdMember {
+  id          Int           @id @default(autoincrement())
+  householdId Int
+  userId      Int
+  role        HouseholdRole @default(MEMBER)
+  createdAt   DateTime      @default(now())
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([householdId, userId])
+  @@index([userId])
+}
+
+model Invitation {
+  id              Int              @id @default(autoincrement())
+  householdId     Int
+  email           String
+  status          InvitationStatus @default(PENDING)
+  invitedByUserId Int
+  createdAt       DateTime         @default(now())
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  invitedBy User      @relation("InvitationsSent", fields: [invitedByUserId], references: [id], onDelete: Cascade)
+
+  @@unique([householdId, email])
+  @@index([email])
+  @@index([invitedByUserId])
+}
+
+model FoodItem {
+  id          Int       @id @default(autoincrement())
+  householdId Int
+  name        String
+  quantity    Float?
+  unit        String?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@index([householdId])
+  @@index([expiresAt])
+}
