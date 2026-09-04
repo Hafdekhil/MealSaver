@@ -5,6 +5,46 @@ import { addFoodItemSchema } from "./inventory.schema.js";
 
 export const inventoryRouter = Router();
 
+inventoryRouter.get("/", async (req, res, next) => {
+  try {
+    const userId = Number(res.locals["userId"]);
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(401).json({ error: "Non authentifié" });
+    }
+
+    const householdId = Number(req.query["householdId"]);
+
+    if (!Number.isInteger(householdId) || householdId <= 0) {
+      return res.status(400).json({ error: "Foyer invalide" });
+    }
+
+    const membership = await prisma.householdMember.findUnique({
+      where: {
+        householdId_userId: {
+          householdId,
+          userId,
+        },
+      },
+    });
+
+    if (!membership) {
+      return res.status(403).json({ error: "Accès refusé" });
+    }
+
+    const items = await prisma.foodItem.findMany({
+      where: { householdId },
+      orderBy: [
+        { expiresAt: "asc" },
+        { name: "asc" },
+      ],
+    });
+
+    return res.status(200).json({ items });
+  } catch (error) {
+    return next(error);
+  }
+});
 inventoryRouter.post("/", async (req, res, next) => {
   try {
     const userId = Number(res.locals["userId"]);
