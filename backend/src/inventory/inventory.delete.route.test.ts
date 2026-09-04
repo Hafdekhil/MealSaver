@@ -3,6 +3,8 @@ import request from "supertest";
 import { app } from "../app.js";
 import { prisma } from "../lib/prisma.js";
 
+void prisma;
+
 vi.mock("../lib/prisma.js", () => ({
   prisma: {
     foodItem: {
