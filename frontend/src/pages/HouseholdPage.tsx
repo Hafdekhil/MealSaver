@@ -1,23 +1,491 @@
-﻿export function HouseholdPage() {
-  return (
-    <main className="page-shell">
-      <section className="content-page">
-        <p className="eyebrow">Foyer</p>
-        <h1>Gérez votre foyer.</h1>
-        <p>
-          Cette page accueillera la création du foyer, l'invitation des membres
-          et la consultation des membres au fur et à mesure de l'intégration des
-          récits MEALSAVER-27, MEALSAVER-28 et MEALSAVER-29.
-        </p>
+import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../components/AuthProvider";
+import "../household-dashboard.css";
 
-        <div className="page-placeholder">
-          <h2>Fonctionnalités prévues</h2>
-          <ul>
-            <li>Créer un foyer</li>
-            <li>Inviter un membre</li>
-            <li>Consulter les membres du foyer</li>
-          </ul>
+type Household = {
+  id: number;
+  name: string;
+  createdAt: string;
+  role: "OWNER" | "MEMBER";
+};
+
+type Invitation = {
+  id: number;
+  email: string;
+  status: "PENDING" | "ACCEPTED";
+  createdAt?: string;
+};
+
+function getInitials(name: string) {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+}
+
+function getRoleLabel(role: Household["role"]) {
+  return role === "OWNER" ? "Propriétaire" : "Membre";
+}
+
+export function HouseholdPage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const [householdName, setHouseholdName] = useState("");
+  const [households, setHouseholds] = useState<Household[]>([]);
+  const [household, setHousehold] = useState<Household | null>(null);
+  const [loadError, setLoadError] = useState("");
+  const [householdError, setHouseholdError] = useState("");
+  const [isLoadingHouseholds, setIsLoadingHouseholds] = useState(true);
+  const [isCreatingHousehold, setIsCreatingHousehold] = useState(false);
+
+  const [invitationEmail, setInvitationEmail] = useState("");
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [invitationError, setInvitationError] = useState("");
+  const [invitationSuccess, setInvitationSuccess] = useState("");
+  const [isInviting, setIsInviting] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadHouseholds() {
+      try {
+        const response = await fetch("/api/households", {
+          credentials: "include",
+        });
+
+        if (!active) return;
+
+        if (response.status === 401) {
+          navigate("/", { replace: true });
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error("Impossible de charger les foyers.");
+        }
+
+        const data = await response.json();
+        const availableHouseholds = data.households as Household[];
+
+        if (!active) return;
+
+        setHouseholds(availableHouseholds);
+
+        if (availableHouseholds.length === 1) {
+          setHousehold(availableHouseholds[0] ?? null);
+        } else {
+          setHousehold(null);
+        }
+      } catch {
+        if (active) {
+          setLoadError(
+            "Impossible de charger vos foyers auprès du serveur MealSaver.",
+          );
+        }
+      } finally {
+        if (active) {
+          setIsLoadingHouseholds(false);
+        }
+      }
+    }
+
+    void loadHouseholds();
+
+    return () => {
+      active = false;
+    };
+  }, [navigate]);
+
+  async function handleCreateHousehold(
+    event: FormEvent<HTMLFormElement>,
+  ) {
+    event.preventDefault();
+    setHouseholdError("");
+
+    try {
+      setIsCreatingHousehold(true);
+
+      const response = await fetch("/api/households", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          name: householdName,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.status === 401) {
+        navigate("/", { replace: true });
+        return;
+      }
+
+      if (!response.ok) {
+        setHouseholdError(data.error ?? "Impossible de créer le foyer.");
+        return;
+      }
+
+      const createdHousehold: Household = {
+        ...(data.household as Omit<Household, "role">),
+        role: "OWNER",
+      };
+
+      setHouseholds((current) => [...current, createdHousehold]);
+      setHousehold(createdHousehold);
+      setHouseholdName("");
+    } catch {
+      setHouseholdError(
+        "Impossible de communiquer avec le serveur MealSaver.",
+      );
+    } finally {
+      setIsCreatingHousehold(false);
+    }
+  }
+
+  async function handleInviteMember(
+    event: FormEvent<HTMLFormElement>,
+  ) {
+    event.preventDefault();
+
+    if (!household || household.role !== "OWNER") return;
+
+    setInvitationError("");
+    setInvitationSuccess("");
+
+    try {
+      setIsInviting(true);
+
+      const response = await fetch(
+        `/api/households/${household.id}/invitations`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            email: invitationEmail,
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (response.status === 401) {
+        navigate("/", { replace: true });
+        return;
+      }
+
+      if (!response.ok) {
+        setInvitationError(
+          data.error ?? "Impossible d'envoyer l'invitation.",
+        );
+        return;
+      }
+
+      const invitation = data.invitation as Invitation;
+
+      setInvitations((current) => [...current, invitation]);
+      setInvitationSuccess(`Invitation envoyée à ${invitation.email}.`);
+      setInvitationEmail("");
+    } catch {
+      setInvitationError(
+        "Impossible de communiquer avec le serveur MealSaver.",
+      );
+    } finally {
+      setIsInviting(false);
+    }
+  }
+
+  if (isLoadingHouseholds) {
+    return (
+      <main className="household-dashboard">
+        <section className="household-create-card">
+          <p>Chargement de votre foyer...</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <main className="household-dashboard">
+        <section className="household-create-card">
+          <p className="form-message form-error" role="alert">
+            {loadError}
+          </p>
+        </section>
+      </main>
+    );
+  }
+
+  if (!household && households.length > 1) {
+    return (
+      <main className="household-dashboard">
+        <section className="household-dashboard-header">
+          <div>
+            <p className="eyebrow">Votre foyer</p>
+            <h1>Choisissez votre espace.</h1>
+            <p>
+              Votre compte appartient à plusieurs foyers. Sélectionnez celui
+              que vous souhaitez utiliser.
+            </p>
+          </div>
+
+          <div className="household-status">
+            <span className="household-badge">
+              {households.length} foyers
+            </span>
+          </div>
+        </section>
+
+        <section className="household-create-card">
+          <h2>Choisir mon foyer</h2>
+          <p>Le foyer sélectionné devient votre espace actif.</p>
+
+          <label htmlFor="household-select">Foyer actif</label>
+          <select
+            id="household-select"
+            className="household-select"
+            defaultValue=""
+            onChange={(event) => {
+              const selectedId = Number(event.target.value);
+              setHousehold(
+                households.find((item) => item.id === selectedId) ?? null,
+              );
+            }}
+          >
+            <option value="" disabled>
+              Sélectionner un foyer
+            </option>
+
+            {households.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name} — {getRoleLabel(item.role)}
+              </option>
+            ))}
+          </select>
+        </section>
+      </main>
+    );
+  }
+
+  if (!household) {
+    return (
+      <main className="household-dashboard">
+        <section className="household-dashboard-header">
+          <div>
+            <p className="eyebrow">Votre foyer</p>
+            <h1>Créez votre espace partagé.</h1>
+            <p>
+              Commencez par créer votre foyer MealSaver pour organiser ensemble un
+              inventaire alimentaire partagé.
+            </p>
+          </div>
+
+          <div className="household-status">
+            <span className="household-badge">Nouveau foyer</span>
+          </div>
+        </section>
+
+        <section className="household-create-card">
+          <h2>Créer mon foyer</h2>
+          <p>Donnez un nom clair à votre foyer pour commencer.</p>
+
+          <form className="auth-form" onSubmit={handleCreateHousehold}>
+            <label htmlFor="household-name">Nom du foyer</label>
+            <input
+              id="household-name"
+              type="text"
+              value={householdName}
+              onChange={(event) => setHouseholdName(event.target.value)}
+              minLength={2}
+              maxLength={80}
+              required
+            />
+
+            <p className="field-help">Entre 2 et 80 caractères.</p>
+
+            <button
+              className="button button-primary button-large"
+              type="submit"
+              disabled={isCreatingHousehold}
+            >
+              {isCreatingHousehold ? "Création..." : "Créer mon foyer"}
+            </button>
+          </form>
+
+          {householdError && (
+            <p className="form-message form-error" role="alert">
+              {householdError}
+            </p>
+          )}
+        </section>
+      </main>
+    );
+  }
+
+  return (
+    <main className="household-dashboard">
+      <section className="household-dashboard-header">
+        <div>
+          <p className="eyebrow">Foyer actif</p>
+          <h1>{household.name}</h1>
+          <p>
+            Gérez votre accès au foyer et les invitations autorisées depuis
+            votre espace MealSaver.
+          </p>
         </div>
+
+        <div className="household-status">
+          <span className="household-badge">Foyer actif</span>
+          <span
+            className={`household-badge${
+              household.role === "OWNER" ? " household-badge-owner" : ""
+            }`}
+          >
+            {getRoleLabel(household.role)}
+          </span>
+        </div>
+      </section>
+
+      <section className="household-dashboard-grid">
+        <article className="household-panel">
+          <header className="household-panel-header">
+            <h2>Votre accès au foyer</h2>
+            <p>Informations associées à votre propre compte dans ce foyer.</p>
+          </header>
+
+          <div className="household-panel-body">
+            {user && (
+              <div className="household-member-card">
+                <div className="household-avatar">
+                  {getInitials(user.name)}
+                </div>
+
+                <div className="household-member-info">
+                  <strong>{user.name}</strong>
+                  <span>{user.email}</span>
+                </div>
+
+                <span
+                  className={`household-badge${
+                    household.role === "OWNER"
+                      ? " household-badge-owner"
+                      : ""
+                  }`}
+                >
+                  {getRoleLabel(household.role)}
+                </span>
+              </div>
+            )}
+
+            <p className="household-note">
+              Cet écran présente votre propre accès au foyer. La gestion de la
+              liste complète des membres reste séparée de cette fonctionnalité.
+            </p>
+
+            {households.length > 1 && (
+              <div className="household-actions">
+                <button
+                  type="button"
+                  className="button button-secondary"
+                  onClick={() => setHousehold(null)}
+                >
+                  Changer de foyer
+                </button>
+              </div>
+            )}
+          </div>
+        </article>
+
+        <article className="household-panel">
+          <header className="household-panel-header">
+            <h2>Invitations</h2>
+            <p>
+              {household.role === "OWNER"
+                ? "Invitez une personne à rejoindre ce foyer."
+                : "Les invitations sont réservées au propriétaire du foyer."}
+            </p>
+          </header>
+
+          <div className="household-panel-body">
+            {invitations.length === 0 ? (
+              <p className="household-empty">
+                Aucune invitation envoyée pendant cette session.
+              </p>
+            ) : (
+              <ul className="household-invitations">
+                {invitations.map((invitation) => (
+                  <li
+                    className="household-invitation-item"
+                    key={invitation.id}
+                  >
+                    <strong>{invitation.email}</strong>
+                    <span>
+                      {invitation.status === "PENDING"
+                        ? "En attente"
+                        : "Acceptée"}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {household.role === "OWNER" ? (
+              <form className="auth-form" onSubmit={handleInviteMember}>
+                <label htmlFor="invitation-email">
+                  Courriel du membre
+                </label>
+
+                <input
+                  id="invitation-email"
+                  type="email"
+                  value={invitationEmail}
+                  onChange={(event) =>
+                    setInvitationEmail(event.target.value)
+                  }
+                  autoComplete="email"
+                  placeholder="membre@exemple.com"
+                  required
+                />
+
+                <button
+                  className="button button-primary button-large"
+                  type="submit"
+                  disabled={isInviting}
+                >
+                  {isInviting ? "Envoi..." : "Envoyer l'invitation"}
+                </button>
+              </form>
+            ) : (
+              <p className="household-note">
+                Seul le propriétaire du foyer peut inviter de nouveaux
+                membres.
+              </p>
+            )}
+
+            {invitationError && (
+              <p className="form-message form-error" role="alert">
+                {invitationError}
+              </p>
+            )}
+
+            {invitationSuccess && (
+              <p className="form-message form-success" role="status">
+                {invitationSuccess}
+              </p>
+            )}
+          </div>
+        </article>
       </section>
     </main>
   );
