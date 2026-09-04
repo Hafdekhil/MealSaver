@@ -6,6 +6,7 @@ import { registerRouter } from "./auth/register.route.js";
 import { householdRouter } from "./households/household.route.js";
 import { householdMembershipRouter } from "./households/household.membership.route.js";
 import { invitationRouter } from "./households/invitation.route.js";
+import { inventoryRouter } from "./inventory.route.js";
 import { inventoryDeleteRouter } from "./inventory/inventory.delete.route.js";
 import { inventoryUpdateRouter } from "./inventory/inventory.patch.route.js";
 
@@ -26,6 +27,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/households", requireAuth, householdRouter);
 app.use("/api/households", requireAuth, householdMembershipRouter);
 app.use("/api/households", requireAuth, invitationRouter);
+app.use("/api/inventory", requireAuth, inventoryRouter);
 app.use("/api/inventory", requireAuth, inventoryUpdateRouter);
 app.use("/api/inventory", requireAuth, inventoryDeleteRouter);
 
