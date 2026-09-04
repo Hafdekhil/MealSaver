@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../components/AuthProvider";
 import "../household-dashboard.css";
 
 type Household = {
@@ -18,6 +17,16 @@ type Invitation = {
   createdAt?: string;
 };
 
+
+type HouseholdPerson = {
+  membershipId?: number;
+  invitationId?: number;
+  userId: number | null;
+  name: string | null;
+  email: string;
+  status: "OWNER" | "MEMBER" | "INVITED";
+};
+
 function getInitials(name: string) {
   return name
     .trim()
@@ -31,9 +40,14 @@ function getRoleLabel(role: Household["role"]) {
   return role === "OWNER" ? "Propriétaire" : "Membre";
 }
 
+function getPersonStatusLabel(status: HouseholdPerson["status"]) {
+  if (status === "OWNER") return "Propriétaire";
+  if (status === "INVITED") return "Invité";
+  return "Membre";
+}
+
 export function HouseholdPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   const [householdName, setHouseholdName] = useState("");
   const [households, setHouseholds] = useState<Household[]>([]);
@@ -42,6 +56,10 @@ export function HouseholdPage() {
   const [householdError, setHouseholdError] = useState("");
   const [isLoadingHouseholds, setIsLoadingHouseholds] = useState(true);
   const [isCreatingHousehold, setIsCreatingHousehold] = useState(false);
+
+  const [people, setPeople] = useState<HouseholdPerson[]>([]);
+  const [peopleError, setPeopleError] = useState("");
+  const [isLoadingPeople, setIsLoadingPeople] = useState(false);
 
   const [invitationEmail, setInvitationEmail] = useState("");
   const [invitations, setInvitations] = useState<Invitation[]>([]);
@@ -100,6 +118,59 @@ export function HouseholdPage() {
       active = false;
     };
   }, [navigate]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadPeople() {
+      if (!household) {
+        setPeople([]);
+        setPeopleError("");
+        return;
+      }
+
+      try {
+        setIsLoadingPeople(true);
+        setPeopleError("");
+
+        const response = await fetch(
+          `/api/households/${household.id}/members`,
+          { credentials: "include" },
+        );
+
+        if (!active) return;
+
+        if (response.status === 401) {
+          navigate("/", { replace: true });
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error("Impossible de charger les membres du foyer.");
+        }
+
+        const data = await response.json();
+
+        if (active) {
+          setPeople(data.people as HouseholdPerson[]);
+        }
+      } catch {
+        if (active) {
+          setPeopleError("Impossible de charger les membres du foyer.");
+        }
+      } finally {
+        if (active) {
+          setIsLoadingPeople(false);
+        }
+      }
+    }
+
+    void loadPeople();
+
+    return () => {
+      active = false;
+    };
+  }, [household, navigate]);
 
   async function handleCreateHousehold(
     event: FormEvent<HTMLFormElement>,
@@ -194,6 +265,16 @@ export function HouseholdPage() {
       const invitation = data.invitation as Invitation;
 
       setInvitations((current) => [...current, invitation]);
+      setPeople((current) => [
+        ...current,
+        {
+          invitationId: invitation.id,
+          userId: null,
+          name: null,
+          email: invitation.email,
+          status: "INVITED",
+        },
+      ]);
       setInvitationSuccess(`Invitation envoyée à ${invitation.email}.`);
       setInvitationEmail("");
     } catch {
@@ -360,38 +441,55 @@ export function HouseholdPage() {
       <section className="household-dashboard-grid">
         <article className="household-panel">
           <header className="household-panel-header">
-            <h2>Votre accès au foyer</h2>
-            <p>Informations associées à votre propre compte dans ce foyer.</p>
+            <h2>Membres du foyer</h2>
+            <p>
+              Consultez les propriétaires, membres et personnes invitées dans
+              ce foyer.
+            </p>
           </header>
 
           <div className="household-panel-body">
-            {user && (
-              <div className="household-member-card">
-                <div className="household-avatar">
-                  {getInitials(user.name)}
-                </div>
+            {isLoadingPeople ? (
+              <p className="household-empty">Chargement des membres...</p>
+            ) : peopleError ? (
+              <p className="form-message form-error" role="alert">
+                {peopleError}
+              </p>
+            ) : people.length === 0 ? (
+              <p className="household-empty">Aucun membre à afficher.</p>
+            ) : (
+              <div className="household-invitations">
+                {people.map((person) => (
+                  <div
+                    className="household-member-card"
+                    key={
+                      person.userId !== null
+                        ? `user-${person.userId}`
+                        : `invitation-${person.invitationId}`
+                    }
+                  >
+                    <div className="household-avatar">
+                      {getInitials(person.name ?? person.email)}
+                    </div>
 
-                <div className="household-member-info">
-                  <strong>{user.name}</strong>
-                  <span>{user.email}</span>
-                </div>
+                    <div className="household-member-info">
+                      <strong>{person.name ?? person.email}</strong>
+                      {person.name && <span>{person.email}</span>}
+                    </div>
 
-                <span
-                  className={`household-badge${
-                    household.role === "OWNER"
-                      ? " household-badge-owner"
-                      : ""
-                  }`}
-                >
-                  {getRoleLabel(household.role)}
-                </span>
+                    <span
+                      className={`household-badge${
+                        person.status === "OWNER"
+                          ? " household-badge-owner"
+                          : ""
+                      }`}
+                    >
+                      {getPersonStatusLabel(person.status)}
+                    </span>
+                  </div>
+                ))}
               </div>
             )}
-
-            <p className="household-note">
-              Cet écran présente votre propre accès au foyer. La gestion de la
-              liste complète des membres reste séparée de cette fonctionnalité.
-            </p>
 
             {households.length > 1 && (
               <div className="household-actions">
