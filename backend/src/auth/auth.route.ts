@@ -11,6 +11,7 @@ import {
   getClearSessionCookieOptions,
   getSessionCookieOptions,
   SESSION_COOKIE_NAME,
+  verifySessionToken,
 } from "./session.js";
 
 export const authRouter = Router();
@@ -46,6 +47,55 @@ authRouter.post("/login", async (req, res, next) => {
   }
 });
 
+authRouter.get("/status", async (req, res, next) => {
+  try {
+    const rawToken = req.cookies?.[SESSION_COOKIE_NAME] as unknown;
+
+    if (typeof rawToken !== "string" || rawToken.length === 0) {
+      return res.status(200).json({
+        authenticated: false,
+        user: null,
+      });
+    }
+
+    const userId = verifySessionToken(rawToken);
+
+    if (!userId) {
+      res.clearCookie(SESSION_COOKIE_NAME, getClearSessionCookieOptions());
+
+      return res.status(200).json({
+        authenticated: false,
+        user: null,
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) {
+      res.clearCookie(SESSION_COOKIE_NAME, getClearSessionCookieOptions());
+
+      return res.status(200).json({
+        authenticated: false,
+        user: null,
+      });
+    }
+
+    return res.status(200).json({
+      authenticated: true,
+      user,
+    });
+  } catch (error: unknown) {
+    return next(error);
+  }
+});
 authRouter.get("/session", requireAuth, async (_req, res, next) => {
   try {
     const userId = Number(res.locals["userId"]);

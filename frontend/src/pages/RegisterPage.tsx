@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 
@@ -52,10 +52,27 @@ export function RegisterPage() {
 
       const user = data.user as RegisteredUser;
 
-      setSuccess(`Compte créé avec succès pour ${user.email}.`);
-      setName("");
-      setEmail("");
-      setPassword("");
+      const loginResponse = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      if (!loginResponse.ok) {
+        setSuccess(`Compte créé avec succès pour ${user.email}.`);
+        setError(
+          "Le compte a été créé, mais la connexion automatique a échoué. Connectez-vous manuellement.",
+        );
+        return;
+      }
+
+      window.location.href = "/household";
     } catch {
       setError("Impossible de communiquer avec le serveur MealSaver.");
     } finally {
@@ -146,4 +163,3 @@ export function RegisterPage() {
     </main>
   );
 }
-

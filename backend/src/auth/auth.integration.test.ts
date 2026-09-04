@@ -143,4 +143,21 @@ describe("Authentification et session", () => {
     const sessionResponse = await agent.get("/api/auth/session");
     expect(sessionResponse.status).toBe(401);
   });
+
+  it("retourne un statut anonyme sans session", async () => {
+    const response = await request(app).get("/api/auth/status");
+    expect(response.status).toBe(200);
+    expect(response.body.authenticated).toBe(false);
+    expect(response.body.user).toBeNull();
+  });
+
+  it("retourne un statut authentifie avec utilisateur", async () => {
+    const agent = request.agent(app);
+    expect((await agent.post("/api/auth/login").send({ email, password })).status).toBe(200);
+    const response = await agent.get("/api/auth/status");
+    expect(response.status).toBe(200);
+    expect(response.body.authenticated).toBe(true);
+    expect(response.body.user.email).toBe(email);
+    expect(response.body.user.passwordHash).toBeUndefined();
+  });
 });

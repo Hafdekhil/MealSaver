@@ -1,8 +1,13 @@
-﻿import type { CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../components/AuthProvider";
 
 import styleReferenceBoard from "../assets/style-reference-board.png";
+
 export function HomePage() {
+  const { authState } = useAuth();
+  const isAuthenticated = authState === "authenticated";
+
   return (
     <main className="page-main">
       <section className="mp-hero section-wrap">
@@ -18,15 +23,31 @@ export function HomePage() {
             disponibles et à gérer ensemble leur inventaire alimentaire.
           </p>
 
-          <div className="hero-actions">
-            <Link className="btn btn-primary btn-xl" to="/register">
-              Créer un compte
-            </Link>
+          {authState !== "checking" && (
+            <div className="hero-actions">
+              {isAuthenticated ? (
+                <>
+                  <Link className="btn btn-primary btn-xl" to="/household">
+                    Accéder à mon foyer
+                  </Link>
 
-            <Link className="btn btn-soft btn-xl" to="/login">
-              Se connecter
-            </Link>
-          </div>
+                  <Link className="btn btn-soft btn-xl" to="/inventory">
+                    Voir mon inventaire
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link className="btn btn-primary btn-xl" to="/register">
+                    Créer un compte
+                  </Link>
+
+                  <Link className="btn btn-soft btn-xl" to="/login">
+                    Se connecter
+                  </Link>
+                </>
+              )}
+            </div>
+          )}
 
           <div className="mp-pills">
             <span>👤 Compte utilisateur</span>
@@ -49,7 +70,8 @@ export function HomePage() {
         <article
           className="mp-photo-tile big"
           style={{
-            "--img": "url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1400&q=85')",
+            "--img":
+              "url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1400&q=85')",
           } as CSSProperties}
         >
           <span>Inventaire alimentaire</span>
@@ -59,7 +81,8 @@ export function HomePage() {
         <article
           className="mp-photo-tile"
           style={{
-            "--img": "url('https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=85')",
+            "--img":
+              "url('https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=85')",
           } as CSSProperties}
         >
           <span>Gestion du foyer</span>
@@ -69,7 +92,8 @@ export function HomePage() {
         <article
           className="mp-photo-tile"
           style={{
-            "--img": "url('https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?auto=format&fit=crop&w=900&q=85')",
+            "--img":
+              "url('https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?auto=format&fit=crop&w=900&q=85')",
           } as CSSProperties}
         >
           <span>Compte utilisateur</span>
@@ -78,12 +102,13 @@ export function HomePage() {
       </section>
 
       <section className="section-wrap mp-section-preview">
-        <Link to="/register">
+        <Link to={isAuthenticated ? "/household" : "/register"}>
           <strong>01</strong>
-          <h3>Compte</h3>
+          <h3>{isAuthenticated ? "Mon espace" : "Compte"}</h3>
           <p>
-            Créer un compte utilisateur, se connecter et se déconnecter de
-            MealSaver.
+            {isAuthenticated
+              ? "Accéder à votre foyer et poursuivre votre utilisation de MealSaver."
+              : "Créer un compte utilisateur, se connecter et se déconnecter de MealSaver."}
           </p>
         </Link>
 
@@ -108,8 +133,3 @@ export function HomePage() {
     </main>
   );
 }
-
-
-
-
-
