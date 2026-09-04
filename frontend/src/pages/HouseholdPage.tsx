@@ -62,7 +62,6 @@ export function HouseholdPage() {
   const [isLoadingPeople, setIsLoadingPeople] = useState(false);
 
   const [invitationEmail, setInvitationEmail] = useState("");
-  const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [invitationError, setInvitationError] = useState("");
   const [invitationSuccess, setInvitationSuccess] = useState("");
   const [isInviting, setIsInviting] = useState(false);
@@ -264,7 +263,6 @@ export function HouseholdPage() {
 
       const invitation = data.invitation as Invitation;
 
-      setInvitations((current) => [...current, invitation]);
       setPeople((current) => [
         ...current,
         {
@@ -285,6 +283,13 @@ export function HouseholdPage() {
       setIsInviting(false);
     }
   }
+
+  const householdMembers = people.filter(
+    (person) => person.status !== "INVITED",
+  );
+  const pendingInvitations = people.filter(
+    (person) => person.status === "INVITED",
+  );
 
   if (isLoadingHouseholds) {
     return (
@@ -443,8 +448,7 @@ export function HouseholdPage() {
           <header className="household-panel-header">
             <h2>Membres du foyer</h2>
             <p>
-              Consultez les propriétaires, membres et personnes invitées dans
-              ce foyer.
+              Consultez les propriétaires et les membres actifs de ce foyer.
             </p>
           </header>
 
@@ -455,11 +459,11 @@ export function HouseholdPage() {
               <p className="form-message form-error" role="alert">
                 {peopleError}
               </p>
-            ) : people.length === 0 ? (
+            ) : householdMembers.length === 0 ? (
               <p className="household-empty">Aucun membre à afficher.</p>
             ) : (
               <div className="household-invitations">
-                {people.map((person) => (
+                {householdMembers.map((person) => (
                   <div
                     className="household-member-card"
                     key={
@@ -516,23 +520,19 @@ export function HouseholdPage() {
           </header>
 
           <div className="household-panel-body">
-            {invitations.length === 0 ? (
+            {pendingInvitations.length === 0 ? (
               <p className="household-empty">
-                Aucune invitation envoyée pendant cette session.
+                Aucune invitation en attente.
               </p>
             ) : (
               <ul className="household-invitations">
-                {invitations.map((invitation) => (
+                {pendingInvitations.map((invitation) => (
                   <li
                     className="household-invitation-item"
-                    key={invitation.id}
+                    key={`invitation-${invitation.invitationId ?? invitation.email}`}
                   >
                     <strong>{invitation.email}</strong>
-                    <span>
-                      {invitation.status === "PENDING"
-                        ? "En attente"
-                        : "Acceptée"}
-                    </span>
+                    <span>En attente</span>
                   </li>
                 ))}
               </ul>
