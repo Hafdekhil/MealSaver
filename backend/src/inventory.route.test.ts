@@ -8,6 +8,7 @@ const ownerEmail = "inventory.add.owner.test@example.com";
 const outsiderEmail = "inventory.add.outsider.test@example.com";
 const password = "MealSaver1";
 
+let ownerId: number;
 let householdId: number;
 let outsiderHouseholdId: number;
 
@@ -68,6 +69,8 @@ beforeEach(async () => {
       passwordHash,
     },
   });
+
+  ownerId = owner.id;
 
   const outsider = await prisma.user.create({
     data: {
@@ -173,6 +176,7 @@ describe("POST /api/inventory", () => {
     expect(response.body.item.householdId).toBe(householdId);
     expect(response.body.item.name).toBe("Poulet");
     expect(response.body.item.storageLocation).toBe("FREEZER");
+    expect(response.body.item.addedBy).toBe(ownerId);
 
     const savedItem = await prisma.foodItem.findUnique({
       where: { id: response.body.item.id },
@@ -183,6 +187,7 @@ describe("POST /api/inventory", () => {
     expect(savedItem?.name).toBe("Poulet");
     expect(savedItem?.quantity).toBe(2);
     expect(savedItem?.unit).toBe("paquets");
+    expect(savedItem?.addedBy).toBe(ownerId);
     expect(savedItem?.storageLocation).toBe("FREEZER");
     expect(savedItem?.expiresAt?.toISOString()).toBe(expiresAt);
   });

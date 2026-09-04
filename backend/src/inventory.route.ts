@@ -76,6 +76,7 @@ inventoryRouter.post("/", async (req, res, next) => {
       householdId: parsed.data.householdId,
       name: parsed.data.name,
       storageLocation: parsed.data.storageLocation,
+      addedBy: userId,
     };
 
     if (parsed.data.quantity !== undefined) {

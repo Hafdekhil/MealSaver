@@ -15,6 +15,7 @@ model User {
   createdAt            DateTime          @default(now())
   householdMemberships HouseholdMember[]
   sentInvitations      Invitation[]      @relation("InvitationsSent")
+  addedFoodItems       FoodItem[]        @relation("FoodItemsAdded")
 }
 
 enum HouseholdRole {
@@ -80,11 +81,14 @@ model FoodItem {
   unit            String?
   expiresAt       DateTime?
   storageLocation StorageLocation?
+  addedBy         Int?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
-  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  addedByUser User?     @relation("FoodItemsAdded", fields: [addedBy], references: [id], onDelete: SetNull)
 
   @@index([householdId])
   @@index([expiresAt])
+  @@index([addedBy])
 }
