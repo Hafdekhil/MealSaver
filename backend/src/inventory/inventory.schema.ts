@@ -19,6 +19,8 @@ export const foodItemSchema = z.object({
     .optional(),
 
   expiresAt: z.coerce.date().optional(),
+
+  storageLocation: z.enum(["FRIDGE", "PANTRY", "FREEZER"]),
 });
 
 export type FoodItemInput = z.infer<typeof foodItemSchema>;
