@@ -1,0 +1,272 @@
+﻿.household-dashboard {
+  width: min(1380px, calc(100% - 72px));
+  margin: 0 auto;
+  padding: 38px 0 80px;
+}
+
+.household-dashboard-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 28px;
+  padding: 30px 34px;
+  border: 1px solid rgba(3, 99, 70, 0.1);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(242, 139, 45, 0.1), transparent 32%),
+    linear-gradient(135deg, #ffffff 0%, #f4fbf7 100%);
+  box-shadow: 0 18px 48px rgba(17, 77, 57, 0.08);
+}
+
+.household-dashboard-header .eyebrow {
+  margin: 0 0 8px;
+}
+
+.household-dashboard-header h1 {
+  margin: 0;
+  color: #003c2d;
+  font-size: clamp(2.2rem, 4vw, 3.8rem);
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.household-dashboard-header p:not(.eyebrow) {
+  max-width: 720px;
+  margin: 14px 0 0;
+  color: #60776f;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.household-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.household-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #e7f7ef;
+  color: #08714a;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.household-badge-owner {
+  background: #fff2e5;
+  color: #a9550d;
+}
+
+.household-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+  gap: 26px;
+  align-items: start;
+}
+
+.household-panel {
+  border: 1px solid rgba(3, 99, 70, 0.1);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 16px 46px rgba(17, 77, 57, 0.08);
+  overflow: hidden;
+}
+
+.household-panel-header {
+  padding: 24px 28px 18px;
+  border-bottom: 1px solid #edf3f0;
+}
+
+.household-panel-header h2,
+.household-panel-header h3 {
+  margin: 0;
+  color: #003c2d;
+  letter-spacing: -0.03em;
+}
+
+.household-panel-header p {
+  margin: 7px 0 0;
+  color: #71857e;
+  line-height: 1.55;
+}
+
+.household-panel-body {
+  padding: 26px 28px 30px;
+}
+
+.household-member-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid #e0ece6;
+  border-radius: 20px;
+  background: #f9fcfa;
+}
+
+.household-avatar {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 16px;
+  background: #0a8056;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.household-member-info {
+  min-width: 0;
+}
+
+.household-member-info strong {
+  display: block;
+  color: #003c2d;
+  font-size: 1.02rem;
+}
+
+.household-member-info span {
+  display: block;
+  margin-top: 4px;
+  overflow: hidden;
+  color: #71857e;
+  font-size: 0.9rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.household-note {
+  margin: 18px 0 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #f3f8f5;
+  color: #60776f;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.household-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.household-actions .button {
+  justify-content: center;
+}
+
+.household-invitations {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 22px;
+  padding: 0;
+  list-style: none;
+}
+
+.household-invitation-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 15px;
+  border: 1px solid #e3ece8;
+  border-radius: 14px;
+  background: #fbfdfc;
+}
+
+.household-empty {
+  margin: 0 0 22px;
+  padding: 16px;
+  border: 1px dashed #cbded5;
+  border-radius: 15px;
+  color: #71857e;
+  background: #fbfdfc;
+}
+
+.household-create-card {
+  max-width: 680px;
+  margin: 30px auto 0;
+  padding: 34px;
+  border: 1px solid rgba(3, 99, 70, 0.12);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(17, 77, 57, 0.1);
+}
+
+.household-create-card h2 {
+  margin: 0 0 8px;
+  color: #003c2d;
+  font-size: 2rem;
+}
+
+.household-create-card > p {
+  margin: 0 0 24px;
+  color: #71857e;
+}
+
+.household-select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 15px 17px;
+  border: 1px solid #cfe1d9;
+  border-radius: 15px;
+  background: #fbfefc;
+  color: #003c2d;
+  font: inherit;
+  outline: none;
+}
+
+.household-select:focus {
+  border-color: #07965f;
+  box-shadow: 0 0 0 4px rgba(7, 150, 95, 0.11);
+}
+
+@media (max-width: 950px) {
+  .household-dashboard {
+    width: min(100% - 32px, 760px);
+    padding-top: 28px;
+  }
+
+  .household-dashboard-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .household-status {
+    justify-content: flex-start;
+  }
+
+  .household-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .household-dashboard-header,
+  .household-panel-header,
+  .household-panel-body,
+  .household-create-card {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .household-member-card {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .household-member-card .household-badge {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
