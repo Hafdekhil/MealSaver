@@ -67,9 +67,15 @@ export function Header() {
               <NavLink to="/household" onClick={closeMenu}>
                 Foyer
               </NavLink>
+
               <NavLink to="/inventory" onClick={closeMenu}>
                 Inventaire
               </NavLink>
+
+              <NavLink to="/recipes" onClick={closeMenu}>
+                Recettes
+              </NavLink>
+
               <button
                 type="button"
                 className="mobile-nav-logout"
@@ -86,6 +92,7 @@ export function Header() {
                   Se connecter
                 </NavLink>
               )}
+
               {location.pathname !== "/register" && (
                 <NavLink to="/register" onClick={closeMenu}>
                   Créer un compte
