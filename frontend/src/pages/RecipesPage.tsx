@@ -13,6 +13,8 @@ type RecipeSuggestion = {
   name: string;
   ingredients: string[];
   inventoryIngredients: string[];
+  availableIngredients: string[];
+  missingIngredients: string[];
 };
 
 export function RecipesPage() {
@@ -20,6 +22,10 @@ export function RecipesPage() {
 
   const [household, setHousehold] = useState<Household | null>(null);
   const [suggestions, setSuggestions] = useState<RecipeSuggestion[]>([]);
+  const [selectedMissingIngredients, setSelectedMissingIngredients] = useState<
+    string[]
+  >([]);
+  const [selectionMessage, setSelectionMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -30,6 +36,7 @@ export function RecipesPage() {
       try {
         setIsLoading(true);
         setError("");
+        setSelectionMessage("");
 
         const householdsResponse = await fetch("/api/households", {
           credentials: "include",
@@ -55,6 +62,7 @@ export function RecipesPage() {
             setHousehold(null);
             setSuggestions([]);
           }
+
           return;
         }
 
@@ -81,6 +89,7 @@ export function RecipesPage() {
 
         if (active) {
           setSuggestions(recipesData.suggestions as RecipeSuggestion[]);
+          setSelectedMissingIngredients([]);
         }
       } catch (error) {
         if (active) {
@@ -104,6 +113,39 @@ export function RecipesPage() {
     };
   }, [navigate]);
 
+  function toggleMissingIngredient(ingredient: string) {
+    setSelectionMessage("");
+
+    setSelectedMissingIngredients((current) => {
+      if (current.includes(ingredient)) {
+        return current.filter((item) => item !== ingredient);
+      }
+
+      return [...current, ingredient];
+    });
+  }
+
+  function prepareShoppingListSelection() {
+    if (selectedMissingIngredients.length === 0) {
+      setSelectionMessage(
+        "Choisissez au moins un ingrédient manquant.",
+      );
+
+      return;
+    }
+
+    setSelectionMessage(
+      `${selectedMissingIngredients.length} ingrédient(s) sélectionné(s) pour la liste d'épicerie.`,
+    );
+
+    /*
+     * MEALSAVER-37 :
+     * Le raccordement réel à la liste d'épicerie sera effectué
+     * lorsque le travail MEALSAVER-39/40/41 de Jean Jacques
+     * sera intégré.
+     */
+  }
+
   return (
     <main className="page-shell">
       <section className="content-page">
@@ -125,6 +167,7 @@ export function RecipesPage() {
         {!isLoading && !error && !household && (
           <div className="page-placeholder">
             <h2>Aucun foyer</h2>
+
             <p>
               Créez d'abord un foyer et ajoutez des aliments à son inventaire.
             </p>
@@ -137,6 +180,7 @@ export function RecipesPage() {
           suggestions.length === 0 && (
             <div className="page-placeholder">
               <h2>Aucune recette disponible</h2>
+
               <p>
                 Ajoutez des aliments dans votre inventaire pour recevoir une
                 suggestion de recette.
@@ -155,25 +199,73 @@ export function RecipesPage() {
                 </div>
               </div>
 
-              <div>
-                <h3>Ingrédients de la recette</h3>
+              <section>
+                <h3>Ingrédients disponibles</h3>
 
-                <ul>
-                  {recipe.ingredients.map((ingredient) => (
-                    <li key={ingredient}>{ingredient}</li>
-                  ))}
-                </ul>
-              </div>
+                {recipe.availableIngredients.length > 0 ? (
+                  <ul>
+                    {recipe.availableIngredients.map((ingredient) => (
+                      <li key={ingredient}>
+                        {ingredient} — déjà dans votre inventaire
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>Aucun ingrédient disponible.</p>
+                )}
+              </section>
 
-              <div>
-                <h3>Déjà dans votre inventaire</h3>
+              <section>
+                <h3>Ingrédients manquants</h3>
 
-                <ul>
-                  {recipe.inventoryIngredients.map((ingredient) => (
-                    <li key={ingredient}>{ingredient}</li>
-                  ))}
-                </ul>
-              </div>
+                {recipe.missingIngredients.length > 0 ? (
+                  <>
+                    <p>
+                      Sélectionnez les ingrédients que vous souhaitez ajouter
+                      à votre future liste d'épicerie.
+                    </p>
+
+                    <div>
+                      {recipe.missingIngredients.map((ingredient) => (
+                        <label
+                          key={ingredient}
+                          style={{
+                            display: "block",
+                            marginBottom: "0.75rem",
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedMissingIngredients.includes(
+                              ingredient,
+                            )}
+                            onChange={() =>
+                              toggleMissingIngredient(ingredient)
+                            }
+                          />{" "}
+                          {ingredient}
+                        </label>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={prepareShoppingListSelection}
+                    >
+                      Préparer la sélection pour la liste
+                    </button>
+
+                    {selectionMessage && (
+                      <p role="status">{selectionMessage}</p>
+                    )}
+                  </>
+                ) : (
+                  <p>
+                    Tous les ingrédients nécessaires sont déjà disponibles.
+                  </p>
+                )}
+              </section>
             </article>
           ))}
       </section>

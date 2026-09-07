@@ -226,4 +226,29 @@ describe("GET /api/recipes", () => {
     expect(suggestion.ingredients).toContain("tomates");
     expect(suggestion.inventoryIngredients).toContain("tomates");
   });
+
+  it("distingue les ingrédients disponibles et manquants", async () => {
+    const agent = await loginAs(ownerEmail);
+
+    const response = await agent.get(
+      `/api/recipes?householdId=${householdId}`,
+    );
+
+    expect(response.status).toBe(200);
+
+    const suggestion = response.body.suggestions[0];
+
+    expect(suggestion.availableIngredients).toEqual(
+      expect.arrayContaining([
+        "riz",
+        "tomates",
+        "oeufs",
+      ]),
+    );
+
+    expect(suggestion.missingIngredients).toEqual([
+      "oignon",
+      "huile",
+    ]);
+  });
 });

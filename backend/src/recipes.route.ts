@@ -13,17 +13,17 @@ const recipeCatalog: RecipeDefinition[] = [
   {
     id: "rice-tomato-eggs",
     name: "Riz aux tomates et aux œufs",
-    ingredients: ["riz", "tomates", "oeufs"],
+    ingredients: ["riz", "tomates", "oeufs", "oignon", "huile"],
   },
   {
     id: "tomato-omelette",
     name: "Omelette aux tomates",
-    ingredients: ["oeufs", "tomates"],
+    ingredients: ["oeufs", "tomates", "fromage"],
   },
   {
     id: "egg-fried-rice",
     name: "Riz sauté aux œufs",
-    ingredients: ["riz", "oeufs"],
+    ingredients: ["riz", "oeufs", "oignon", "sauce soja"],
   },
 ];
 
@@ -100,8 +100,12 @@ recipesRouter.get("/", async (req, res, next) => {
 
     const matchingRecipes = recipeCatalog
       .map((recipe) => {
-        const inventoryIngredients = recipe.ingredients.filter((ingredient) =>
+        const availableIngredients = recipe.ingredients.filter((ingredient) =>
           inventoryNames.has(normalizeName(ingredient)),
+        );
+
+        const missingIngredients = recipe.ingredients.filter(
+          (ingredient) => !inventoryNames.has(normalizeName(ingredient)),
         );
 
         const usesUrgentIngredient = recipe.ingredients.some(
@@ -110,18 +114,19 @@ recipesRouter.get("/", async (req, res, next) => {
 
         return {
           recipe,
-          inventoryIngredients,
+          availableIngredients,
+          missingIngredients,
           usesUrgentIngredient,
         };
       })
-      .filter((candidate) => candidate.inventoryIngredients.length > 0)
+      .filter((candidate) => candidate.availableIngredients.length > 0)
       .sort((a, b) => {
         if (a.usesUrgentIngredient !== b.usesUrgentIngredient) {
           return a.usesUrgentIngredient ? -1 : 1;
         }
 
         return (
-          b.inventoryIngredients.length - a.inventoryIngredients.length
+          b.availableIngredients.length - a.availableIngredients.length
         );
       });
 
@@ -134,7 +139,13 @@ recipesRouter.get("/", async (req, res, next) => {
             id: bestMatch.recipe.id,
             name: bestMatch.recipe.name,
             ingredients: bestMatch.recipe.ingredients,
-            inventoryIngredients: bestMatch.inventoryIngredients,
+
+            // Conservé pour MEALSAVER-36
+            inventoryIngredients: bestMatch.availableIngredients,
+
+            // MEALSAVER-37
+            availableIngredients: bestMatch.availableIngredients,
+            missingIngredients: bestMatch.missingIngredients,
           },
         ],
       });
@@ -146,7 +157,11 @@ recipesRouter.get("/", async (req, res, next) => {
           id: "anti-waste-fallback",
           name: `Recette anti-gaspillage avec ${urgentItem.name}`,
           ingredients: [urgentItem.name],
+
           inventoryIngredients: [urgentItem.name],
+
+          availableIngredients: [urgentItem.name],
+          missingIngredients: [],
         },
       ],
     });
