@@ -1,21 +1,7 @@
-﻿import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-
-export type SessionUser = {
-  id: number;
-  name: string;
-  email: string;
-  createdAt: string;
-};
-
-type AuthState = "checking" | "authenticated" | "anonymous";
-
-type AuthContextValue = {
-  authState: AuthState;
-  user: SessionUser | null;
-};
-
-const AuthContext = createContext<AuthContextValue | null>(null);
+import { AuthContext } from "./auth-context";
+import type { AuthState, SessionUser } from "./auth-context";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [authState, setAuthState] = useState<AuthState>("checking");
@@ -67,14 +53,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth doit être utilisé dans AuthProvider");
-  }
-
-  return context;
 }

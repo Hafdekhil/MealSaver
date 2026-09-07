@@ -219,6 +219,12 @@ describe("Invitations du foyer", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.message).toBe("Vous avez rejoint le foyer");
+    expect(response.body.household).toMatchObject({
+      id: householdId,
+      name: "Foyer Invitation Test",
+      role: "MEMBER",
+    });
+    expect(response.body.household.createdAt).toBeDefined();
 
     const membership = await prisma.householdMember.findUnique({
       where: {
@@ -239,5 +245,32 @@ describe("Invitations du foyer", () => {
     });
 
     expect(updatedInvitation?.status).toBe("ACCEPTED");
+  });
+
+  it("retourne les invitations PENDING de l'utilisateur authentifie", async () => {
+    const invitation = await prisma.invitation.create({
+      data: {
+        householdId,
+        email: invitedEmail,
+        invitedByUserId: ownerId,
+        status: "PENDING",
+      },
+    });
+
+    const response = await request(createTestApp(invitedUserId)).get(
+      "/api/households/invitations",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.invitations).toHaveLength(1);
+    expect(response.body.invitations[0]).toMatchObject({
+      id: invitation.id,
+      email: invitedEmail,
+      status: "PENDING",
+      household: {
+        id: householdId,
+        name: "Foyer Invitation Test",
+      },
+    });
   });
 });

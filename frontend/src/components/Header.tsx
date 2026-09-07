@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { useAuth } from "./AuthProvider";
+import { useAuth } from "./auth-context";
 import logoHorizontal from "../assets/logo-horizontal.png";
 
 export function Header() {
@@ -10,10 +10,6 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const isCheckingSession = authState === "checking";
-
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [location.pathname]);
 
   async function handleLogout() {
     if (isLoggingOut) return;

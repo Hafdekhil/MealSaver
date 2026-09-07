@@ -17,6 +17,17 @@ type Invitation = {
   createdAt?: string;
 };
 
+type ReceivedInvitation = {
+  id: number;
+  email: string;
+  status: "PENDING";
+  createdAt: string;
+  household: {
+    id: number;
+    name: string;
+  };
+};
+
 
 type HouseholdPerson = {
   membershipId?: number;
@@ -65,6 +76,10 @@ export function HouseholdPage() {
   const [invitationError, setInvitationError] = useState("");
   const [invitationSuccess, setInvitationSuccess] = useState("");
   const [isInviting, setIsInviting] = useState(false);
+  const [receivedInvitations, setReceivedInvitations] = useState<ReceivedInvitation[]>([]);
+  const [receivedInvitationError, setReceivedInvitationError] = useState("");
+  const [receivedInvitationSuccess, setReceivedInvitationSuccess] = useState("");
+  const [acceptingInvitationId, setAcceptingInvitationId] = useState<number | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -97,6 +112,39 @@ export function HouseholdPage() {
           setHousehold(availableHouseholds[0] ?? null);
         } else {
           setHousehold(null);
+        }
+        try {
+          const invitationResponse = await fetch(
+            "/api/households/invitations",
+            { credentials: "include" },
+          );
+
+          if (!active) return;
+
+          if (invitationResponse.status === 401) {
+            navigate("/", { replace: true });
+            return;
+          }
+
+          const invitationData = await invitationResponse.json();
+
+          if (!invitationResponse.ok) {
+            throw new Error(
+              invitationData.error ?? "Impossible de charger vos invitations.",
+            );
+          }
+
+          if (active) {
+            setReceivedInvitations(
+              invitationData.invitations as ReceivedInvitation[],
+            );
+          }
+        } catch {
+          if (active) {
+            setReceivedInvitationError(
+              "Impossible de charger vos invitations.",
+            );
+          }
         }
       } catch {
         if (active) {
@@ -284,6 +332,121 @@ export function HouseholdPage() {
     }
   }
 
+  async function handleAcceptInvitation(invitationId: number) {
+    setReceivedInvitationError("");
+    setReceivedInvitationSuccess("");
+
+    try {
+      setAcceptingInvitationId(invitationId);
+
+      const response = await fetch(
+        `/api/households/invitations/${invitationId}/accept`,
+        {
+          method: "POST",
+          credentials: "include",
+        },
+      );
+
+      const data = await response.json();
+
+      if (response.status === 401) {
+        navigate("/", { replace: true });
+        return;
+      }
+
+      if (!response.ok) {
+        setReceivedInvitationError(
+          data.error ?? "Impossible d'accepter l'invitation.",
+        );
+        return;
+      }
+
+      const joinedHousehold = data.household as Household;
+
+      setReceivedInvitations((current) =>
+        current.filter((invitation) => invitation.id !== invitationId),
+      );
+
+      setHouseholds((current) =>
+        current.some((item) => item.id === joinedHousehold.id)
+          ? current.map((item) =>
+              item.id === joinedHousehold.id ? joinedHousehold : item,
+            )
+          : [...current, joinedHousehold],
+      );
+
+      setHousehold(joinedHousehold);
+      setReceivedInvitationSuccess(
+        data.message ?? "Invitation acceptee. Vous etes maintenant membre.",
+      );
+    } catch {
+      setReceivedInvitationError(
+        "Impossible de communiquer avec le serveur MealSaver.",
+      );
+    } finally {
+      setAcceptingInvitationId(null);
+    }
+  }
+  function renderReceivedInvitations() {
+    if (
+      receivedInvitations.length === 0 &&
+      !receivedInvitationError &&
+      !receivedInvitationSuccess
+    ) {
+      return null;
+    }
+
+    return (
+      <section className="household-create-card">
+        <h2>Invitations reçues</h2>
+        <p>
+          Une invitation en attente signifie que vous êtes invité, mais pas
+          encore membre du foyer.
+        </p>
+
+        {receivedInvitations.length > 0 && (
+          <div className="household-invitations">
+            {receivedInvitations.map((invitation) => (
+              <div
+                className="household-member-card"
+                key={`received-invitation-${invitation.id}`}
+              >
+                <div className="household-member-info">
+                  <strong>{invitation.household.name}</strong>
+                  <span>{invitation.email}</span>
+                </div>
+
+                <span className="household-badge">Invité — En attente</span>
+
+                <button
+                  type="button"
+                  className="button button-primary"
+                  disabled={acceptingInvitationId === invitation.id}
+                  onClick={() => void handleAcceptInvitation(invitation.id)}
+                >
+                  {acceptingInvitationId === invitation.id
+                    ? "Acceptation..."
+                    : "Accepter"}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {receivedInvitationError && (
+          <p className="form-message form-error" role="alert">
+            {receivedInvitationError}
+          </p>
+        )}
+
+        {receivedInvitationSuccess && (
+          <p className="form-message form-success" role="status">
+            {receivedInvitationSuccess}
+          </p>
+        )}
+      </section>
+    );
+  }
   const householdMembers = people.filter(
     (person) => person.status !== "INVITED",
   );
@@ -360,6 +523,8 @@ export function HouseholdPage() {
             ))}
           </select>
         </section>
+
+        {renderReceivedInvitations()}
       </main>
     );
   }
@@ -415,6 +580,8 @@ export function HouseholdPage() {
             </p>
           )}
         </section>
+
+        {renderReceivedInvitations()}
       </main>
     );
   }
@@ -442,6 +609,8 @@ export function HouseholdPage() {
           </span>
         </div>
       </section>
+
+      {renderReceivedInvitations()}
 
       <section className="household-dashboard-grid">
         <article className="household-panel">
