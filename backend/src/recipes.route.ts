@@ -36,6 +36,51 @@ function normalizeName(value: string) {
     .trim();
 }
 
+function daysUntilExpiration(expiresAt: Date) {
+  const now = new Date();
+
+  const todayUtc = Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate(),
+  );
+
+  const expirationUtc = Date.UTC(
+    expiresAt.getUTCFullYear(),
+    expiresAt.getUTCMonth(),
+    expiresAt.getUTCDate(),
+  );
+
+  return Math.round(
+    (expirationUtc - todayUtc) / (1000 * 60 * 60 * 24),
+  );
+}
+
+function buildRecommendationReason(
+  ingredientName: string,
+  expiresAt: Date | null,
+) {
+  if (!expiresAt) {
+    return `Cette recette utilise ${ingredientName}, un aliment déjà disponible dans votre inventaire.`;
+  }
+
+  const days = daysUntilExpiration(expiresAt);
+
+  if (days === 0) {
+    return `Cette recette est recommandée en priorité car elle utilise ${ingredientName}, qui expire aujourd'hui.`;
+  }
+
+  if (days === 1) {
+    return `Cette recette est recommandée en priorité car elle utilise ${ingredientName}, qui expire demain.`;
+  }
+
+  if (days > 1) {
+    return `Cette recette est recommandée en priorité car elle utilise ${ingredientName}, qui expire dans ${days} jours.`;
+  }
+
+  return `Cette recette utilise ${ingredientName}, dont la date d'expiration est la plus urgente dans votre inventaire.`;
+}
+
 recipesRouter.get("/", async (req, res, next) => {
   try {
     const userId = Number(res.locals["userId"]);
@@ -130,6 +175,19 @@ recipesRouter.get("/", async (req, res, next) => {
         );
       });
 
+    const priorityIngredient = {
+      name: urgentItem.name,
+      expiresAt: urgentItem.expiresAt,
+      daysUntilExpiration: urgentItem.expiresAt
+        ? daysUntilExpiration(urgentItem.expiresAt)
+        : null,
+    };
+
+    const recommendationReason = buildRecommendationReason(
+      urgentItem.name,
+      urgentItem.expiresAt,
+    );
+
     if (matchingRecipes.length > 0) {
       const bestMatch = matchingRecipes[0]!;
 
@@ -140,12 +198,17 @@ recipesRouter.get("/", async (req, res, next) => {
             name: bestMatch.recipe.name,
             ingredients: bestMatch.recipe.ingredients,
 
-            // Conservé pour MEALSAVER-36
+            // MEALSAVER-36
             inventoryIngredients: bestMatch.availableIngredients,
 
             // MEALSAVER-37
             availableIngredients: bestMatch.availableIngredients,
             missingIngredients: bestMatch.missingIngredients,
+
+            // MEALSAVER-38
+            priorityIngredient,
+            recommendationReason,
+            isFallback: false,
           },
         ],
       });
@@ -155,13 +218,22 @@ recipesRouter.get("/", async (req, res, next) => {
       suggestions: [
         {
           id: "anti-waste-fallback",
-          name: `Recette anti-gaspillage avec ${urgentItem.name}`,
+          name: `Idée anti-gaspillage avec ${urgentItem.name}`,
           ingredients: [urgentItem.name],
 
           inventoryIngredients: [urgentItem.name],
 
           availableIngredients: [urgentItem.name],
           missingIngredients: [],
+
+          priorityIngredient,
+          recommendationReason:
+            `Aucune recette exacte n'a été trouvée. ` +
+            buildRecommendationReason(
+              urgentItem.name,
+              urgentItem.expiresAt,
+            ),
+          isFallback: true,
         },
       ],
     });

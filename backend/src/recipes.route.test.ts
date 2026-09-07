@@ -251,4 +251,66 @@ describe("GET /api/recipes", () => {
       "huile",
     ]);
   });
+
+  it("identifie l'aliment prioritaire et explique la recommandation", async () => {
+    const agent = await loginAs(ownerEmail);
+
+    const response = await agent.get(
+      `/api/recipes?householdId=${householdId}`,
+    );
+
+    expect(response.status).toBe(200);
+
+    const suggestion = response.body.suggestions[0];
+
+    expect(suggestion.priorityIngredient.name).toBe("Tomates");
+    expect(suggestion.priorityIngredient.expiresAt).not.toBeNull();
+    expect(suggestion.recommendationReason).toContain("Tomates");
+    expect(suggestion.isFallback).toBe(false);
+  });
+
+  it("reste utilisable lorsqu'aucune recette exacte n'est trouvée", async () => {
+    const ownerMembership = await prisma.householdMember.findFirstOrThrow({
+      where: {
+        householdId,
+        role: "OWNER",
+      },
+    });
+
+    await prisma.foodItem.deleteMany({
+      where: {
+        householdId,
+      },
+    });
+
+    await prisma.foodItem.create({
+      data: {
+        householdId,
+        name: "Courgette",
+        quantity: 2,
+        unit: "unité",
+        storageLocation: "FRIDGE",
+        expiresAt: new Date("2026-09-08T00:00:00.000Z"),
+        addedBy: ownerMembership.userId,
+      },
+    });
+
+    const agent = await loginAs(ownerEmail);
+
+    const response = await agent.get(
+      `/api/recipes?householdId=${householdId}`,
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.suggestions).toHaveLength(1);
+
+    const suggestion = response.body.suggestions[0];
+
+    expect(suggestion.isFallback).toBe(true);
+    expect(suggestion.name).toContain("Courgette");
+    expect(suggestion.availableIngredients).toContain("Courgette");
+    expect(suggestion.recommendationReason).toContain(
+      "Aucune recette exacte",
+    );
+  });
 });

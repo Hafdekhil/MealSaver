@@ -8,6 +8,12 @@ type Household = {
   role: "OWNER" | "MEMBER";
 };
 
+type PriorityIngredient = {
+  name: string;
+  expiresAt: string | null;
+  daysUntilExpiration: number | null;
+};
+
 type RecipeSuggestion = {
   id: string;
   name: string;
@@ -15,6 +21,9 @@ type RecipeSuggestion = {
   inventoryIngredients: string[];
   availableIngredients: string[];
   missingIngredients: string[];
+  priorityIngredient: PriorityIngredient;
+  recommendationReason: string;
+  isFallback: boolean;
 };
 
 export function RecipesPage() {
@@ -167,7 +176,6 @@ export function RecipesPage() {
         {!isLoading && !error && !household && (
           <div className="page-placeholder">
             <h2>Aucun foyer</h2>
-
             <p>
               Créez d'abord un foyer et ajoutez des aliments à son inventaire.
             </p>
@@ -180,7 +188,6 @@ export function RecipesPage() {
           suggestions.length === 0 && (
             <div className="page-placeholder">
               <h2>Aucune recette disponible</h2>
-
               <p>
                 Ajoutez des aliments dans votre inventaire pour recevoir une
                 suggestion de recette.
@@ -194,10 +201,39 @@ export function RecipesPage() {
             <article className="panel" key={recipe.id}>
               <div className="panel-head">
                 <div>
-                  <p className="eyebrow">Suggestion du foyer</p>
+                  <p className="eyebrow">
+                    {recipe.isFallback
+                      ? "Idée anti-gaspillage"
+                      : "Suggestion prioritaire"}
+                  </p>
+
                   <h2>{recipe.name}</h2>
                 </div>
               </div>
+
+              <section>
+                <h3>Pourquoi cette recette ?</h3>
+
+                <p>{recipe.recommendationReason}</p>
+
+                <p>
+                  <strong>Aliment prioritaire :</strong>{" "}
+                  {recipe.priorityIngredient.name}
+                </p>
+
+                {recipe.priorityIngredient.daysUntilExpiration !== null && (
+                  <p>
+                    <strong>Expiration :</strong>{" "}
+                    {recipe.priorityIngredient.daysUntilExpiration === 0
+                      ? "aujourd'hui"
+                      : recipe.priorityIngredient.daysUntilExpiration === 1
+                        ? "demain"
+                        : recipe.priorityIngredient.daysUntilExpiration > 1
+                          ? `dans ${recipe.priorityIngredient.daysUntilExpiration} jours`
+                          : "date dépassée"}
+                  </p>
+                )}
+              </section>
 
               <section>
                 <h3>Ingrédients disponibles</h3>
