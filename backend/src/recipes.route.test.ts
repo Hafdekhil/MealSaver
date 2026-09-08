@@ -269,6 +269,68 @@ describe("GET /api/recipes", () => {
     expect(suggestion.isFallback).toBe(false);
   });
 
+  it("n'attribue pas à une recette un aliment urgent qu'elle n'utilise pas", async () => {
+    const ownerMembership = await prisma.householdMember.findFirstOrThrow({
+      where: {
+        householdId,
+        role: "OWNER",
+      },
+    });
+
+    await prisma.foodItem.deleteMany({
+      where: {
+        householdId,
+      },
+    });
+
+    await prisma.foodItem.createMany({
+      data: [
+        {
+          householdId,
+          name: "Courgette",
+          quantity: 2,
+          unit: "unité",
+          storageLocation: "FRIDGE",
+          expiresAt: new Date("2026-09-08T00:00:00.000Z"),
+          addedBy: ownerMembership.userId,
+        },
+        {
+          householdId,
+          name: "Oeufs",
+          quantity: 6,
+          unit: "unité",
+          storageLocation: "FRIDGE",
+          expiresAt: new Date("2026-09-17T00:00:00.000Z"),
+          addedBy: ownerMembership.userId,
+        },
+        {
+          householdId,
+          name: "Riz",
+          quantity: 1,
+          unit: "kg",
+          storageLocation: "PANTRY",
+          expiresAt: new Date("2026-10-06T00:00:00.000Z"),
+          addedBy: ownerMembership.userId,
+        },
+      ],
+    });
+
+    const agent = await loginAs(ownerEmail);
+
+    const response = await agent.get(
+      `/api/recipes?householdId=${householdId}`,
+    );
+
+    expect(response.status).toBe(200);
+
+    const suggestion = response.body.suggestions[0];
+
+    expect(suggestion.isFallback).toBe(false);
+    expect(suggestion.ingredients).not.toContain("courgette");
+    expect(suggestion.priorityIngredient.name).toBe("Oeufs");
+    expect(suggestion.recommendationReason).toContain("Oeufs");
+    expect(suggestion.recommendationReason).not.toContain("Courgette");
+  });
   it("reste utilisable lorsqu'aucune recette exacte n'est trouvée", async () => {
     const ownerMembership = await prisma.householdMember.findFirstOrThrow({
       where: {

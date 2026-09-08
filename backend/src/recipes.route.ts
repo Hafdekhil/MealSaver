@@ -141,8 +141,6 @@ recipesRouter.get("/", async (req, res, next) => {
       inventoryItems.find((item) => item.expiresAt !== null) ??
       inventoryItems[0]!;
 
-    const urgentName = normalizeName(urgentItem.name);
-
     const matchingRecipes = recipeCatalog
       .map((recipe) => {
         const availableIngredients = recipe.ingredients.filter((ingredient) =>
@@ -153,21 +151,34 @@ recipesRouter.get("/", async (req, res, next) => {
           (ingredient) => !inventoryNames.has(normalizeName(ingredient)),
         );
 
-        const usesUrgentIngredient = recipe.ingredients.some(
-          (ingredient) => normalizeName(ingredient) === urgentName,
+        const matchingInventoryItems = inventoryItems.filter((item) =>
+          recipe.ingredients.some(
+            (ingredient) =>
+              normalizeName(ingredient) === normalizeName(item.name),
+          ),
         );
+
+        const priorityItem =
+          matchingInventoryItems.find((item) => item.expiresAt !== null) ??
+          matchingInventoryItems[0] ??
+          null;
+
+        const priorityDays = priorityItem?.expiresAt
+          ? daysUntilExpiration(priorityItem.expiresAt)
+          : Number.MAX_SAFE_INTEGER;
 
         return {
           recipe,
           availableIngredients,
           missingIngredients,
-          usesUrgentIngredient,
+          priorityItem,
+          priorityDays,
         };
       })
       .filter((candidate) => candidate.availableIngredients.length > 0)
       .sort((a, b) => {
-        if (a.usesUrgentIngredient !== b.usesUrgentIngredient) {
-          return a.usesUrgentIngredient ? -1 : 1;
+        if (a.priorityDays !== b.priorityDays) {
+          return a.priorityDays - b.priorityDays;
         }
 
         return (
@@ -183,13 +194,26 @@ recipesRouter.get("/", async (req, res, next) => {
         : null,
     };
 
-    const recommendationReason = buildRecommendationReason(
-      urgentItem.name,
-      urgentItem.expiresAt,
-    );
 
     if (matchingRecipes.length > 0) {
       const bestMatch = matchingRecipes[0]!;
+
+      if (!bestMatch.priorityItem) {
+        throw new Error("Recette correspondante sans ingrédient d'inventaire");
+      }
+
+      const priorityIngredient = {
+        name: bestMatch.priorityItem.name,
+        expiresAt: bestMatch.priorityItem.expiresAt,
+        daysUntilExpiration: bestMatch.priorityItem.expiresAt
+          ? daysUntilExpiration(bestMatch.priorityItem.expiresAt)
+          : null,
+      };
+
+      const recommendationReason = buildRecommendationReason(
+        bestMatch.priorityItem.name,
+        bestMatch.priorityItem.expiresAt,
+      );
 
       return res.status(200).json({
         suggestions: [
