@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../components/AuthProvider";
+import { useAuth } from "../components/auth-context";
 
 import styleReferenceBoard from "../assets/style-reference-board.png";
 

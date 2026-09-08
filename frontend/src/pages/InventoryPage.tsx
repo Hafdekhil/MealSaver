@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AddFoodForm } from "../AddFoodForm";
 
@@ -65,7 +65,7 @@ export function InventoryPage() {
   const selectedHousehold =
     households.find((household) => household.id === householdId) ?? null;
 
-  async function loadItems(targetHouseholdId: number) {
+  const loadItems = useCallback(async (targetHouseholdId: number) => {
     setIsLoadingItems(true);
     setLoadError("");
 
@@ -96,7 +96,7 @@ export function InventoryPage() {
     } finally {
       setIsLoadingItems(false);
     }
-  }
+  }, [navigate]);
 
   useEffect(() => {
     let active = true;
@@ -125,7 +125,9 @@ export function InventoryPage() {
         setHouseholds(availableHouseholds);
 
         if (availableHouseholds.length > 0) {
-          setHouseholdId(availableHouseholds[0]?.id ?? null);
+          const firstHouseholdId = availableHouseholds[0]?.id ?? null;
+          setHouseholdId(firstHouseholdId);
+          if (firstHouseholdId !== null) void loadItems(firstHouseholdId);
         }
       } catch (error) {
         if (active) {
@@ -147,15 +149,7 @@ export function InventoryPage() {
     return () => {
       active = false;
     };
-  }, [navigate]);
-
-  useEffect(() => {
-    if (householdId !== null) {
-      void loadItems(householdId);
-    } else {
-      setItems([]);
-    }
-  }, [householdId]);
+  }, [navigate, loadItems]);
 
   function startEdit(item: FoodItem) {
     setActionError("");
@@ -325,9 +319,11 @@ export function InventoryPage() {
             <select
               id="inventory-household"
               value={householdId ?? ""}
-              onChange={(event) =>
-                setHouseholdId(Number(event.target.value))
-              }
+              onChange={(event) => {
+                const selectedId = Number(event.target.value);
+                setHouseholdId(selectedId);
+                void loadItems(selectedId);
+              }}
             >
               {households.map((household) => (
                 <option key={household.id} value={household.id}>
