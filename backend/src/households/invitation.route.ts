@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
+import { sendHouseholdInvitationEmail } from "../lib/mailer.js";
 import { createInvitationSchema } from "./invitation.schema.js";
 
 export const invitationRouter = Router();
@@ -102,6 +103,19 @@ invitationRouter.post("/:householdId/invitations", async (req, res, next) => {
           userId,
         },
       },
+      select: {
+        role: true,
+        household: {
+          select: {
+            name: true,
+          },
+        },
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
 
     if (!ownerMembership || ownerMembership.role !== "OWNER") {
@@ -160,6 +174,26 @@ invitationRouter.post("/:householdId/invitations", async (req, res, next) => {
         status: "PENDING",
       },
     });
+
+    try {
+      await sendHouseholdInvitationEmail({
+        to: email,
+        householdName: ownerMembership.household.name,
+        inviterName: ownerMembership.user.name,
+      });
+    } catch {
+      await prisma.invitation.delete({
+        where: {
+          id: invitation.id,
+        },
+      });
+
+      console.error("Echec de l'envoi du courriel d'invitation MealSaver");
+
+      return res.status(502).json({
+        error: "Impossible d'envoyer le courriel d'invitation",
+      });
+    }
 
     return res.status(201).json({
       invitation,
