@@ -11,6 +11,7 @@ import { memberRouter } from "./member.route.js";
 import { inventoryDeleteRouter } from "./inventory/inventory.delete.route.js";
 import { inventoryUpdateRouter } from "./inventory/inventory.patch.route.js";
 import { recipesRouter } from "./recipes.route.js";
+import { scanRouter } from "./scan.route.js";
 
 export const app = express();
 
@@ -37,6 +38,8 @@ app.use("/api/inventory", requireAuth, inventoryUpdateRouter);
 app.use("/api/inventory", requireAuth, inventoryDeleteRouter);
 
 app.use("/api/recipes", requireAuth, recipesRouter);
+
+app.use("/api/scan", requireAuth, scanRouter);
 
 app.use(
   (

@@ -272,7 +272,7 @@ Les contributions Git et les Pull Requests sont conservées afin de préserver l
 
 # Sprint 2 - Fonctionnalités anti-gaspillage
 
-Le Sprint 2 est actuellement au backlog de développement. Les récits ci-dessous ne sont pas considérés comme livrés tant que leurs critères d'acceptation ne sont pas validés.
+Le Sprint 2 est en cours de développement. Les récits ci-dessous ne sont pas considérés comme livrés tant que leurs critères d'acceptation, la revue croisée et la CI ne sont pas validés.
 
 | Récit | Titre | Responsable | Priorité | Statut Jira |
 |---|---|---|---|---|
@@ -289,10 +289,16 @@ Le Sprint 2 est actuellement au backlog de développement. Les récits ci-dessou
 | MEALSAVER-43 | Voir les alertes dans le tableau de bord | Danensky | Medium | To Do |
 | MEALSAVER-44 | Relier une alerte à une recette | Danensky | Medium | To Do |
 
+## Utilisation de l'IA - Sprint 2
+
+Pour MEALSAVER-33, ChatGPT a été utilisé comme assistant de développement pour l'analyse, la revue de code, le débogage et la préparation des tests. Les modifications ont été exécutées et vérifiées par le responsable du récit.
+
+Google Gemini est utilisé par la fonctionnalité de scan pour proposer l'identification de l'aliment à partir d'une image. Le résultat demeure une proposition et une validation manuelle est obligatoire avant tout ajout à l'inventaire. Les clés et secrets nécessaires sont conservés dans des variables d'environnement et ne sont pas versionnés.
+
 ## Statut du projet
 
 - Sprint 0 : terminé.
 - Sprint 1 : implémenté et en validation finale.
-- Sprint 2 : To Do dans Jira - développement non commencé.
+- Sprint 2 : en cours de développement ; MEALSAVER-33 est en validation avant revue croisée et CI.
 
 La priorité reste le respect du livrable, des critères d'acceptation Jira, de la revue croisée et de la CI avant fusion vers main.
