@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
+import { sendHouseholdInvitationEmail } from "../lib/mailer.js";
 import { createInvitationSchema } from "./invitation.schema.js";
 
 export const invitationRouter = Router();
@@ -48,6 +49,11 @@ invitationRouter.get("/invitations", async (_req, res, next) => {
         household: {
           select: {
             id: true,
+            name: true,
+          },
+        },
+        invitedBy: {
+          select: {
             name: true,
           },
         },
@@ -100,6 +106,19 @@ invitationRouter.post("/:householdId/invitations", async (req, res, next) => {
         householdId_userId: {
           householdId,
           userId,
+        },
+      },
+      select: {
+        role: true,
+        household: {
+          select: {
+            name: true,
+          },
+        },
+        user: {
+          select: {
+            name: true,
+          },
         },
       },
     });
@@ -161,6 +180,27 @@ invitationRouter.post("/:householdId/invitations", async (req, res, next) => {
       },
     });
 
+    try {
+      await sendHouseholdInvitationEmail({
+        to: email,
+        householdName: ownerMembership.household.name,
+        inviterName: ownerMembership.user.name,
+        invitationId: invitation.id,
+      });
+    } catch {
+      await prisma.invitation.delete({
+        where: {
+          id: invitation.id,
+        },
+      });
+
+      console.error("Echec de l'envoi du courriel d'invitation MealSaver");
+
+      return res.status(502).json({
+        error: "Impossible d'envoyer le courriel d'invitation",
+      });
+    }
+
     return res.status(201).json({
       invitation,
     });
@@ -169,6 +209,187 @@ invitationRouter.post("/:householdId/invitations", async (req, res, next) => {
   }
 });
 
+/**
+ * DELETE /api/households/:householdId/invitations/:invitationId
+ * Le OWNER du foyer annule une invitation encore PENDING.
+ */
+invitationRouter.delete(
+  "/:householdId/invitations/:invitationId",
+  async (req, res, next) => {
+    try {
+      const userId = Number(res.locals["userId"]);
+      const householdId = Number(req.params["householdId"]);
+      const invitationId = Number(req.params["invitationId"]);
+
+      if (!userId) {
+        return res.status(401).json({
+          error: "Non authentifié",
+        });
+      }
+
+      if (
+        !Number.isInteger(householdId) ||
+        householdId <= 0 ||
+        !Number.isInteger(invitationId) ||
+        invitationId <= 0
+      ) {
+        return res.status(400).json({
+          error: "Invitation invalide",
+        });
+      }
+
+      const ownerMembership = await prisma.householdMember.findUnique({
+        where: {
+          householdId_userId: {
+            householdId,
+            userId,
+          },
+        },
+        select: {
+          role: true,
+        },
+      });
+
+      if (!ownerMembership || ownerMembership.role !== "OWNER") {
+        return res.status(403).json({
+          error: "Vous n'avez pas la permission d'annuler cette invitation",
+        });
+      }
+
+      const invitation = await prisma.invitation.findUnique({
+        where: {
+          id: invitationId,
+        },
+        select: {
+          householdId: true,
+          status: true,
+        },
+      });
+
+      if (!invitation || invitation.householdId !== householdId) {
+        return res.status(404).json({
+          error: "Invitation introuvable",
+        });
+      }
+
+      if (invitation.status !== "PENDING") {
+        return res.status(409).json({
+          error: "Cette invitation n'est plus en attente",
+        });
+      }
+
+      const deletion = await prisma.invitation.deleteMany({
+        where: {
+          id: invitationId,
+          householdId,
+          status: "PENDING",
+        },
+      });
+
+      if (deletion.count !== 1) {
+        return res.status(409).json({
+          error: "Cette invitation n'est plus en attente",
+        });
+      }
+
+      return res.status(200).json({
+        message: "Invitation annulée",
+      });
+    } catch (error) {
+      return next(error);
+    }
+  },
+);
+/**
+ * POST /api/households/invitations/:invitationId/decline
+ * Le destinataire refuse une invitation encore PENDING.
+ */
+invitationRouter.post(
+  "/invitations/:invitationId/decline",
+  async (req, res, next) => {
+    try {
+      const userId = Number(res.locals["userId"]);
+      const invitationId = Number(req.params["invitationId"]);
+
+      if (!Number.isInteger(userId) || userId <= 0) {
+        return res.status(401).json({
+          error: "Non authentifié",
+        });
+      }
+
+      if (!Number.isInteger(invitationId) || invitationId <= 0) {
+        return res.status(400).json({
+          error: "Invitation invalide",
+        });
+      }
+
+      const user = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          email: true,
+        },
+      });
+
+      if (!user) {
+        return res.status(404).json({
+          error: "Utilisateur introuvable",
+        });
+      }
+
+      const invitation = await prisma.invitation.findUnique({
+        where: {
+          id: invitationId,
+        },
+        select: {
+          email: true,
+          status: true,
+        },
+      });
+
+      if (!invitation) {
+        return res.status(404).json({
+          error: "Invitation introuvable",
+        });
+      }
+
+      if (invitation.status !== "PENDING") {
+        return res.status(409).json({
+          error: "Cette invitation n'est plus en attente",
+        });
+      }
+
+      if (
+        invitation.email.trim().toLowerCase() !==
+        user.email.trim().toLowerCase()
+      ) {
+        return res.status(403).json({
+          error: "Cette invitation ne vous appartient pas",
+        });
+      }
+
+      const deletion = await prisma.invitation.deleteMany({
+        where: {
+          id: invitationId,
+          status: "PENDING",
+        },
+      });
+
+      if (deletion.count !== 1) {
+        return res.status(409).json({
+          error: "Cette invitation n'est plus en attente",
+        });
+      }
+
+      return res.status(200).json({
+        message: "Invitation refusée",
+      });
+    } catch (error) {
+      return next(error);
+    }
+  },
+);
 /**
  * POST /api/households/invitations/:invitationId/accept
  * La personne invitée rejoint le foyer.

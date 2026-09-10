@@ -23,7 +23,7 @@ export function Header() {
       });
 
       if (!response.ok) {
-        throw new Error("La déconnexion a échoué.");
+        throw new Error("La d\u00E9connexion a \u00E9chou\u00E9.");
       }
 
       setIsMenuOpen(false);
@@ -63,16 +63,26 @@ export function Header() {
               <NavLink to="/household" onClick={closeMenu}>
                 Foyer
               </NavLink>
+
               <NavLink to="/inventory" onClick={closeMenu}>
                 Inventaire
               </NavLink>
+
+              <NavLink to="/scan" onClick={closeMenu}>
+                Scan
+              </NavLink>
+
+              <NavLink to="/recipes" onClick={closeMenu}>
+                Recettes
+              </NavLink>
+
               <button
                 type="button"
                 className="mobile-nav-logout"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
               >
-                {isLoggingOut ? "Déconnexion..." : "Se déconnecter"}
+                {isLoggingOut ? "D\u00E9connexion..." : "Se d\u00E9connecter"}
               </button>
             </>
           ) : (
@@ -82,9 +92,10 @@ export function Header() {
                   Se connecter
                 </NavLink>
               )}
+
               {location.pathname !== "/register" && (
                 <NavLink to="/register" onClick={closeMenu}>
-                  Créer un compte
+                  {"Cr\u00E9er un compte"}
                 </NavLink>
               )}
             </>
@@ -105,7 +116,7 @@ export function Header() {
               onClick={handleLogout}
               disabled={isLoggingOut}
             >
-              {isLoggingOut ? "Déconnexion..." : "Se déconnecter"}
+              {isLoggingOut ? "D\u00E9connexion..." : "Se d\u00E9connecter"}
             </button>
           </>
         ) : !isCheckingSession ? (
@@ -124,7 +135,7 @@ export function Header() {
 
             {location.pathname !== "/register" && (
               <NavLink className="btn btn-primary" to="/register">
-                Créer un compte
+                {"Cr\u00E9er un compte"}
               </NavLink>
             )}
           </>
@@ -139,7 +150,7 @@ export function Header() {
         aria-controls="main-navigation"
         onClick={() => setIsMenuOpen((open) => !open)}
       >
-        {isMenuOpen ? "×" : "☰"}
+        {isMenuOpen ? "\u00D7" : "\u2630"}
       </button>
     </header>
   );

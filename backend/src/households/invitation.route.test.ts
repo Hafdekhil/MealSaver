@@ -1,7 +1,12 @@
 import express from "express";
 import request from "supertest";
-import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { prisma } from "../lib/prisma.js";
+import { sendHouseholdInvitationEmail } from "../lib/mailer.js";
+
+vi.mock("../lib/mailer.js", () => ({
+  sendHouseholdInvitationEmail: vi.fn(),
+}));
 import { invitationRouter } from "./invitation.route.js";
 
 const ownerEmail = "owner.invitation.test@example.com";
@@ -83,6 +88,9 @@ async function cleanupTestData() {
 
 describe("Invitations du foyer", () => {
   beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.mocked(sendHouseholdInvitationEmail).mockResolvedValue(undefined);
+
     await cleanupTestData();
 
     const owner = await prisma.user.create({
@@ -165,6 +173,14 @@ describe("Invitations du foyer", () => {
     expect(invitation).not.toBeNull();
     expect(invitation?.status).toBe("PENDING");
     expect(invitation?.invitedByUserId).toBe(ownerId);
+
+    expect(sendHouseholdInvitationEmail).toHaveBeenCalledTimes(1);
+    expect(sendHouseholdInvitationEmail).toHaveBeenCalledWith({
+      to: invitedEmail,
+      householdName: "Foyer Invitation Test",
+      inviterName: "Owner Test",
+      invitationId: invitation?.id,
+    });
   });
 
   it("refuse une invitation envoyée par un MEMBER", async () => {
@@ -271,6 +287,232 @@ describe("Invitations du foyer", () => {
         id: householdId,
         name: "Foyer Invitation Test",
       },
+      invitedBy: {
+        name: "Owner Test",
+      },
     });
   });
-});
+
+  it("supprime l'invitation si l'envoi du courriel échoue", async () => {
+    vi.mocked(sendHouseholdInvitationEmail).mockRejectedValueOnce(
+      new Error("SMTP indisponible"),
+    );
+
+    const response = await request(createTestApp(ownerId))
+      .post(`/api/households/${householdId}/invitations`)
+      .send({
+        email: invitedEmail,
+      });
+
+    expect(response.status).toBe(502);
+    expect(response.body.error).toBe(
+      "Impossible d'envoyer le courriel d'invitation",
+    );
+    expect(sendHouseholdInvitationEmail).toHaveBeenCalledTimes(1);
+
+    const invitation = await prisma.invitation.findUnique({
+      where: {
+        householdId_email: {
+          householdId,
+          email: invitedEmail,
+        },
+      },
+    });
+
+    expect(invitation).toBeNull();
+  });
+
+  it("permet au OWNER d'annuler une invitation en attente", async () => {
+    const invitation = await prisma.invitation.create({
+      data: {
+        householdId,
+        email: invitedEmail,
+        invitedByUserId: ownerId,
+        status: "PENDING",
+      },
+    });
+
+    const response = await request(createTestApp(ownerId)).delete(
+      `/api/households/${householdId}/invitations/${invitation.id}`,
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe("Invitation annulée");
+
+    const deletedInvitation = await prisma.invitation.findUnique({
+      where: {
+        id: invitation.id,
+      },
+    });
+
+    expect(deletedInvitation).toBeNull();
+  });
+
+  it("refuse l'annulation d'une invitation par un MEMBER", async () => {
+    const invitation = await prisma.invitation.create({
+      data: {
+        householdId,
+        email: invitedEmail,
+        invitedByUserId: ownerId,
+        status: "PENDING",
+      },
+    });
+
+    const response = await request(createTestApp(memberId)).delete(
+      `/api/households/${householdId}/invitations/${invitation.id}`,
+    );
+
+    expect(response.status).toBe(403);
+
+    const existingInvitation = await prisma.invitation.findUnique({
+      where: {
+        id: invitation.id,
+      },
+    });
+
+    expect(existingInvitation?.status).toBe("PENDING");
+  });
+
+  it("refuse d'annuler une invitation déjà acceptée", async () => {
+    const invitation = await prisma.invitation.create({
+      data: {
+        householdId,
+        email: invitedEmail,
+        invitedByUserId: ownerId,
+        status: "ACCEPTED",
+      },
+    });
+
+    const response = await request(createTestApp(ownerId)).delete(
+      `/api/households/${householdId}/invitations/${invitation.id}`,
+    );
+
+    expect(response.status).toBe(409);
+
+    const existingInvitation = await prisma.invitation.findUnique({
+      where: {
+        id: invitation.id,
+      },
+    });
+
+    expect(existingInvitation?.status).toBe("ACCEPTED");
+  });
+
+  it("conserve l'invitation PENDING pendant la création du compte invité", async () => {
+    await prisma.user.delete({
+      where: {
+        id: invitedUserId,
+      },
+    });
+
+    const createResponse = await request(createTestApp(ownerId))
+      .post(`/api/households/${householdId}/invitations`)
+      .send({
+        email: invitedEmail,
+      });
+
+    expect(createResponse.status).toBe(201);
+
+    const invitationId = createResponse.body.invitation.id as number;
+
+    const pendingBeforeRegistration = await prisma.invitation.findUnique({
+      where: {
+        id: invitationId,
+      },
+    });
+
+    expect(pendingBeforeRegistration?.status).toBe("PENDING");
+
+    const registeredUser = await prisma.user.create({
+      data: {
+        name: "Invited After Invitation",
+        email: invitedEmail,
+        passwordHash: "test-password-hash",
+      },
+    });
+
+    const invitationsResponse = await request(
+      createTestApp(registeredUser.id),
+    ).get("/api/households/invitations");
+
+    expect(invitationsResponse.status).toBe(200);
+    expect(invitationsResponse.body.invitations).toHaveLength(1);
+    expect(invitationsResponse.body.invitations[0]).toMatchObject({
+      id: invitationId,
+      email: invitedEmail,
+      status: "PENDING",
+      household: {
+        id: householdId,
+        name: "Foyer Invitation Test",
+      },
+    });
+
+    const pendingAfterRegistration = await prisma.invitation.findUnique({
+      where: {
+        id: invitationId,
+      },
+    });
+
+    expect(pendingAfterRegistration?.status).toBe("PENDING");
+  });
+  it("permet au destinataire de refuser une invitation PENDING", async () => {
+    const invitation = await prisma.invitation.create({
+      data: {
+        householdId,
+        email: invitedEmail,
+        invitedByUserId: ownerId,
+        status: "PENDING",
+      },
+    });
+
+    const response = await request(createTestApp(invitedUserId)).post(
+      `/api/households/invitations/${invitation.id}/decline`,
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe("Invitation refusée");
+
+    const deletedInvitation = await prisma.invitation.findUnique({
+      where: {
+        id: invitation.id,
+      },
+    });
+
+    expect(deletedInvitation).toBeNull();
+
+    const membership = await prisma.householdMember.findUnique({
+      where: {
+        householdId_userId: {
+          householdId,
+          userId: invitedUserId,
+        },
+      },
+    });
+
+    expect(membership).toBeNull();
+  });
+
+  it("interdit de refuser l'invitation destinée à un autre compte", async () => {
+    const invitation = await prisma.invitation.create({
+      data: {
+        householdId,
+        email: invitedEmail,
+        invitedByUserId: ownerId,
+        status: "PENDING",
+      },
+    });
+
+    const response = await request(createTestApp(ownerId)).post(
+      `/api/households/invitations/${invitation.id}/decline`,
+    );
+
+    expect(response.status).toBe(403);
+
+    const existingInvitation = await prisma.invitation.findUnique({
+      where: {
+        id: invitation.id,
+      },
+    });
+
+    expect(existingInvitation?.status).toBe("PENDING");
+  });});

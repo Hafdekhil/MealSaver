@@ -1,4 +1,4 @@
-﻿.household-dashboard {
+.household-dashboard {
   width: min(1380px, calc(100% - 72px));
   margin: 0 auto;
   padding: 38px 0 80px;
@@ -166,6 +166,21 @@
 .household-actions .button {
   justify-content: center;
 }
+.button-danger {
+  border: 1px solid #d8a7a7;
+  background: #fff5f5;
+  color: #a52a2a;
+}
+
+.button-danger:hover {
+  background: #fde8e8;
+}
+
+.button-danger:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
 
 .household-invitations {
   display: grid;
@@ -268,5 +283,27 @@
   .household-member-card .household-badge {
     grid-column: 1 / -1;
     justify-self: start;
+  }
+}
+
+.household-multi-grid {
+  width: min(1200px, 100%);
+  margin: 30px auto 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.household-multi-grid .household-create-card {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 950px) {
+  .household-multi-grid {
+    grid-template-columns: 1fr;
   }
 }
