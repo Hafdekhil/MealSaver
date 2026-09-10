@@ -1,7 +1,19 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
+function getSafeReturnTo(value: string | null) {
+  if (
+    !value ||
+    !value.startsWith("/") ||
+    value.startsWith("//") ||
+    value.includes("\\")
+  ) {
+    return "/household";
+  }
+
+  return value;
+}
 type RegisteredUser = {
   id: number;
   name: string;
@@ -10,6 +22,9 @@ type RegisteredUser = {
 };
 
 export function RegisterPage() {
+  const [searchParams] = useSearchParams();
+  const returnTo = getSafeReturnTo(searchParams.get("returnTo"));
+  const loginHref = `/login?returnTo=${encodeURIComponent(returnTo)}`;
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -72,7 +87,7 @@ export function RegisterPage() {
         return;
       }
 
-      window.location.href = "/household";
+      window.location.href = returnTo;
     } catch {
       setError("Impossible de communiquer avec le serveur MealSaver.");
     } finally {
@@ -156,7 +171,7 @@ export function RegisterPage() {
           )}
 
           <p className="auth-switch">
-            Vous avez déjà un compte ? <Link to="/login">Se connecter</Link>
+            Vous avez déjà un compte ? <Link to={loginHref}>Se connecter</Link>
           </p>
         </div>
       </section>

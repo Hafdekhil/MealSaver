@@ -67,7 +67,7 @@ async function cleanupTestData() {
   });
 }
 
-describe("POST /api/households", () => {
+describe("Foyers", () => {
   beforeEach(async () => {
     await cleanupTestData();
 
@@ -174,4 +174,114 @@ describe("POST /api/households", () => {
     expect(membership).not.toBeNull();
     expect(membership?.role).toBe("OWNER");
   });
-});
+
+  it("permet au OWNER de supprimer son foyer sans supprimer son compte", async () => {
+    const createResponse = await request(createTestApp(testUserId))
+      .post("/api/households")
+      .send({
+        name: "Foyer à supprimer",
+      });
+
+    expect(createResponse.status).toBe(201);
+
+    const householdId = createResponse.body.household.id as number;
+
+    await prisma.invitation.create({
+      data: {
+        householdId,
+        email: "invitation.delete.test@example.com",
+        invitedByUserId: testUserId,
+        status: "PENDING",
+      },
+    });
+
+    await prisma.foodItem.create({
+      data: {
+        householdId,
+        name: "Aliment test suppression",
+        addedBy: testUserId,
+      },
+    });
+
+    const response = await request(createTestApp(testUserId)).delete(
+      `/api/households/${householdId}`,
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe("Foyer supprimé");
+
+    const deletedHousehold = await prisma.household.findUnique({
+      where: {
+        id: householdId,
+      },
+    });
+
+    expect(deletedHousehold).toBeNull();
+
+    const memberships = await prisma.householdMember.count({
+      where: {
+        householdId,
+      },
+    });
+
+    const invitations = await prisma.invitation.count({
+      where: {
+        householdId,
+      },
+    });
+
+    const foodItems = await prisma.foodItem.count({
+      where: {
+        householdId,
+      },
+    });
+
+    expect(memberships).toBe(0);
+    expect(invitations).toBe(0);
+    expect(foodItems).toBe(0);
+
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        id: testUserId,
+      },
+    });
+
+    expect(existingUser).not.toBeNull();
+  });
+
+  it("refuse à un MEMBER de supprimer le foyer", async () => {
+    const household = await prisma.household.create({
+      data: {
+        name: "Foyer membre sans suppression",
+        members: {
+          create: {
+            userId: testUserId,
+            role: "MEMBER",
+          },
+        },
+      },
+    });
+
+    const response = await request(createTestApp(testUserId)).delete(
+      `/api/households/${household.id}`,
+    );
+
+    expect(response.status).toBe(403);
+
+    const existingHousehold = await prisma.household.findUnique({
+      where: {
+        id: household.id,
+      },
+    });
+
+    expect(existingHousehold).not.toBeNull();
+  });
+
+  it("retourne 400 pour un identifiant de foyer invalide à la suppression", async () => {
+    const response = await request(createTestApp(testUserId)).delete(
+      "/api/households/invalide",
+    );
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe("Foyer invalide");
+  });});

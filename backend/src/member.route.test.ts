@@ -1,8 +1,14 @@
 import bcrypt from "bcryptjs";
 import request from "supertest";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { app } from "./app.js";
 import { prisma } from "./lib/prisma.js";
+import { sendHouseholdMemberLeftEmail } from "./lib/mailer.js";
+
+vi.mock("./lib/mailer.js", () => ({
+  sendHouseholdInvitationEmail: vi.fn(),
+  sendHouseholdMemberLeftEmail: vi.fn(),
+}));
 
 const ownerEmail = "members.owner.test@example.com";
 const memberEmail = "members.member.test@example.com";
@@ -57,13 +63,15 @@ async function loginAs(email: string) {
   return agent;
 }
 
-describe("GET /api/households/:householdId/members", () => {
+describe("Membres du foyer", () => {
   beforeAll(() => {
     process.env["JWT_SECRET"] =
       "mealsaver-test-secret-with-more-than-32-characters";
   });
 
   beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.mocked(sendHouseholdMemberLeftEmail).mockResolvedValue(undefined);
     await cleanupTestData();
 
     const passwordHash = await bcrypt.hash(password, 12);
@@ -200,4 +208,177 @@ describe("GET /api/households/:householdId/members", () => {
 
     expect(JSON.stringify(response.body)).not.toContain("passwordHash");
   });
-});
+
+  it("permet au OWNER de retirer un MEMBER du foyer sans supprimer son compte", async () => {
+    const memberMembership = await prisma.householdMember.findFirst({
+      where: {
+        householdId,
+        user: {
+          email: memberEmail,
+        },
+      },
+    });
+
+    expect(memberMembership).not.toBeNull();
+
+    const agent = await loginAs(ownerEmail);
+
+    const response = await agent.delete(
+      `/api/households/${householdId}/members/${memberMembership!.id}`,
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe("Membre retiré du foyer");
+
+    const deletedMembership = await prisma.householdMember.findUnique({
+      where: {
+        id: memberMembership!.id,
+      },
+    });
+
+    expect(deletedMembership).toBeNull();
+
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        email: memberEmail,
+      },
+    });
+
+    expect(existingUser).not.toBeNull();
+  });
+
+  it("refuse à un MEMBER de retirer un membre du foyer", async () => {
+    const memberMembership = await prisma.householdMember.findFirst({
+      where: {
+        householdId,
+        user: {
+          email: memberEmail,
+        },
+      },
+    });
+
+    expect(memberMembership).not.toBeNull();
+
+    const agent = await loginAs(memberEmail);
+
+    const response = await agent.delete(
+      `/api/households/${householdId}/members/${memberMembership!.id}`,
+    );
+
+    expect(response.status).toBe(403);
+
+    const existingMembership = await prisma.householdMember.findUnique({
+      where: {
+        id: memberMembership!.id,
+      },
+    });
+
+    expect(existingMembership).not.toBeNull();
+  });
+
+  it("refuse au OWNER de retirer le propriétaire du foyer", async () => {
+    const ownerMembership = await prisma.householdMember.findFirst({
+      where: {
+        householdId,
+        user: {
+          email: ownerEmail,
+        },
+      },
+    });
+
+    expect(ownerMembership).not.toBeNull();
+
+    const agent = await loginAs(ownerEmail);
+
+    const response = await agent.delete(
+      `/api/households/${householdId}/members/${ownerMembership!.id}`,
+    );
+
+    expect(response.status).toBe(409);
+
+    const existingMembership = await prisma.householdMember.findUnique({
+      where: {
+        id: ownerMembership!.id,
+      },
+    });
+
+    expect(existingMembership?.role).toBe("OWNER");
+  });
+
+  it("permet à un MEMBER de quitter lui-même le foyer sans supprimer son compte", async () => {
+    const memberMembership = await prisma.householdMember.findFirst({
+      where: {
+        householdId,
+        user: {
+          email: memberEmail,
+        },
+      },
+    });
+
+    expect(memberMembership).not.toBeNull();
+
+    const agent = await loginAs(memberEmail);
+
+    const response = await agent.delete(
+      `/api/households/${householdId}/membership`,
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe("Vous avez quitté le foyer");
+
+    const deletedMembership = await prisma.householdMember.findUnique({
+      where: {
+        id: memberMembership!.id,
+      },
+    });
+
+    expect(deletedMembership).toBeNull();
+
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        email: memberEmail,
+      },
+    });
+
+    expect(existingUser).not.toBeNull();
+
+    const existingHousehold = await prisma.household.findUnique({
+      where: {
+        id: householdId,
+      },
+    });
+
+    expect(existingHousehold).not.toBeNull();
+
+    expect(sendHouseholdMemberLeftEmail).toHaveBeenCalledTimes(1);
+    expect(sendHouseholdMemberLeftEmail).toHaveBeenCalledWith({
+      to: ownerEmail,
+      householdName: "Members Test Household",
+      memberName: "Household Member",
+      memberEmail,
+    });
+  });
+
+  it("interdit au OWNER de quitter le foyer avec l'action membre", async () => {
+    const agent = await loginAs(ownerEmail);
+
+    const response = await agent.delete(
+      `/api/households/${householdId}/membership`,
+    );
+
+    expect(response.status).toBe(409);
+    expect(response.body.error).toBe(
+      "Le propriétaire ne peut pas quitter le foyer sans transférer ou supprimer le foyer",
+    );
+
+    const ownerMembership = await prisma.householdMember.findFirst({
+      where: {
+        householdId,
+        user: {
+          email: ownerEmail,
+        },
+      },
+    });
+
+    expect(ownerMembership?.role).toBe("OWNER");
+  });});

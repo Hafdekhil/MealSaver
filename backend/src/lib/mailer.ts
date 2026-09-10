@@ -5,6 +5,7 @@ type HouseholdInvitationEmail = {
   to: string;
   householdName: string;
   inviterName: string;
+  invitationId: number;
 };
 
 let transporter: Transporter | undefined;
@@ -54,7 +55,7 @@ export async function sendHouseholdInvitationEmail(
 
   const frontendUrl = getRequiredEnv("FRONTEND_URL").replace(/\/+$/, "");
   const mailFrom = getRequiredEnv("MAIL_FROM");
-  const householdUrl = `${frontendUrl}/household`;
+  const householdUrl = `${frontendUrl}/household?invitation=${encodeURIComponent(String(input.invitationId))}`;
 
   const householdName = input.householdName.replace(/[\r\n]+/g, " ").trim();
   const inviterName = input.inviterName.replace(/[\r\n]+/g, " ").trim();
@@ -87,9 +88,58 @@ export async function sendHouseholdInvitationEmail(
         foyer pour accepter l'invitation.
       </p>
       <p>
-        <a href="${escapeHtml(householdUrl)}">Ouvrir MealSaver</a>
+        <a href="${escapeHtml(householdUrl)}">Voir et accepter l'invitation</a>
       </p>
       <p>Si vous n'attendiez pas cette invitation, vous pouvez ignorer ce message.</p>
+      <p>MealSaver</p>
+    `,
+  });
+}
+
+type HouseholdMemberLeftEmail = {
+  to: string;
+  householdName: string;
+  memberName: string;
+  memberEmail: string;
+};
+
+export async function sendHouseholdMemberLeftEmail(
+  input: HouseholdMemberLeftEmail,
+): Promise<void> {
+  if (
+    process.env["NODE_ENV"] === "test" ||
+    process.env["VITEST"] === "true"
+  ) {
+    return;
+  }
+
+  const mailFrom = getRequiredEnv("MAIL_FROM");
+  const householdName = input.householdName.replace(/[\r\n]+/g, " ").trim();
+  const memberName = input.memberName.replace(/[\r\n]+/g, " ").trim();
+  const memberEmail = input.memberEmail.replace(/[\r\n]+/g, " ").trim();
+
+  await getTransporter().sendMail({
+    from: mailFrom,
+    to: input.to,
+    subject: `${memberName} a quitté ${householdName} sur MealSaver`,
+    text: [
+      "Bonjour,",
+      "",
+      `${memberName} (${memberEmail}) vient de quitter le foyer "${householdName}".`,
+      "",
+      "Son compte MealSaver n'a pas été supprimé.",
+      "",
+      "MealSaver",
+    ].join("\n"),
+    html: `
+      <h2>Membre ayant quitté le foyer</h2>
+      <p>Bonjour,</p>
+      <p>
+        <strong>${escapeHtml(memberName)}</strong>
+        (${escapeHtml(memberEmail)}) vient de quitter le foyer
+        <strong>${escapeHtml(householdName)}</strong>.
+      </p>
+      <p>Son compte MealSaver n'a pas été supprimé.</p>
       <p>MealSaver</p>
     `,
   });
