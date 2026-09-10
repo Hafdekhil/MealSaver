@@ -243,7 +243,7 @@ export function HomePage() {
 
                       <Link
                         className="btn btn-soft"
-                        to={`/recipes?ingredient=${encodeURIComponent(alert.name)}`}
+                        to={`/recipes?householdId=${alert.householdId}&ingredient=${encodeURIComponent(alert.name)}`}
                       >
                         Voir une recette
                       </Link>
