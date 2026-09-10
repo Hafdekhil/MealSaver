@@ -1,5 +1,5 @@
-﻿import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 type Household = {
   id: number;
@@ -26,8 +26,24 @@ type RecipeSuggestion = {
   isFallback: boolean;
 };
 
+function getPositiveIntegerParam(value: string | null): number | null {
+  if (!value || !/^\d+$/.test(value)) {
+    return null;
+  }
+
+  const parsed = Number(value);
+
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
 export function RecipesPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const requestedHouseholdId = getPositiveIntegerParam(
+    searchParams.get("householdId"),
+  );
+  const requestedIngredient = searchParams.get("ingredient")?.trim() ?? "";
 
   const [household, setHousehold] = useState<Household | null>(null);
   const [suggestions, setSuggestions] = useState<RecipeSuggestion[]>([]);
@@ -75,14 +91,27 @@ export function RecipesPage() {
           return;
         }
 
-        const selectedHousehold = households[0]!;
+        const selectedHousehold =
+          (requestedHouseholdId !== null
+            ? households.find(
+                (candidate) => candidate.id === requestedHouseholdId,
+              )
+            : undefined) ?? households[0]!;
 
         if (active) {
           setHousehold(selectedHousehold);
         }
 
+        const recipeParams = new URLSearchParams({
+          householdId: String(selectedHousehold.id),
+        });
+
+        if (requestedIngredient) {
+          recipeParams.set("ingredient", requestedIngredient);
+        }
+
         const recipesResponse = await fetch(
-          `/api/recipes?householdId=${selectedHousehold.id}`,
+          `/api/recipes?${recipeParams.toString()}`,
           {
             credentials: "include",
           },
@@ -120,7 +149,7 @@ export function RecipesPage() {
     return () => {
       active = false;
     };
-  }, [navigate]);
+  }, [navigate, requestedHouseholdId, requestedIngredient]);
 
   function toggleMissingIngredient(ingredient: string) {
     setSelectionMessage("");
@@ -166,6 +195,13 @@ export function RecipesPage() {
           <p>
             Suggestions préparées à partir de l'inventaire de{" "}
             <strong>{household.name}</strong>.
+          </p>
+        )}
+
+        {requestedIngredient && household && (
+          <p role="status">
+            Alerte sélectionnée : recherche d'une recette utilisant{" "}
+            <strong>{requestedIngredient}</strong>.
           </p>
         )}
 

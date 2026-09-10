@@ -700,3 +700,9 @@
     max-width: 250px;
   }
 }
+
+.food-row-targeted {
+  border: 2px solid var(--orange);
+  background: #fff8ef;
+  box-shadow: 0 0 0 4px rgba(244, 123, 32, 0.12);
+}

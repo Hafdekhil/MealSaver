@@ -81,10 +81,27 @@ function buildRecommendationReason(
   return `Cette recette utilise ${ingredientName}, dont la date d'expiration est la plus urgente dans votre inventaire.`;
 }
 
+function getRequestedIngredient(value: unknown): string | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const ingredient = value.trim();
+
+  if (!ingredient || ingredient.length > 120) {
+    return null;
+  }
+
+  return ingredient;
+}
+
 recipesRouter.get("/", async (req, res, next) => {
   try {
     const userId = Number(res.locals["userId"]);
     const householdId = Number(req.query["householdId"]);
+    const requestedIngredient = getRequestedIngredient(
+      req.query["ingredient"],
+    );
 
     if (!Number.isInteger(userId) || userId <= 0) {
       return res.status(401).json({
@@ -137,6 +154,13 @@ recipesRouter.get("/", async (req, res, next) => {
       inventoryItems.map((item) => normalizeName(item.name)),
     );
 
+    const requestedItem = requestedIngredient
+      ? inventoryItems.find(
+          (item) =>
+            normalizeName(item.name) === normalizeName(requestedIngredient),
+        ) ?? null
+      : null;
+
     const urgentItem =
       inventoryItems.find((item) => item.expiresAt !== null) ??
       inventoryItems[0]!;
@@ -158,10 +182,18 @@ recipesRouter.get("/", async (req, res, next) => {
           ),
         );
 
-        const priorityItem =
-          matchingInventoryItems.find((item) => item.expiresAt !== null) ??
-          matchingInventoryItems[0] ??
-          null;
+        const usesRequestedItem =
+          requestedItem !== null &&
+          recipe.ingredients.some(
+            (ingredient) =>
+              normalizeName(ingredient) === normalizeName(requestedItem.name),
+          );
+
+        const priorityItem = usesRequestedItem
+          ? requestedItem
+          : matchingInventoryItems.find((item) => item.expiresAt !== null) ??
+            matchingInventoryItems[0] ??
+            null;
 
         const priorityDays = priorityItem?.expiresAt
           ? daysUntilExpiration(priorityItem.expiresAt)
@@ -173,10 +205,18 @@ recipesRouter.get("/", async (req, res, next) => {
           missingIngredients,
           priorityItem,
           priorityDays,
+          usesRequestedItem,
         };
       })
       .filter((candidate) => candidate.availableIngredients.length > 0)
       .sort((a, b) => {
+        if (
+          requestedItem !== null &&
+          a.usesRequestedItem !== b.usesRequestedItem
+        ) {
+          return a.usesRequestedItem ? -1 : 1;
+        }
+
         if (a.priorityDays !== b.priorityDays) {
           return a.priorityDays - b.priorityDays;
         }
@@ -186,16 +226,11 @@ recipesRouter.get("/", async (req, res, next) => {
         );
       });
 
-    const priorityIngredient = {
-      name: urgentItem.name,
-      expiresAt: urgentItem.expiresAt,
-      daysUntilExpiration: urgentItem.expiresAt
-        ? daysUntilExpiration(urgentItem.expiresAt)
-        : null,
-    };
+    const requestedMatchExists =
+      requestedItem !== null &&
+      matchingRecipes.some((candidate) => candidate.usesRequestedItem);
 
-
-    if (matchingRecipes.length > 0) {
+    if (matchingRecipes.length > 0 && (!requestedItem || requestedMatchExists)) {
       const bestMatch = matchingRecipes[0]!;
 
       if (!bestMatch.priorityItem) {
@@ -221,15 +256,9 @@ recipesRouter.get("/", async (req, res, next) => {
             id: bestMatch.recipe.id,
             name: bestMatch.recipe.name,
             ingredients: bestMatch.recipe.ingredients,
-
-            // MEALSAVER-36
             inventoryIngredients: bestMatch.availableIngredients,
-
-            // MEALSAVER-37
             availableIngredients: bestMatch.availableIngredients,
             missingIngredients: bestMatch.missingIngredients,
-
-            // MEALSAVER-38
             priorityIngredient,
             recommendationReason,
             isFallback: false,
@@ -238,24 +267,30 @@ recipesRouter.get("/", async (req, res, next) => {
       });
     }
 
+    const fallbackItem = requestedItem ?? urgentItem;
+    const priorityIngredient = {
+      name: fallbackItem.name,
+      expiresAt: fallbackItem.expiresAt,
+      daysUntilExpiration: fallbackItem.expiresAt
+        ? daysUntilExpiration(fallbackItem.expiresAt)
+        : null,
+    };
+
     return res.status(200).json({
       suggestions: [
         {
           id: "anti-waste-fallback",
-          name: `Idée anti-gaspillage avec ${urgentItem.name}`,
-          ingredients: [urgentItem.name],
-
-          inventoryIngredients: [urgentItem.name],
-
-          availableIngredients: [urgentItem.name],
+          name: `Idée anti-gaspillage avec ${fallbackItem.name}`,
+          ingredients: [fallbackItem.name],
+          inventoryIngredients: [fallbackItem.name],
+          availableIngredients: [fallbackItem.name],
           missingIngredients: [],
-
           priorityIngredient,
           recommendationReason:
             `Aucune recette exacte n'a été trouvée. ` +
             buildRecommendationReason(
-              urgentItem.name,
-              urgentItem.expiresAt,
+              fallbackItem.name,
+              fallbackItem.expiresAt,
             ),
           isFallback: true,
         },

@@ -227,6 +227,22 @@ describe("GET /api/recipes", () => {
     expect(suggestion.inventoryIngredients).toContain("tomates");
   });
 
+  it("priorise l'aliment transmis depuis une alerte", async () => {
+    const agent = await loginAs(ownerEmail);
+
+    const response = await agent.get(
+      `/api/recipes?householdId=${householdId}&ingredient=${encodeURIComponent("Riz")}`,
+    );
+
+    expect(response.status).toBe(200);
+
+    const suggestion = response.body.suggestions[0];
+
+    expect(suggestion.ingredients).toContain("riz");
+    expect(suggestion.priorityIngredient.name).toBe("Riz");
+    expect(suggestion.recommendationReason).toContain("Riz");
+  });
+
   it("distingue les ingrédients disponibles et manquants", async () => {
     const agent = await loginAs(ownerEmail);
 
@@ -331,6 +347,7 @@ describe("GET /api/recipes", () => {
     expect(suggestion.recommendationReason).toContain("Oeufs");
     expect(suggestion.recommendationReason).not.toContain("Courgette");
   });
+
   it("reste utilisable lorsqu'aucune recette exacte n'est trouvée", async () => {
     const ownerMembership = await prisma.householdMember.findFirstOrThrow({
       where: {

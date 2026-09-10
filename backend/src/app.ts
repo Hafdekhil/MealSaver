@@ -1,5 +1,6 @@
 import cookieParser from "cookie-parser";
 import express from "express";
+import { alertsRouter } from "./alerts.route.js";
 import { requireAuth } from "./auth/auth.middleware.js";
 import { authRouter } from "./auth/auth.route.js";
 import { registerRouter } from "./auth/register.route.js";
@@ -37,8 +38,8 @@ app.use("/api/inventory", requireAuth, inventoryRouter);
 app.use("/api/inventory", requireAuth, inventoryUpdateRouter);
 app.use("/api/inventory", requireAuth, inventoryDeleteRouter);
 
+app.use("/api/alerts", requireAuth, alertsRouter);
 app.use("/api/recipes", requireAuth, recipesRouter);
-
 app.use("/api/scan", requireAuth, scanRouter);
 
 app.use(

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { AddFoodForm } from "../AddFoodForm";
 
 type Household = {
@@ -45,8 +45,27 @@ function formatExpiration(value: string | null) {
   }).format(new Date(value));
 }
 
+function getPositiveIntegerParam(value: string | null): number | null {
+  if (!value || !/^\d+$/.test(value)) {
+    return null;
+  }
+
+  const parsed = Number(value);
+
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
 export function InventoryPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const targetedHouseholdId = getPositiveIntegerParam(
+    searchParams.get("householdId"),
+  );
+
+  const targetedItemId = getPositiveIntegerParam(
+    searchParams.get("item"),
+  );
 
   const [households, setHouseholds] = useState<Household[]>([]);
   const [householdId, setHouseholdId] = useState<number | null>(null);
@@ -125,9 +144,23 @@ export function InventoryPage() {
         setHouseholds(availableHouseholds);
 
         if (availableHouseholds.length > 0) {
-          const firstHouseholdId = availableHouseholds[0]?.id ?? null;
-          setHouseholdId(firstHouseholdId);
-          if (firstHouseholdId !== null) void loadItems(firstHouseholdId);
+          const requestedHousehold =
+            targetedHouseholdId !== null
+              ? availableHouseholds.find(
+                  (household) => household.id === targetedHouseholdId,
+                )
+              : undefined;
+
+          const initialHouseholdId =
+            requestedHousehold?.id ??
+            availableHouseholds[0]?.id ??
+            null;
+
+          setHouseholdId(initialHouseholdId);
+
+          if (initialHouseholdId !== null) {
+            void loadItems(initialHouseholdId);
+          }
         }
       } catch (error) {
         if (active) {
@@ -149,7 +182,28 @@ export function InventoryPage() {
     return () => {
       active = false;
     };
-  }, [navigate, loadItems]);
+  }, [navigate, loadItems, targetedHouseholdId]);
+
+  useEffect(() => {
+    if (
+      targetedItemId === null ||
+      isLoadingItems ||
+      items.length === 0
+    ) {
+      return;
+    }
+
+    const targetedItem = document.getElementById(
+      `food-item-${targetedItemId}`,
+    );
+
+    if (targetedItem) {
+      targetedItem.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [targetedItemId, items, isLoadingItems]);
 
   function startEdit(item: FoodItem) {
     setActionError("");
@@ -344,6 +398,7 @@ export function InventoryPage() {
                 <h2>Inventaire du foyer</h2>
                 <p>{selectedHousehold?.name}</p>
               </div>
+
               <span className="status ok">
                 {items.length} aliment{items.length > 1 ? "s" : ""}
               </span>
@@ -361,9 +416,20 @@ export function InventoryPage() {
             ) : (
               <div className="inventory-feed">
                 {items.map((item) => (
-                  <article className="food-row" key={item.id}>
+                  <article
+                    id={`food-item-${item.id}`}
+                    className={`food-row${
+                      targetedItemId === item.id
+                        ? " food-row-targeted"
+                        : ""
+                    }`}
+                    key={item.id}
+                  >
                     {editingId === item.id && editDraft ? (
-                      <div className="form-panel" style={{ width: "100%" }}>
+                      <div
+                        className="form-panel"
+                        style={{ width: "100%" }}
+                      >
                         <form
                           onSubmit={(event) => {
                             event.preventDefault();
@@ -402,7 +468,9 @@ export function InventoryPage() {
                             }
                           />
 
-                          <label htmlFor={`edit-unit-${item.id}`}>Unité</label>
+                          <label htmlFor={`edit-unit-${item.id}`}>
+                            Unité
+                          </label>
                           <input
                             id={`edit-unit-${item.id}`}
                             value={editDraft.unit}
@@ -454,8 +522,11 @@ export function InventoryPage() {
                               className="btn btn-primary"
                               disabled={isSaving}
                             >
-                              {isSaving ? "Enregistrement..." : "Enregistrer"}
+                              {isSaving
+                                ? "Enregistrement..."
+                                : "Enregistrer"}
                             </button>
+
                             <button
                               type="button"
                               className="btn btn-soft"
@@ -472,6 +543,13 @@ export function InventoryPage() {
                         <div className="food-left">
                           <div>
                             <strong>{item.name}</strong>
+
+                            {targetedItemId === item.id && (
+                              <span className="status urgent">
+                                Alerte d'expiration
+                              </span>
+                            )}
+
                             <small>
                               {item.quantity ?? "—"} {item.unit ?? ""}
                               {" · "}
@@ -492,6 +570,7 @@ export function InventoryPage() {
                           >
                             Modifier
                           </button>
+
                           <button
                             type="button"
                             className="btn btn-soft"
