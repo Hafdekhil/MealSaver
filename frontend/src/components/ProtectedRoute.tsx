@@ -1,8 +1,9 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "./auth-context";
 
 export function ProtectedRoute() {
   const { authState } = useAuth();
+  const location = useLocation();
 
   if (authState === "checking") {
     return (
@@ -13,7 +14,13 @@ export function ProtectedRoute() {
   }
 
   if (authState === "anonymous") {
-    return <Navigate to="/" replace />;
+    const returnTo = `${location.pathname}${location.search}`;
+    return (
+      <Navigate
+        to={`/login?returnTo=${encodeURIComponent(returnTo)}`}
+        replace
+      />
+    );
   }
 
   return <Outlet />;
