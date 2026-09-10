@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import "./original-home.css";
 import "./academic-home-overrides.css";
+import "./smart-fridge.css";
 
 import { AuthProvider } from "./components/AuthProvider";
 import { Layout } from "./components/Layout";
