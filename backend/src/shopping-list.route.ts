@@ -74,8 +74,8 @@ async function isHouseholdMember(userId: number, householdId: number) {
 
 type ItemInput = {
   name: string;
-  quantity?: number;
-  unit?: string;
+  quantity?: number | undefined;
+  unit?: string | undefined;
 };
 
 async function createOrMergeItem(
@@ -100,8 +100,8 @@ async function createOrMergeItem(
         householdId,
         name: input.name.trim(),
         normalizedName,
-        quantity: input.quantity,
-        unit: input.unit,
+        quantity: input.quantity ?? null,
+        unit: input.unit ?? null,
         createdBy: userId,
       },
       include: shoppingItemInclude,
