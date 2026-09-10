@@ -28,6 +28,8 @@ export function ScanPage() {
   const [identification, setIdentification] =
     useState<IdentificationResult | null>(null);
   const [isIdentifying, setIsIdentifying] = useState(false);
+  const [hasScanFailure, setHasScanFailure] = useState(false);
+  const [manualMode, setManualMode] = useState(false);
 
   const [households, setHouseholds] = useState<Household[]>([]);
   const [householdId, setHouseholdId] = useState<number | null>(null);
@@ -91,6 +93,13 @@ export function ScanPage() {
     };
   }, [previewUrl]);
 
+  function reportScanFailure(message: string) {
+    setError(message);
+    setIdentification(null);
+    setHasScanFailure(true);
+    setManualMode(false);
+  }
+
   function handleImageSelection(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
 
@@ -100,15 +109,21 @@ export function ScanPage() {
 
     setError("");
     setIdentification(null);
+    setHasScanFailure(false);
+    setManualMode(false);
 
     if (!ACCEPTED_IMAGE_TYPES.has(file.type)) {
-      setError("Veuillez sélectionner une image JPEG, PNG ou WebP.");
+      reportScanFailure(
+        "Cette image ne peut pas être analysée. Utilisez JPEG, PNG ou WebP, ou continuez avec la saisie manuelle.",
+      );
       event.target.value = "";
       return;
     }
 
     if (file.size > MAX_IMAGE_SIZE_BYTES) {
-      setError("L'image ne doit pas dépasser 5 Mo.");
+      reportScanFailure(
+        "Cette image dépasse 5 Mo et ne peut pas être analysée. Vous pouvez continuer avec la saisie manuelle.",
+      );
       event.target.value = "";
       return;
     }
@@ -134,6 +149,8 @@ export function ScanPage() {
 
     setError("");
     setIdentification(null);
+    setHasScanFailure(false);
+    setManualMode(false);
     setIsIdentifying(true);
 
     try {
@@ -149,9 +166,10 @@ export function ScanPage() {
       const body = await response.json().catch(() => null);
 
       if (!response.ok) {
-        setError(
-          body?.error ??
-            "Impossible d'obtenir une proposition d'identification.",
+        reportScanFailure(
+          body?.error
+            ? `${body.error}. Vous pouvez continuer avec la saisie manuelle.`
+            : "Le scan n'a pas abouti. Vous pouvez continuer avec la saisie manuelle.",
         );
         return;
       }
@@ -160,7 +178,9 @@ export function ScanPage() {
         typeof body?.suggestion !== "string" ||
         typeof body?.requiresManualValidation !== "boolean"
       ) {
-        setError("Réponse d'identification invalide.");
+        reportScanFailure(
+          "La réponse du scan est invalide. Vous pouvez continuer avec la saisie manuelle.",
+        );
         return;
       }
 
@@ -168,11 +188,56 @@ export function ScanPage() {
         suggestion: body.suggestion,
         requiresManualValidation: body.requiresManualValidation,
       });
+      setHasScanFailure(false);
     } catch {
-      setError("Impossible de communiquer avec le service d'identification.");
+      reportScanFailure(
+        "Impossible de communiquer avec le service d'identification. Vous pouvez continuer avec la saisie manuelle.",
+      );
     } finally {
       setIsIdentifying(false);
     }
+  }
+
+  function renderHouseholdSelection(prefix: string) {
+    if (isLoadingHouseholds) {
+      return <p>Chargement de vos foyers...</p>;
+    }
+
+    if (householdError) {
+      return <p role="alert">{householdError}</p>;
+    }
+
+    if (households.length === 0) {
+      return (
+        <p role="alert">
+          Vous devez appartenir à un foyer avant d'ajouter un aliment à
+          l'inventaire.
+        </p>
+      );
+    }
+
+    return (
+      <>
+        {households.length > 1 && (
+          <div>
+            <label htmlFor={`${prefix}-household`}>Foyer</label>
+            <select
+              id={`${prefix}-household`}
+              value={householdId ?? ""}
+              onChange={(event) =>
+                setHouseholdId(Number(event.target.value))
+              }
+            >
+              {households.map((household) => (
+                <option key={household.id} value={household.id}>
+                  {household.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </>
+    );
   }
 
   return (
@@ -244,7 +309,6 @@ export function ScanPage() {
             </div>
 
             {selectedFileName && <p>Image : {selectedFileName}</p>}
-            {error && <p role="alert">{error}</p>}
           </section>
 
           <aside className="panel result-panel scan-result-panel">
@@ -273,42 +337,47 @@ export function ScanPage() {
                   confirmer l'ajout.
                 </p>
 
-                {isLoadingHouseholds ? (
-                  <p>Chargement de vos foyers...</p>
-                ) : householdError ? (
-                  <p role="alert">{householdError}</p>
-                ) : households.length === 0 ? (
-                  <p role="alert">
-                    Vous devez appartenir à un foyer avant d'ajouter cet
-                    aliment à l'inventaire.
+                {renderHouseholdSelection("scan")}
+
+                {householdId !== null && !householdError && (
+                  <AddFoodForm
+                    key={`${identification.suggestion}-${householdId}`}
+                    householdId={householdId}
+                    initialName={identification.suggestion}
+                    submitLabel="Valider et ajouter à l'inventaire"
+                  />
+                )}
+              </>
+            ) : hasScanFailure ? (
+              <>
+                <div className="scan-fallback-message">
+                  <h3>Le scan n'a pas abouti</h3>
+                  <p role="alert">{error}</p>
+                  <p>
+                    MealSaver reste utilisable : passez à l'ajout manuel pour
+                    renseigner les informations de base de l'aliment.
                   </p>
+                </div>
+
+                {!manualMode ? (
+                  <button
+                    type="button"
+                    className="btn btn-primary full"
+                    onClick={() => setManualMode(true)}
+                  >
+                    Passer à la saisie manuelle
+                  </button>
                 ) : (
                   <>
-                    {households.length > 1 && (
-                      <div>
-                        <label htmlFor="scan-household">Foyer</label>
-                        <select
-                          id="scan-household"
-                          value={householdId ?? ""}
-                          onChange={(event) =>
-                            setHouseholdId(Number(event.target.value))
-                          }
-                        >
-                          {households.map((household) => (
-                            <option key={household.id} value={household.id}>
-                              {household.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
+                    <hr />
+                    <h3>Ajouter l'aliment manuellement</h3>
+                    {renderHouseholdSelection("manual")}
 
-                    {householdId !== null && (
+                    {householdId !== null && !householdError && (
                       <AddFoodForm
-                        key={`${identification.suggestion}-${householdId}`}
+                        key={`manual-${householdId}`}
                         householdId={householdId}
-                        initialName={identification.suggestion}
-                        submitLabel="Valider et ajouter à l'inventaire"
+                        submitLabel="Ajouter manuellement à l'inventaire"
                       />
                     )}
                   </>
@@ -321,16 +390,24 @@ export function ScanPage() {
               </p>
             )}
 
-            <button
-              type="button"
-              className="btn btn-primary full"
-              onClick={() => void identifyFood()}
-              disabled={!selectedFile || isIdentifying}
-            >
-              {isIdentifying
-                ? "Identification en cours..."
-                : "Identifier l'aliment"}
-            </button>
+            {!manualMode && (
+              <button
+                type="button"
+                className={
+                  hasScanFailure
+                    ? "btn btn-soft full"
+                    : "btn btn-primary full"
+                }
+                onClick={() => void identifyFood()}
+                disabled={!selectedFile || isIdentifying}
+              >
+                {isIdentifying
+                  ? "Identification en cours..."
+                  : hasScanFailure
+                    ? "Réessayer le scan"
+                    : "Identifier l'aliment"}
+              </button>
+            )}
 
             <p>
               Aucune identification ne crée automatiquement un aliment dans
