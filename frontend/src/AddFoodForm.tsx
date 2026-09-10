@@ -5,11 +5,18 @@ type StorageLocation = "FRIDGE" | "PANTRY" | "FREEZER";
 
 type AddFoodFormProps = {
   householdId: number;
+  initialName?: string;
+  submitLabel?: string;
   onCreated?: () => void;
 };
 
-export function AddFoodForm({ householdId, onCreated }: AddFoodFormProps) {
-  const [name, setName] = useState("");
+export function AddFoodForm({
+  householdId,
+  initialName = "",
+  submitLabel = "Ajouter",
+  onCreated,
+}: AddFoodFormProps) {
+  const [name, setName] = useState(initialName);
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("");
   const [expiresAt, setExpiresAt] = useState("");
@@ -147,7 +154,7 @@ export function AddFoodForm({ householdId, onCreated }: AddFoodFormProps) {
       {success && <p role="status">{success}</p>}
 
       <button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Ajout..." : "Ajouter"}
+        {isSubmitting ? "Ajout..." : submitLabel}
       </button>
     </form>
   );

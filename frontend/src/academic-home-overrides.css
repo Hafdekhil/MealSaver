@@ -1,4 +1,4 @@
-﻿/* Ajustements de la Home académique MealSaver */
+/* Ajustements de la Home académique MealSaver */
 
 .mp-hero {
   min-height: auto;
@@ -717,4 +717,161 @@ body:has(.scan-layout) .site-header {
 
 body:has(.scan-layout) .page-shell {
   padding-top: 42px;
+}
+
+/* MEALSAVER-34 — validation du scan */
+@media (min-width: 1181px) {
+  .scan-layout {
+    grid-template-columns: minmax(0, 1.05fr) minmax(500px, 0.95fr);
+    align-items: start;
+  }
+}
+
+.scan-result-panel {
+  padding: 30px;
+}
+
+.scan-result-panel .panel-head {
+  margin-bottom: 16px;
+}
+
+.scan-result-panel:has(form) > p:first-of-type {
+  margin: 0 0 12px;
+  padding: 16px 18px;
+  border: 1px solid #cfe8db;
+  border-radius: 18px;
+  background: #eef9f3;
+  color: #214f40;
+  font-size: 1.02rem;
+}
+
+.scan-result-panel:has(form) > p:first-of-type strong {
+  color: #07543a;
+  font-size: 1.12rem;
+}
+
+.scan-result-panel:has(form) > p[role="status"] {
+  margin: 0 0 20px;
+  padding: 14px 16px;
+  border: 1px solid #f0d9ab;
+  border-radius: 16px;
+  background: #fff9ec;
+  color: #72511a;
+}
+
+.scan-result-panel hr {
+  height: 1px;
+  margin: 4px 0 22px;
+  border: 0;
+  background: var(--line);
+}
+
+.scan-result-panel h3 {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+  letter-spacing: -0.3px;
+}
+
+.scan-result-panel form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+  padding: 20px;
+  border: 1px solid #d7e7df;
+  border-radius: 22px;
+  background: #f8fcfa;
+}
+
+.scan-result-panel form > div {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.scan-result-panel form > div:first-child {
+  grid-column: 1 / -1;
+}
+
+.scan-result-panel form label {
+  color: #2f5a4b;
+  font-weight: 850;
+}
+
+.scan-result-panel form input,
+.scan-result-panel form select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 14px;
+  border: 1px solid #cfe1d9;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.scan-result-panel form input:focus,
+.scan-result-panel form select:focus {
+  outline: none;
+  border-color: #07965f;
+  box-shadow: 0 0 0 4px rgba(7, 150, 95, 0.11);
+}
+
+.scan-result-panel form > p {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.scan-result-panel form > button {
+  grid-column: 1 / -1;
+  min-height: 50px;
+  border: 0;
+  border-radius: 999px;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, var(--green-600), #087248);
+  color: #fff;
+  box-shadow: 0 14px 30px rgba(8, 114, 72, 0.2);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.scan-result-panel form > button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 17px 34px rgba(8, 114, 72, 0.26);
+}
+
+.scan-result-panel form > button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.scan-result-panel:has(form) > .btn.full {
+  margin-top: 16px;
+  border: 1px solid #cfe1d9;
+  background: #fff;
+  color: #07543a;
+  box-shadow: none;
+}
+
+.scan-result-panel:has(form) > .btn.full:hover {
+  background: #eef8f3;
+  box-shadow: none;
+}
+
+@media (max-width: 720px) {
+  .scan-result-panel {
+    padding: 20px;
+  }
+
+  .scan-result-panel form {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .scan-result-panel form > div:first-child,
+  .scan-result-panel form > p,
+  .scan-result-panel form > button {
+    grid-column: auto;
+  }
 }
