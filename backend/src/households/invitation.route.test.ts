@@ -1,7 +1,12 @@
 import express from "express";
 import request from "supertest";
-import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { prisma } from "../lib/prisma.js";
+import { sendHouseholdInvitationEmail } from "../lib/mailer.js";
+
+vi.mock("../lib/mailer.js", () => ({
+  sendHouseholdInvitationEmail: vi.fn(),
+}));
 import { invitationRouter } from "./invitation.route.js";
 
 const ownerEmail = "owner.invitation.test@example.com";
@@ -83,6 +88,9 @@ async function cleanupTestData() {
 
 describe("Invitations du foyer", () => {
   beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.mocked(sendHouseholdInvitationEmail).mockResolvedValue(undefined);
+
     await cleanupTestData();
 
     const owner = await prisma.user.create({
@@ -165,6 +173,13 @@ describe("Invitations du foyer", () => {
     expect(invitation).not.toBeNull();
     expect(invitation?.status).toBe("PENDING");
     expect(invitation?.invitedByUserId).toBe(ownerId);
+
+    expect(sendHouseholdInvitationEmail).toHaveBeenCalledTimes(1);
+    expect(sendHouseholdInvitationEmail).toHaveBeenCalledWith({
+      to: invitedEmail,
+      householdName: "Foyer Invitation Test",
+      inviterName: "Owner Test",
+    });
   });
 
   it("refuse une invitation envoyée par un MEMBER", async () => {
@@ -219,6 +234,12 @@ describe("Invitations du foyer", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.message).toBe("Vous avez rejoint le foyer");
+    expect(response.body.household).toMatchObject({
+      id: householdId,
+      name: "Foyer Invitation Test",
+      role: "MEMBER",
+    });
+    expect(response.body.household.createdAt).toBeDefined();
 
     const membership = await prisma.householdMember.findUnique({
       where: {
@@ -239,5 +260,61 @@ describe("Invitations du foyer", () => {
     });
 
     expect(updatedInvitation?.status).toBe("ACCEPTED");
+  });
+
+  it("retourne les invitations PENDING de l'utilisateur authentifie", async () => {
+    const invitation = await prisma.invitation.create({
+      data: {
+        householdId,
+        email: invitedEmail,
+        invitedByUserId: ownerId,
+        status: "PENDING",
+      },
+    });
+
+    const response = await request(createTestApp(invitedUserId)).get(
+      "/api/households/invitations",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.invitations).toHaveLength(1);
+    expect(response.body.invitations[0]).toMatchObject({
+      id: invitation.id,
+      email: invitedEmail,
+      status: "PENDING",
+      household: {
+        id: householdId,
+        name: "Foyer Invitation Test",
+      },
+    });
+  });
+
+  it("supprime l'invitation si l'envoi du courriel échoue", async () => {
+    vi.mocked(sendHouseholdInvitationEmail).mockRejectedValueOnce(
+      new Error("SMTP indisponible"),
+    );
+
+    const response = await request(createTestApp(ownerId))
+      .post(`/api/households/${householdId}/invitations`)
+      .send({
+        email: invitedEmail,
+      });
+
+    expect(response.status).toBe(502);
+    expect(response.body.error).toBe(
+      "Impossible d'envoyer le courriel d'invitation",
+    );
+    expect(sendHouseholdInvitationEmail).toHaveBeenCalledTimes(1);
+
+    const invitation = await prisma.invitation.findUnique({
+      where: {
+        householdId_email: {
+          householdId,
+          email: invitedEmail,
+        },
+      },
+    });
+
+    expect(invitation).toBeNull();
   });
 });

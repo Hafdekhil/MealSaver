@@ -1,8 +1,70 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
+import { sendHouseholdInvitationEmail } from "../lib/mailer.js";
 import { createInvitationSchema } from "./invitation.schema.js";
 
 export const invitationRouter = Router();
+
+
+/**
+ * GET /api/households/invitations
+ * Retourne uniquement les invitations PENDING destinees
+ * a l'utilisateur authentifie.
+ */
+invitationRouter.get("/invitations", async (_req, res, next) => {
+  try {
+    const userId = Number(res.locals["userId"]);
+
+    if (!userId) {
+      return res.status(401).json({
+        error: "Non authentifie",
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        email: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        error: "Utilisateur introuvable",
+      });
+    }
+
+    const invitations = await prisma.invitation.findMany({
+      where: {
+        email: user.email.trim().toLowerCase(),
+        status: "PENDING",
+      },
+      select: {
+        id: true,
+        email: true,
+        status: true,
+        createdAt: true,
+        household: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return res.status(200).json({
+      invitations,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
 
 /**
  * POST /api/households/:householdId/invitations
@@ -39,6 +101,19 @@ invitationRouter.post("/:householdId/invitations", async (req, res, next) => {
         householdId_userId: {
           householdId,
           userId,
+        },
+      },
+      select: {
+        role: true,
+        household: {
+          select: {
+            name: true,
+          },
+        },
+        user: {
+          select: {
+            name: true,
+          },
         },
       },
     });
@@ -99,6 +174,26 @@ invitationRouter.post("/:householdId/invitations", async (req, res, next) => {
         status: "PENDING",
       },
     });
+
+    try {
+      await sendHouseholdInvitationEmail({
+        to: email,
+        householdName: ownerMembership.household.name,
+        inviterName: ownerMembership.user.name,
+      });
+    } catch {
+      await prisma.invitation.delete({
+        where: {
+          id: invitation.id,
+        },
+      });
+
+      console.error("Echec de l'envoi du courriel d'invitation MealSaver");
+
+      return res.status(502).json({
+        error: "Impossible d'envoyer le courriel d'invitation",
+      });
+    }
 
     return res.status(201).json({
       invitation,
@@ -167,12 +262,22 @@ invitationRouter.post(
         });
       }
 
-      await prisma.$transaction(async (tx) => {
-        await tx.householdMember.create({
+      const membership = await prisma.$transaction(async (tx) => {
+        const createdMembership = await tx.householdMember.create({
           data: {
             householdId: invitation.householdId,
             userId,
             role: "MEMBER",
+          },
+          select: {
+            role: true,
+            household: {
+              select: {
+                id: true,
+                name: true,
+                createdAt: true,
+              },
+            },
           },
         });
 
@@ -184,10 +289,16 @@ invitationRouter.post(
             status: "ACCEPTED",
           },
         });
+
+        return createdMembership;
       });
 
       return res.status(200).json({
         message: "Vous avez rejoint le foyer",
+        household: {
+          ...membership.household,
+          role: membership.role,
+        },
       });
     } catch (error) {
       return next(error);

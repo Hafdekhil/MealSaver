@@ -1,110 +1,298 @@
 # MealSaver
 
-**Réduire le gaspillage, une recette à la fois.**
+**Réduire le gaspillage alimentaire grâce à un foyer connecté et un inventaire partagé.**
 
-MealSaver est une application Web responsive qui aide les foyers à mieux gérer leurs aliments, leurs repas et leurs achats.
+MealSaver est une application Web collaborative qui aide les membres d'un foyer à gérer leurs aliments et à réduire le gaspillage alimentaire.
 
-L’objectif est simple : savoir ce que l’on possède déjà, repérer les aliments à consommer bientôt, trouver des idées de repas et éviter les achats en double.
+Le projet est développé progressivement par sprints :
+
+- **Sprint 0** : conception, maquettes, prototype et fondations du projet.
+- **Sprint 1** : authentification, foyer collaboratif et inventaire partagé fonctionnel.
+- **Sprint 2** : fonctionnalités intelligentes et anti-gaspillage - planifiées (To Do dans Jira).
 
 ---
 
-## Le problème
+## Objectif du projet
 
 Dans un foyer, les aliments sont répartis entre le réfrigérateur, le congélateur et le garde-manger.
 
-Il devient alors facile d’oublier un produit, d’acheter quelque chose que l’on possède déjà ou de ne pas savoir quoi cuisiner.
+MealSaver vise à centraliser ces informations afin de :
 
-MealSaver regroupe ces informations dans un espace partagé unique afin que tous les membres du foyer puissent mieux s’organiser.
+- savoir quels aliments sont disponibles ;
+- éviter les achats en double ;
+- suivre les quantités et les dates d'expiration ;
+- partager l'information entre les membres du foyer ;
+- réduire le gaspillage alimentaire.
 
----
+Le parcours produit prévu est :
 
-## La solution MealSaver
-
-MealSaver propose un parcours simple :
-
-**Foyer → Inventaire → Alerte → Recette → Liste d’épicerie**
-
-Le foyer partage un inventaire alimentaire commun.
-
-Lorsqu’un aliment approche de sa date d’expiration, MealSaver peut le signaler comme prioritaire.
-
-L’application peut ensuite proposer des recettes à partir des ingrédients disponibles.
-
-Si certains ingrédients manquent, ils peuvent être ajoutés à la liste d’épicerie partagée.
-
-L’objectif est de simplifier la gestion alimentaire et de réduire le gaspillage.
+**Foyer -> Inventaire -> Alertes -> Recettes -> Liste d'épicerie**
 
 ---
 
-## Fonctionnalités principales
+# Sprint 0 - Conception et prototype
 
-### Foyer collaboratif
+Le Sprint 0 a permis de définir les fondations de MealSaver.
 
-Plusieurs personnes peuvent partager les informations relatives aux aliments et aux achats du foyer.
+Il comprend notamment :
 
-### Inventaire alimentaire
+- définition du problème et de la solution ;
+- analyse du besoin utilisateur ;
+- conception de l'expérience utilisateur ;
+- maquettes Web et responsive ;
+- identité visuelle MealSaver ;
+- prototype démonstratif ;
+- organisation du dépôt GitHub ;
+- préparation du backlog produit.
 
-L’utilisateur peut consulter les aliments disponibles, leurs quantités, leurs lieux de conservation et leurs dates d’expiration.
+Le prototype Sprint 0 présentait notamment :
 
-### Alertes d’expiration
+- foyer collaboratif ;
+- inventaire alimentaire ;
+- alertes d'expiration ;
+- recettes anti-gaspillage ;
+- liste d'épicerie collaborative ;
+- scan intelligent ;
+- tableau de bord.
 
-MealSaver permet de repérer les aliments à utiliser en priorité avant qu’ils ne soient oubliés.
+Certaines de ces fonctions étaient uniquement représentées dans le prototype. Leur implémentation réelle est réalisée progressivement dans les sprints suivants.
 
-### Recettes anti-gaspillage
 
-Des idées de repas peuvent être proposées en fonction des aliments déjà disponibles dans le foyer.
+## Références Jira - Sprint 0
 
-### Liste d’épicerie collaborative
-
-Les membres peuvent ajouter et cocher les produits à acheter afin de réduire les oublis et les achats en double.
-
-### Scan intelligent MVP
-
-L’utilisateur peut prendre ou téléverser une image d’un aliment.
-
-Le système propose une identification, mais l’utilisateur doit toujours confirmer ou corriger le résultat avant de l’ajouter à l’inventaire.
-
-Si le scan ne fonctionne pas correctement, la saisie manuelle reste disponible.
-
-### Tableau de bord
-
-Le tableau de bord regroupe les informations importantes : aliments prioritaires, alertes, recettes proposées et actions rapides.
-
----
-
-## Démonstration publique
-
-Site MealSaver :
-
-https://hafdekhil.github.io/MealSaver/
-
-Dépôt GitHub :
-
-https://github.com/Hafdekhil/MealSaver
-
-La démonstration interactive est accessible depuis le bouton **Voir la démo** du site.
+| Récit | Titre | Statut |
+|---|---|---|
+| MEALSAVER-21 | Consulter la vitrine MealSaver | Done |
+| MEALSAVER-22 | Comprendre la solution proposée | Done |
+| MEALSAVER-23 | Demander l’accès ou ouvrir la démo | Done |
 
 ---
 
-## Pages du site
+# Sprint 1 - Application fonctionnelle
 
-- `index.html` : présentation générale de MealSaver
-- `solution.html` : problème traité et solution proposée
-- `produit.html` : principales fonctionnalités
-- `ecrans.html` : maquettes Web et mobile responsive
-- `impact.html` : bénéfices attendus de MealSaver
-- `offre.html` : présentation du prototype et évolutions possibles
-- `app.html` : démonstration interactive
+Le Sprint 1 transforme le prototype en application Web réelle avec frontend, backend et base de données.
+
+## Authentification
+
+L'utilisateur peut :
+
+- créer un compte ;
+- se connecter ;
+- conserver une session authentifiée ;
+- se déconnecter ;
+- accéder aux pages protégées uniquement lorsqu'il est connecté.
+
+## Foyer collaboratif
+
+L'utilisateur peut :
+
+- créer un foyer ;
+- consulter ses foyers ;
+- sélectionner un foyer actif ;
+- inviter une personne par courriel ;
+- empêcher une invitation en double ;
+- consulter les membres du foyer ;
+- distinguer le propriétaire des membres ;
+- voir séparément les invitations en attente.
+
+Les rôles utilisés sont :
+
+- `OWNER`
+- `MEMBER`
+
+
+## Inventaire partagé
+
+Les membres autorisés d'un foyer peuvent consulter un inventaire commun.
+
+Un aliment peut contenir : nom, quantité, unité, emplacement, date d'expiration et utilisateur ayant ajouté l'aliment.
+
+Emplacements disponibles : FRIDGE (réfrigérateur), PANTRY (garde-manger) et FREEZER (congélateur).
+
+Un membre autorisé peut ajouter, modifier et supprimer un aliment. Une confirmation est demandée avant la suppression.
+
 
 ---
 
-## Lancer MealSaver localement
+# Architecture technique
 
-Le prototype actuel est un site statique en HTML, CSS et JavaScript.
+## Frontend
 
-Aucune installation de dépendances n’est nécessaire.
+React, TypeScript, Vite et React Router.
 
-Cloner le dépôt :
+Dossier principal : frontend/
 
-```bash
+## Backend
+
+Node.js, Express, TypeScript, Zod, Prisma ORM, JWT et cookies de session.
+
+Dossier principal : backend/
+
+## Base de données
+
+PostgreSQL avec Prisma ORM et migrations versionnées.
+
+Schéma principal : backend/prisma/schema.prisma
+
+
+---
+
+# Installation locale
+
+## Prérequis
+
+- Git
+- Node.js et npm
+- PostgreSQL
+
+## 1. Cloner le projet
+
+`ash
 git clone https://github.com/Hafdekhil/MealSaver.git
+cd MealSaver
+`
+
+## 2. Installer les dépendances
+
+`ash
+npm --prefix backend install
+npm --prefix frontend install
+`
+
+## 3. Configurer le backend
+
+Copier le fichier d'exemple :
+
+`powershell
+Copy-Item backend/.env.example backend/.env
+`
+
+Configurer ensuite ackend/.env avec notamment DATABASE_URL et JWT_SECRET. Le vrai fichier .env ne doit jamais être ajouté à Git.
+
+
+## 4. Préparer Prisma et la base de données
+
+Après avoir créé la base PostgreSQL et configuré DATABASE_URL :
+
+`ash
+cd backend
+npx prisma generate
+npx prisma migrate deploy
+cd ..
+`
+
+## 5. Lancer le backend
+
+Dans un premier terminal, depuis la racine du projet :
+
+`ash
+npm --prefix backend run dev
+`
+
+Par défaut, le backend est accessible sur http://127.0.0.1:3001.
+
+## 6. Lancer le frontend
+
+Dans un deuxième terminal :
+
+`ash
+npm --prefix frontend run dev
+`
+
+Ouvrir ensuite http://localhost:5173 dans le navigateur. En développement, Vite transmet les requêtes /api au backend local.
+
+
+---
+
+# Tests et validation
+
+## Tests backend
+
+`ash
+npm --prefix backend test
+`
+
+Les tests couvrent notamment l'authentification, les foyers, les invitations, les membres, l'inventaire et les contrôles d'autorisation.
+
+## Build backend
+
+`ash
+npm --prefix backend run build
+`
+
+## Build frontend
+
+`ash
+npm --prefix frontend run build
+`
+
+## Lint frontend
+
+`ash
+npm --prefix frontend run lint
+`
+
+Avant une fusion vers main, la Pull Request doit être revue et la CI GitHub doit être verte.
+
+
+---
+
+# Démonstration Sprint 1
+
+Scénario recommandé :
+
+1. Créer un compte et se connecter.
+2. Créer un foyer et vérifier le rôle OWNER.
+3. Inviter un second utilisateur par courriel et vérifier le statut PENDING.
+4. Vérifier que les membres actifs et les invitations en attente sont affichés séparément.
+5. Ajouter un aliment avec nom, quantité, unité, emplacement et date d'expiration.
+6. Modifier l'aliment et vérifier la mise à jour dans l'inventaire partagé.
+7. Supprimer l'aliment et confirmer sa disparition de l'inventaire.
+
+Remarque : l'invitation est actuellement enregistrée dans l'application ; aucun service d'envoi réel de courriel n'est requis pour cette démonstration. Le parcours complet d'acceptation de l'invitation dans l'interface reste en validation finale.
+
+# Répartition officielle - Sprint 1
+
+| Récit | Titre | Responsable | Statut Jira |
+|---|---|---|---|
+| MEALSAVER-24 | Se connecter au compte | Hafedh | Done |
+| MEALSAVER-25 | Créer un compte | Hafedh | Done |
+| MEALSAVER-26 | Se déconnecter du compte | Hafedh | Done |
+| MEALSAVER-27 | Créer un foyer | Kevin | Done |
+| MEALSAVER-28 | Inviter un membre | Kevin | Done |
+| MEALSAVER-29 | Consulter les membres du foyer | Danensky | Done |
+| MEALSAVER-30 | Ajouter un aliment | Danensky | Done |
+| MEALSAVER-31 | Modifier un aliment | Jean Jacques | Done |
+| MEALSAVER-32 | Supprimer un aliment | Jean Jacques | Done |
+
+Les contributions Git et les Pull Requests sont conservées afin de préserver la traçabilité du travail de chaque membre.
+
+
+---
+
+# Sprint 2 - Fonctionnalités anti-gaspillage
+
+Le Sprint 2 est actuellement au backlog de développement. Les récits ci-dessous ne sont pas considérés comme livrés tant que leurs critères d'acceptation ne sont pas validés.
+
+| Récit | Titre | Responsable | Priorité | Statut Jira |
+|---|---|---|---|---|
+| MEALSAVER-33 | Scanner ou téléverser un aliment | Hafedh | Medium | To Do |
+| MEALSAVER-34 | Valider ou corriger le résultat du scan | Hafedh | High | To Do |
+| MEALSAVER-35 | Utiliser une saisie manuelle si le scan échoue | Hafedh | Medium | To Do |
+| MEALSAVER-36 | Recevoir une recette | Kevin | Highest | To Do |
+| MEALSAVER-37 | Voir les ingrédients disponibles et manquants | Kevin | High | To Do |
+| MEALSAVER-38 | Prioriser les aliments proches de l’expiration | Kevin | Medium | To Do |
+| MEALSAVER-39 | Ajouter un article à la liste | Jean Jacques | High | To Do |
+| MEALSAVER-40 | Ajouter les ingrédients manquants d’une recette à la liste | Jean Jacques | Medium | To Do |
+| MEALSAVER-41 | Cocher un article acheté | Jean Jacques | High | To Do |
+| MEALSAVER-42 | Recevoir une alerte d’expiration | Danensky | Medium | To Do |
+| MEALSAVER-43 | Voir les alertes dans le tableau de bord | Danensky | Medium | To Do |
+| MEALSAVER-44 | Relier une alerte à une recette | Danensky | Medium | To Do |
+
+## Statut du projet
+
+- Sprint 0 : terminé.
+- Sprint 1 : implémenté et en validation finale.
+- Sprint 2 : To Do dans Jira - développement non commencé.
+
+La priorité reste le respect du livrable, des critères d'acceptation Jira, de la revue croisée et de la CI avant fusion vers main.

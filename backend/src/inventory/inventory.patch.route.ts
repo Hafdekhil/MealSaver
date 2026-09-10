@@ -67,6 +67,10 @@ inventoryUpdateRouter.patch("/:id", async (req, res, next) => {
       updateData.expiresAt = parsed.data.expiresAt;
     }
 
+    if (parsed.data.storageLocation !== undefined) {
+      updateData.storageLocation = parsed.data.storageLocation;
+    }
+
     const updated = await prisma.foodItem.update({
       where: { id },
       data: updateData,
