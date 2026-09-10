@@ -164,7 +164,11 @@ export function ShoppingListPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error ?? "Impossible d'ajouter l'article.");
+        const fallbackError =
+          response.status === 409
+            ? "Cet article existe déjà avec une unité différente. Utilisez la même unité pour fusionner les quantités."
+            : "Impossible d'ajouter l'article.";
+        throw new Error(data.error ?? fallbackError);
       }
 
       setName("");
@@ -172,7 +176,7 @@ export function ShoppingListPage() {
       setUnit("");
       setMessage(
         data.merged
-          ? "Article déjà présent : la liste a été fusionnée sans créer de doublon."
+          ? "Article déjà présent : les quantités ont été fusionnées avec la même unité."
           : "Article ajouté à la liste collaborative.",
       );
       await reloadItems(householdId);

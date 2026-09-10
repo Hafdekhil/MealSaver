@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "./lib/prisma.js";
@@ -44,6 +45,15 @@ const shoppingItemInclude = {
   },
 } as const;
 
+class IncompatibleShoppingUnitError extends Error {
+  constructor() {
+    super(
+      "Cet article existe déjà avec une unité différente. Utilisez la même unité pour fusionner les quantités.",
+    );
+    this.name = "IncompatibleShoppingUnitError";
+  }
+}
+
 function normalizeName(value: string) {
   return value
     .toLowerCase()
@@ -78,14 +88,35 @@ type ItemInput = {
   unit?: string | undefined;
 };
 
+type ShoppingListDb = typeof prisma | Prisma.TransactionClient;
+
+function hasIncompatibleUnit(
+  existing: { quantity: number | null; unit: string | null },
+  input: ItemInput,
+) {
+  const existingUnit = normalizeUnit(existing.unit);
+  const incomingUnit = normalizeUnit(input.unit);
+
+  if (existingUnit === incomingUnit) {
+    return false;
+  }
+
+  if (existingUnit && incomingUnit) {
+    return true;
+  }
+
+  return input.quantity !== undefined && existing.quantity !== null;
+}
+
 async function createOrMergeItem(
   userId: number,
   householdId: number,
   input: ItemInput,
+  db: ShoppingListDb = prisma,
 ) {
   const normalizedName = normalizeName(input.name);
 
-  const existing = await prisma.shoppingItem.findUnique({
+  const existing = await db.shoppingItem.findUnique({
     where: {
       householdId_normalizedName: {
         householdId,
@@ -95,7 +126,7 @@ async function createOrMergeItem(
   });
 
   if (!existing) {
-    const item = await prisma.shoppingItem.create({
+    const item = await db.shoppingItem.create({
       data: {
         householdId,
         name: input.name.trim(),
@@ -110,6 +141,10 @@ async function createOrMergeItem(
     return { item, merged: false };
   }
 
+  if (hasIncompatibleUnit(existing, input)) {
+    throw new IncompatibleShoppingUnitError();
+  }
+
   let quantity = existing.quantity;
   let unit = existing.unit;
 
@@ -117,15 +152,13 @@ async function createOrMergeItem(
     if (existing.quantity === null) {
       quantity = input.quantity;
       unit = input.unit ?? existing.unit;
-    } else if (
-      normalizeUnit(existing.unit) === normalizeUnit(input.unit ?? existing.unit)
-    ) {
+    } else {
       quantity = existing.quantity + input.quantity;
       unit = existing.unit ?? input.unit ?? null;
     }
   }
 
-  const item = await prisma.shoppingItem.update({
+  const item = await db.shoppingItem.update({
     where: { id: existing.id },
     data: {
       quantity,
@@ -187,6 +220,10 @@ shoppingListRouter.post("/", async (req, res, next) => {
 
     return res.status(result.merged ? 200 : 201).json(result);
   } catch (error) {
+    if (error instanceof IncompatibleShoppingUnitError) {
+      return res.status(409).json({ error: error.message });
+    }
+
     return next(error);
   }
 });
@@ -206,11 +243,17 @@ shoppingListRouter.post("/from-recipe", async (req, res, next) => {
       return res.status(403).json({ error: "Accès refusé" });
     }
 
-    const results = [];
+    const results = await prisma.$transaction(async (tx) => {
+      const transactionResults = [];
 
-    for (const item of items) {
-      results.push(await createOrMergeItem(userId, householdId, item));
-    }
+      for (const item of items) {
+        transactionResults.push(
+          await createOrMergeItem(userId, householdId, item, tx),
+        );
+      }
+
+      return transactionResults;
+    });
 
     return res.status(200).json({
       items: results.map((result) => result.item),
@@ -218,6 +261,10 @@ shoppingListRouter.post("/from-recipe", async (req, res, next) => {
       mergedCount: results.filter((result) => result.merged).length,
     });
   } catch (error) {
+    if (error instanceof IncompatibleShoppingUnitError) {
+      return res.status(409).json({ error: error.message });
+    }
+
     return next(error);
   }
 });

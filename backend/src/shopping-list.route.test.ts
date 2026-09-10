@@ -161,6 +161,34 @@ describe("Liste d'épicerie collaborative", () => {
     expect(count).toBe(1);
   });
 
+  it("refuse une fusion manuelle lorsque l'unité est incompatible", async () => {
+    const agent = await loginAs(ownerEmail);
+
+    await agent.post("/api/shopping-list").send({
+      householdId,
+      name: "Lait",
+      quantity: 2,
+      unit: "L",
+    });
+
+    const duplicateResponse = await agent.post("/api/shopping-list").send({
+      householdId,
+      name: "lait",
+      quantity: 1,
+      unit: "gallon",
+    });
+
+    expect(duplicateResponse.status).toBe(409);
+    expect(duplicateResponse.body.error).toMatch(/unité différente/i);
+
+    const item = await prisma.shoppingItem.findFirstOrThrow({
+      where: { householdId, normalizedName: "lait" },
+    });
+
+    expect(item.quantity).toBe(2);
+    expect(item.unit).toBe("L");
+  });
+
   it("ajoute les ingrédients manquants d'une recette avec leurs données disponibles", async () => {
     const agent = await loginAs(ownerEmail);
 
@@ -210,6 +238,34 @@ describe("Liste d'épicerie collaborative", () => {
     expect(response.body.addedCount).toBe(0);
     expect(response.body.mergedCount).toBe(1);
     expect(response.body.items[0].quantity).toBe(3);
+  });
+
+  it("refuse une fusion depuis une recette lorsque l'unité est incompatible", async () => {
+    const agent = await loginAs(ownerEmail);
+
+    await agent.post("/api/shopping-list").send({
+      householdId,
+      name: "Lait",
+      quantity: 2,
+      unit: "L",
+    });
+
+    const response = await agent
+      .post("/api/shopping-list/from-recipe")
+      .send({
+        householdId,
+        items: [{ name: "lait", quantity: 1, unit: "gallon" }],
+      });
+
+    expect(response.status).toBe(409);
+    expect(response.body.error).toMatch(/unité différente/i);
+
+    const item = await prisma.shoppingItem.findFirstOrThrow({
+      where: { householdId, normalizedName: "lait" },
+    });
+
+    expect(item.quantity).toBe(2);
+    expect(item.unit).toBe("L");
   });
 
   it("permet de cocher puis décocher un article en affichant le membre responsable", async () => {
