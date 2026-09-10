@@ -35,12 +35,13 @@ enum StorageLocation {
 }
 
 model Household {
-  id          Int               @id @default(autoincrement())
-  name        String
-  createdAt   DateTime          @default(now())
-  members     HouseholdMember[]
-  invitations Invitation[]
-  foodItems   FoodItem[]
+  id                      Int                      @id @default(autoincrement())
+  name                    String
+  createdAt               DateTime                 @default(now())
+  members                 HouseholdMember[]
+  invitations             Invitation[]
+  foodItems               FoodItem[]
+  smartFridgeMeasurements SmartFridgeMeasurement[]
 }
 
 model HouseholdMember {
@@ -91,4 +92,18 @@ model FoodItem {
   @@index([householdId])
   @@index([expiresAt])
   @@index([addedBy])
+}
+
+model SmartFridgeMeasurement {
+  id           Int      @id @default(autoincrement())
+  householdId  Int
+  sourceId     String
+  temperatureC Float
+  measuredAt   DateTime
+  receivedAt   DateTime @default(now())
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@index([householdId, measuredAt])
+  @@index([sourceId])
 }
