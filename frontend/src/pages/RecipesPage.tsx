@@ -23,6 +23,7 @@ type RecipeSuggestion = {
   missingIngredients: string[];
   priorityIngredient: PriorityIngredient;
   recommendationReason: string;
+  preferenceApplied?: boolean;
   isFallback: boolean;
 };
 
@@ -51,6 +52,7 @@ export function RecipesPage() {
     string[]
   >([]);
   const [selectionMessage, setSelectionMessage] = useState("");
+  const [isAddingToList, setIsAddingToList] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -129,11 +131,11 @@ export function RecipesPage() {
           setSuggestions(recipesData.suggestions as RecipeSuggestion[]);
           setSelectedMissingIngredients([]);
         }
-      } catch (error) {
+      } catch (caughtError) {
         if (active) {
           setError(
-            error instanceof Error
-              ? error.message
+            caughtError instanceof Error
+              ? caughtError.message
               : "Impossible de charger les recettes.",
           );
         }
@@ -163,25 +165,57 @@ export function RecipesPage() {
     });
   }
 
-  function prepareShoppingListSelection() {
+  async function addSelectionToShoppingList() {
     if (selectedMissingIngredients.length === 0) {
-      setSelectionMessage(
-        "Choisissez au moins un ingrédient manquant.",
-      );
-
+      setSelectionMessage("Choisissez au moins un ingrédient manquant.");
       return;
     }
 
-    setSelectionMessage(
-      `${selectedMissingIngredients.length} ingrédient(s) sélectionné(s) pour la liste d'épicerie.`,
-    );
+    if (!household || isAddingToList) return;
 
-    /*
-     * MEALSAVER-37 :
-     * Le raccordement réel à la liste d'épicerie sera effectué
-     * lorsque le travail MEALSAVER-39/40/41 de Jean Jacques
-     * sera intégré.
-     */
+    try {
+      setIsAddingToList(true);
+      setError("");
+      setSelectionMessage("");
+
+      const response = await fetch("/api/shopping-list/from-recipe", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          householdId: household.id,
+          items: selectedMissingIngredients.map((name) => ({ name })),
+        }),
+      });
+      const data = await response.json();
+
+      if (response.status === 401) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ?? "Impossible d'ajouter les ingrédients à la liste.",
+        );
+      }
+
+      const addedCount = Number(data.addedCount ?? 0);
+      const mergedCount = Number(data.mergedCount ?? 0);
+
+      setSelectedMissingIngredients([]);
+      setSelectionMessage(
+        `${addedCount} ingrédient(s) ajouté(s) et ${mergedCount} fusionné(s) dans la liste d'épicerie.`,
+      );
+    } catch (caughtError) {
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Impossible d'ajouter les ingrédients à la liste.",
+      );
+    } finally {
+      setIsAddingToList(false);
+    }
   }
 
   return (
@@ -252,6 +286,12 @@ export function RecipesPage() {
 
                 <p>{recipe.recommendationReason}</p>
 
+                {recipe.preferenceApplied && (
+                  <p role="status">
+                    Cette suggestion tient compte de vos préférences alimentaires.
+                  </p>
+                )}
+
                 <p>
                   <strong>Aliment prioritaire :</strong>{" "}
                   {recipe.priorityIngredient.name}
@@ -293,8 +333,8 @@ export function RecipesPage() {
                 {recipe.missingIngredients.length > 0 ? (
                   <>
                     <p>
-                      Sélectionnez les ingrédients que vous souhaitez ajouter
-                      à votre future liste d'épicerie.
+                      Sélectionnez les ingrédients à ajouter à la liste
+                      d'épicerie collaborative.
                     </p>
 
                     <div>
@@ -311,9 +351,7 @@ export function RecipesPage() {
                             checked={selectedMissingIngredients.includes(
                               ingredient,
                             )}
-                            onChange={() =>
-                              toggleMissingIngredient(ingredient)
-                            }
+                            onChange={() => toggleMissingIngredient(ingredient)}
                           />{" "}
                           {ingredient}
                         </label>
@@ -323,13 +361,25 @@ export function RecipesPage() {
                     <button
                       type="button"
                       className="btn btn-primary"
-                      onClick={prepareShoppingListSelection}
+                      onClick={() => void addSelectionToShoppingList()}
+                      disabled={isAddingToList}
                     >
-                      Préparer la sélection pour la liste
+                      {isAddingToList
+                        ? "Ajout à la liste..."
+                        : "Ajouter à la liste d'épicerie"}
                     </button>
 
                     {selectionMessage && (
-                      <p role="status">{selectionMessage}</p>
+                      <>
+                        <p role="status">{selectionMessage}</p>
+                        <button
+                          type="button"
+                          className="btn btn-ghost"
+                          onClick={() => navigate("/shopping-list")}
+                        >
+                          Voir la liste
+                        </button>
+                      </>
                     )}
                   </>
                 ) : (

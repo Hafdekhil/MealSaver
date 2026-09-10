@@ -23,7 +23,7 @@ export function Header() {
       });
 
       if (!response.ok) {
-        throw new Error("La d\u00E9connexion a \u00E9chou\u00E9.");
+        throw new Error("La déconnexion a échoué.");
       }
 
       setIsMenuOpen(false);
@@ -76,13 +76,21 @@ export function Header() {
                 Recettes
               </NavLink>
 
+              <NavLink to="/shopping-list" onClick={closeMenu}>
+                Liste
+              </NavLink>
+
+              <NavLink to="/profile" onClick={closeMenu}>
+                Profil
+              </NavLink>
+
               <button
                 type="button"
                 className="mobile-nav-logout"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
               >
-                {isLoggingOut ? "D\u00E9connexion..." : "Se d\u00E9connecter"}
+                {isLoggingOut ? "Déconnexion..." : "Se déconnecter"}
               </button>
             </>
           ) : (
@@ -95,7 +103,7 @@ export function Header() {
 
               {location.pathname !== "/register" && (
                 <NavLink to="/register" onClick={closeMenu}>
-                  {"Cr\u00E9er un compte"}
+                  Créer un compte
                 </NavLink>
               )}
             </>
@@ -116,7 +124,7 @@ export function Header() {
               onClick={handleLogout}
               disabled={isLoggingOut}
             >
-              {isLoggingOut ? "D\u00E9connexion..." : "Se d\u00E9connecter"}
+              {isLoggingOut ? "Déconnexion..." : "Se déconnecter"}
             </button>
           </>
         ) : !isCheckingSession ? (
@@ -135,7 +143,7 @@ export function Header() {
 
             {location.pathname !== "/register" && (
               <NavLink className="btn btn-primary" to="/register">
-                {"Cr\u00E9er un compte"}
+                Créer un compte
               </NavLink>
             )}
           </>
@@ -150,7 +158,7 @@ export function Header() {
         aria-controls="main-navigation"
         onClick={() => setIsMenuOpen((open) => !open)}
       >
-        {isMenuOpen ? "\u00D7" : "\u2630"}
+        {isMenuOpen ? "×" : "☰"}
       </button>
     </header>
   );

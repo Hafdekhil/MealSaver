@@ -87,6 +87,18 @@ alertsRouter.get("/", async (req, res, next) => {
       });
     }
 
+    const userPreferences = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { expirationAlertsEnabled: true },
+    });
+
+    if (!userPreferences?.expirationAlertsEnabled) {
+      return res.status(200).json({
+        alerts: [],
+        disabledByPreference: true,
+      });
+    }
+
     const items = await prisma.foodItem.findMany({
       where: {
         householdId,
@@ -112,12 +124,11 @@ alertsRouter.get("/", async (req, res, next) => {
           message: getAlertMessage(item.name, daysRemaining),
         };
       })
-      .filter(
-        (alert) => alert.daysRemaining <= ALERT_WINDOW_DAYS,
-      );
+      .filter((alert) => alert.daysRemaining <= ALERT_WINDOW_DAYS);
 
     return res.status(200).json({
       alerts,
+      disabledByPreference: false,
     });
   } catch (error) {
     return next(error);

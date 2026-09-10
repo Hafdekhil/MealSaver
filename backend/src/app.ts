@@ -11,8 +11,10 @@ import { inventoryRouter } from "./inventory.route.js";
 import { memberRouter } from "./member.route.js";
 import { inventoryDeleteRouter } from "./inventory/inventory.delete.route.js";
 import { inventoryUpdateRouter } from "./inventory/inventory.patch.route.js";
+import { preferencesRouter } from "./preferences.route.js";
 import { recipesRouter } from "./recipes.route.js";
 import { scanRouter } from "./scan.route.js";
+import { shoppingListRouter } from "./shopping-list.route.js";
 
 export const app = express();
 
@@ -41,6 +43,8 @@ app.use("/api/inventory", requireAuth, inventoryDeleteRouter);
 app.use("/api/alerts", requireAuth, alertsRouter);
 app.use("/api/recipes", requireAuth, recipesRouter);
 app.use("/api/scan", requireAuth, scanRouter);
+app.use("/api/shopping-list", requireAuth, shoppingListRouter);
+app.use("/api/preferences", requireAuth, preferencesRouter);
 
 app.use(
   (

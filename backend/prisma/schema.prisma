@@ -8,14 +8,18 @@ datasource db {
 }
 
 model User {
-  id                   Int               @id @default(autoincrement())
-  name                 String
-  email                String            @unique
-  passwordHash         String
-  createdAt            DateTime          @default(now())
-  householdMemberships HouseholdMember[]
-  sentInvitations      Invitation[]      @relation("InvitationsSent")
-  addedFoodItems       FoodItem[]        @relation("FoodItemsAdded")
+  id                      Int               @id @default(autoincrement())
+  name                    String
+  email                   String            @unique
+  passwordHash            String
+  preferredIngredients    String[]          @default([])
+  expirationAlertsEnabled Boolean           @default(true)
+  createdAt               DateTime          @default(now())
+  householdMemberships    HouseholdMember[]
+  sentInvitations         Invitation[]      @relation("InvitationsSent")
+  addedFoodItems          FoodItem[]        @relation("FoodItemsAdded")
+  createdShoppingItems    ShoppingItem[]    @relation("ShoppingItemsCreated")
+  purchasedShoppingItems  ShoppingItem[]    @relation("ShoppingItemsPurchased")
 }
 
 enum HouseholdRole {
@@ -35,12 +39,13 @@ enum StorageLocation {
 }
 
 model Household {
-  id          Int               @id @default(autoincrement())
-  name        String
-  createdAt   DateTime          @default(now())
-  members     HouseholdMember[]
-  invitations Invitation[]
-  foodItems   FoodItem[]
+  id            Int               @id @default(autoincrement())
+  name          String
+  createdAt     DateTime          @default(now())
+  members       HouseholdMember[]
+  invitations   Invitation[]
+  foodItems     FoodItem[]
+  shoppingItems ShoppingItem[]
 }
 
 model HouseholdMember {
@@ -91,4 +96,27 @@ model FoodItem {
   @@index([householdId])
   @@index([expiresAt])
   @@index([addedBy])
+}
+
+model ShoppingItem {
+  id             Int      @id @default(autoincrement())
+  householdId    Int
+  name           String
+  normalizedName String
+  quantity       Float?
+  unit           String?
+  purchased      Boolean  @default(false)
+  createdBy      Int?
+  purchasedBy    Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  household      Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  createdByUser  User?     @relation("ShoppingItemsCreated", fields: [createdBy], references: [id], onDelete: SetNull)
+  purchasedByUser User?    @relation("ShoppingItemsPurchased", fields: [purchasedBy], references: [id], onDelete: SetNull)
+
+  @@unique([householdId, normalizedName])
+  @@index([householdId, purchased])
+  @@index([createdBy])
+  @@index([purchasedBy])
 }
