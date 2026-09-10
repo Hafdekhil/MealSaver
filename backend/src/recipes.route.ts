@@ -130,6 +130,15 @@ recipesRouter.get("/", async (req, res, next) => {
       });
     }
 
+    const userPreferences = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { preferredIngredients: true },
+    });
+
+    const preferredIngredientNames = new Set(
+      (userPreferences?.preferredIngredients ?? []).map(normalizeName),
+    );
+
     const inventoryItems = await prisma.foodItem.findMany({
       where: {
         householdId,
@@ -199,6 +208,10 @@ recipesRouter.get("/", async (req, res, next) => {
           ? daysUntilExpiration(priorityItem.expiresAt)
           : Number.MAX_SAFE_INTEGER;
 
+        const matchedPreferredIngredients = recipe.ingredients.filter(
+          (ingredient) => preferredIngredientNames.has(normalizeName(ingredient)),
+        );
+
         return {
           recipe,
           availableIngredients,
@@ -206,6 +219,7 @@ recipesRouter.get("/", async (req, res, next) => {
           priorityItem,
           priorityDays,
           usesRequestedItem,
+          matchedPreferredIngredients,
         };
       })
       .filter((candidate) => candidate.availableIngredients.length > 0)
@@ -219,6 +233,16 @@ recipesRouter.get("/", async (req, res, next) => {
 
         if (a.priorityDays !== b.priorityDays) {
           return a.priorityDays - b.priorityDays;
+        }
+
+        if (
+          a.matchedPreferredIngredients.length !==
+          b.matchedPreferredIngredients.length
+        ) {
+          return (
+            b.matchedPreferredIngredients.length -
+            a.matchedPreferredIngredients.length
+          );
         }
 
         return (
@@ -245,10 +269,16 @@ recipesRouter.get("/", async (req, res, next) => {
           : null,
       };
 
-      const recommendationReason = buildRecommendationReason(
-        bestMatch.priorityItem.name,
-        bestMatch.priorityItem.expiresAt,
-      );
+      const preferenceApplied = bestMatch.matchedPreferredIngredients.length > 0;
+      const preferenceReason = preferenceApplied
+        ? ` Elle correspond aussi à vos préférences (${bestMatch.matchedPreferredIngredients.join(", ")}).`
+        : "";
+
+      const recommendationReason =
+        buildRecommendationReason(
+          bestMatch.priorityItem.name,
+          bestMatch.priorityItem.expiresAt,
+        ) + preferenceReason;
 
       return res.status(200).json({
         suggestions: [
@@ -261,6 +291,7 @@ recipesRouter.get("/", async (req, res, next) => {
             missingIngredients: bestMatch.missingIngredients,
             priorityIngredient,
             recommendationReason,
+            preferenceApplied,
             isFallback: false,
           },
         ],
@@ -292,6 +323,7 @@ recipesRouter.get("/", async (req, res, next) => {
               fallbackItem.name,
               fallbackItem.expiresAt,
             ),
+          preferenceApplied: false,
           isFallback: true,
         },
       ],
