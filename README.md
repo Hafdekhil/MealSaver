@@ -1,116 +1,120 @@
 # MealSaver
 
-**Réduire le gaspillage alimentaire grâce à un foyer connecté et un inventaire partagé.**
+**Réduire le gaspillage alimentaire grâce à un foyer connecté, un inventaire partagé, des alertes et des recettes anti-gaspillage.**
 
-MealSaver est une application Web collaborative qui aide les membres d'un foyer à gérer leurs aliments et à réduire le gaspillage alimentaire.
+MealSaver est une application Web collaborative développée dans le cadre du cours **420-321-AH — Projet intégrateur**.
 
-Le projet est développé progressivement par sprints :
+## État du projet au 10 septembre 2026
 
-- **Sprint 0** : conception, maquettes, prototype et fondations du projet.
-- **Sprint 1** : authentification, foyer collaboratif et inventaire partagé fonctionnel.
-- **Sprint 2** : fonctionnalités intelligentes et anti-gaspillage - planifiées (To Do dans Jira).
+- **Sprint 0** : conception, maquettes, prototype et fondations.
+- **Sprint 1** : authentification, foyers collaboratifs et inventaire partagé intégrés.
+- **Sprint 2** : incrément anti-gaspillage en cours de finalisation pour la revue du 11 septembre 2026.
 
----
-
-## Objectif du projet
-
-Dans un foyer, les aliments sont répartis entre le réfrigérateur, le congélateur et le garde-manger.
-
-MealSaver vise à centraliser ces informations afin de :
-
-- savoir quels aliments sont disponibles ;
-- éviter les achats en double ;
-- suivre les quantités et les dates d'expiration ;
-- partager l'information entre les membres du foyer ;
-- réduire le gaspillage alimentaire.
-
-Le parcours produit prévu est :
-
-**Foyer -> Inventaire -> Alertes -> Recettes -> Liste d'épicerie**
+Le périmètre Sprint 2 reste strictement celui déjà planifié. Aucun nouveau récit n'est ajouté pour la revue.
 
 ---
 
-# Sprint 0 - Conception et prototype
+## Objectif du produit
 
-Le Sprint 0 a permis de définir les fondations de MealSaver.
+MealSaver vise à aider un foyer à :
 
-Il comprend notamment :
+- connaître les aliments disponibles ;
+- partager un inventaire commun ;
+- suivre quantités, emplacements et dates d'expiration ;
+- repérer les aliments à consommer rapidement ;
+- proposer des recettes qui utilisent les aliments du foyer ;
+- limiter les pertes et les achats inutiles.
 
-- définition du problème et de la solution ;
-- analyse du besoin utilisateur ;
-- conception de l'expérience utilisateur ;
-- maquettes Web et responsive ;
-- identité visuelle MealSaver ;
-- prototype démonstratif ;
-- organisation du dépôt GitHub ;
-- préparation du backlog produit.
+Parcours produit visé :
 
-Le prototype Sprint 0 présentait notamment :
-
-- foyer collaboratif ;
-- inventaire alimentaire ;
-- alertes d'expiration ;
-- recettes anti-gaspillage ;
-- liste d'épicerie collaborative ;
-- scan intelligent ;
-- tableau de bord.
-
-Certaines de ces fonctions étaient uniquement représentées dans le prototype. Leur implémentation réelle est réalisée progressivement dans les sprints suivants.
-
-
-## Références Jira - Sprint 0
-
-| Récit | Titre | Statut |
-|---|---|---|
-| MEALSAVER-21 | Consulter la vitrine MealSaver | Done |
-| MEALSAVER-22 | Comprendre la solution proposée | Done |
-| MEALSAVER-23 | Demander l’accès ou ouvrir la démo | Done |
+**Foyer → Inventaire → Alertes → Recettes → Liste d'épicerie**
 
 ---
 
-# Sprint 1 - Application fonctionnelle
+# Sprint 1 — Base fonctionnelle
 
-Le Sprint 1 transforme le prototype en application Web réelle avec frontend, backend et base de données.
+Le Sprint 1 a transformé le prototype en application Web avec frontend, backend et base PostgreSQL.
 
-## Authentification
+Fonctions intégrées :
 
-L'utilisateur peut :
+- création de compte, connexion, session et déconnexion ;
+- création et consultation des foyers ;
+- invitations et gestion des membres ;
+- inventaire partagé par foyer ;
+- ajout, modification et suppression d'aliments ;
+- contrôle d'accès selon l'appartenance au foyer.
 
-- créer un compte ;
-- se connecter ;
-- conserver une session authentifiée ;
-- se déconnecter ;
-- accéder aux pages protégées uniquement lorsqu'il est connecté.
+Les contributions originales des membres sont conservées dans l'historique Git et les Pull Requests.
 
-## Foyer collaboratif
+---
 
-L'utilisateur peut :
+# Sprint 2 — État réel du périmètre engagé
 
-- créer un foyer ;
-- consulter ses foyers ;
-- sélectionner un foyer actif ;
-- inviter une personne par courriel ;
-- empêcher une invitation en double ;
-- consulter les membres du foyer ;
-- distinguer le propriétaire des membres ;
-- voir séparément les invitations en attente.
+| Jira | Récit | Responsable | État au 10 septembre | Preuve GitHub |
+|---|---|---|---|---|
+| MEALSAVER-33 | Scanner ou téléverser un aliment | Hafedh | **Done** | PR #34 fusionnée |
+| MEALSAVER-34 | Valider ou corriger le résultat du scan | Hafedh | **Done** | PR #36 fusionnée |
+| MEALSAVER-35 | Utiliser une saisie manuelle si le scan échoue | Hafedh | **En revue** | PR #40 ouverte, CI verte |
+| MEALSAVER-36 | Recevoir une recette | Kevin | **Done** | PR #32 fusionnée |
+| MEALSAVER-37 | Voir les ingrédients disponibles et manquants | Kevin | **Done** | PR #32 fusionnée |
+| MEALSAVER-38 | Prioriser les aliments proches de l'expiration | Kevin | **Done** | PR #32 fusionnée |
+| MEALSAVER-39 | Ajouter un article à la liste | Jean Jacques | **In Progress** | non intégré à `main` |
+| MEALSAVER-40 | Ajouter les ingrédients manquants d'une recette à la liste | Jean Jacques | **In Progress** | non intégré à `main` |
+| MEALSAVER-41 | Cocher un article acheté | Jean Jacques | **In Progress** | non intégré à `main` |
+| MEALSAVER-42 | Recevoir une alerte d'expiration | Kevin | **Done** | PR #37 fusionnée |
+| MEALSAVER-43 | Voir les alertes dans le tableau de bord | Kevin | **Done** | PR #37 fusionnée |
+| MEALSAVER-44 | Relier une alerte à une recette | Kevin | **Done** | PR #37 fusionnée |
+| MEALSAVER-48 | Consulter son profil | Kevin | **To Do** | aucun incrément fusionné |
+| MEALSAVER-49 | Modifier ses préférences alimentaires | Kevin | **To Do** | aucun incrément fusionné |
+| MEALSAVER-50 | Gérer les notifications | Kevin | **To Do** | aucun incrément fusionné |
 
-Les rôles utilisés sont :
+Les tâches de vérification/QA prévues pour Danensky au Sprint 2 ont été transférées à Kevin selon l'instruction de l'enseignant. Les contributions historiques de Danensky au Sprint 1 restent inchangées.
 
-- `OWNER`
-- `MEMBER`
+## Scan intelligent
 
+Le parcours intégré couvre :
 
-## Inventaire partagé
+1. téléversement ou prise d'une photo ;
+2. prévisualisation de l'image ;
+3. proposition d'identification par Google Gemini ;
+4. validation ou correction manuelle du résultat ;
+5. ajout à l'inventaire uniquement après action explicite de l'utilisateur.
 
-Les membres autorisés d'un foyer peuvent consulter un inventaire commun.
+MEALSAVER-35 complète ce parcours par une saisie manuelle lorsque l'identification échoue. La PR #40 reste en revue et ne doit être fusionnée qu'après validation croisée.
 
-Un aliment peut contenir : nom, quantité, unité, emplacement, date d'expiration et utilisateur ayant ajouté l'aliment.
+## Recettes anti-gaspillage
 
-Emplacements disponibles : FRIDGE (réfrigérateur), PANTRY (garde-manger) et FREEZER (congélateur).
+Les recettes :
 
-Un membre autorisé peut ajouter, modifier et supprimer un aliment. Une confirmation est demandée avant la suppression.
+- utilisent l'inventaire du foyer ;
+- distinguent ingrédients disponibles et manquants ;
+- priorisent les aliments proches de l'expiration ;
+- expliquent pourquoi une recette est recommandée ;
+- proposent un repli lorsque le catalogue ne contient pas de recette exacte.
 
+## Alertes d'expiration
+
+Le système :
+
+- calcule le délai avant expiration ;
+- affiche les aliments urgents dans le tableau de bord ;
+- les ordonne par urgence ;
+- permet d'ouvrir l'aliment concerné ;
+- transmet le contexte de l'aliment vers les recettes.
+
+---
+
+# Écarts à déclarer à la revue
+
+La documentation de revue doit distinguer ce qui est réellement livré de ce qui reste à faire.
+
+- MEALSAVER-35 est encore en attente de revue croisée avant fusion.
+- MEALSAVER-39/40/41 ne sont pas encore intégrés à `main`.
+- MEALSAVER-48/49/50 sont encore `To Do` dans Jira.
+- L'adresse d'un environnement full-stack déployé doit être fournie à l'enseignant si elle existe ; une exécution uniquement locale ne doit pas être présentée comme un déploiement en ligne.
+- La fiche officielle de la semaine 3 demande une chaîne d'objet intelligent acquisition → transmission → persistance → restitution. Aucun nouveau récit ne sera ajouté au Sprint 2 : si cette exigence n'est pas couverte par le périmètre existant, elle doit être déclarée comme écart plutôt que présentée artificiellement comme livrée.
+
+Voir `docs/SPRINT2_LIVRABLE.md` pour la checklist détaillée et `docs/SPRINT2_PRESENTATION.md` pour le déroulement de la revue.
 
 ---
 
@@ -118,22 +122,31 @@ Un membre autorisé peut ajouter, modifier et supprimer un aliment. Une confirma
 
 ## Frontend
 
-React, TypeScript, Vite et React Router.
+- React
+- TypeScript
+- Vite
+- React Router
 
-Dossier principal : frontend/
+Dossier : `frontend/`
 
 ## Backend
 
-Node.js, Express, TypeScript, Zod, Prisma ORM, JWT et cookies de session.
+- Node.js
+- Express
+- TypeScript
+- Zod
+- Prisma ORM
+- JWT et cookies de session
 
-Dossier principal : backend/
+Dossier : `backend/`
 
 ## Base de données
 
-PostgreSQL avec Prisma ORM et migrations versionnées.
+- PostgreSQL
+- Prisma ORM
+- migrations versionnées
 
-Schéma principal : backend/prisma/schema.prisma
-
+Schéma : `backend/prisma/schema.prisma`
 
 ---
 
@@ -145,160 +158,102 @@ Schéma principal : backend/prisma/schema.prisma
 - Node.js et npm
 - PostgreSQL
 
-## 1. Cloner le projet
+## 1. Cloner le dépôt
 
-`ash
+```bash
 git clone https://github.com/Hafdekhil/MealSaver.git
 cd MealSaver
-`
+```
 
 ## 2. Installer les dépendances
 
-`ash
+```bash
 npm --prefix backend install
 npm --prefix frontend install
-`
+```
 
-## 3. Configurer le backend
+## 3. Préparer l'environnement backend
 
-Copier le fichier d'exemple :
+Sous PowerShell :
 
-`powershell
+```powershell
 Copy-Item backend/.env.example backend/.env
-`
+```
 
-Configurer ensuite ackend/.env avec notamment DATABASE_URL et JWT_SECRET. Le vrai fichier .env ne doit jamais être ajouté à Git.
+Chaque membre configure **son propre** `backend/.env`. Le vrai fichier `.env`, les mots de passe, clés API et secrets ne sont jamais versionnés ni partagés dans le dépôt.
 
+## 4. Préparer Prisma et PostgreSQL
 
-## 4. Préparer Prisma et la base de données
-
-Après avoir créé la base PostgreSQL et configuré DATABASE_URL :
-
-`ash
+```bash
 cd backend
 npx prisma generate
 npx prisma migrate deploy
 cd ..
-`
+```
 
 ## 5. Lancer le backend
 
-Dans un premier terminal, depuis la racine du projet :
-
-`ash
+```bash
 npm --prefix backend run dev
-`
+```
 
-Par défaut, le backend est accessible sur http://127.0.0.1:3001.
+Backend local par défaut : `http://127.0.0.1:3001`.
 
 ## 6. Lancer le frontend
 
-Dans un deuxième terminal :
-
-`ash
+```bash
 npm --prefix frontend run dev
-`
+```
 
-Ouvrir ensuite http://localhost:5173 dans le navigateur. En développement, Vite transmet les requêtes /api au backend local.
-
+Frontend local : `http://localhost:5173`.
 
 ---
 
-# Tests et validation
+# Tests et qualité
 
-## Tests backend
+Backend :
 
-`ash
+```bash
 npm --prefix backend test
-`
-
-Les tests couvrent notamment l'authentification, les foyers, les invitations, les membres, l'inventaire et les contrôles d'autorisation.
-
-## Build backend
-
-`ash
 npm --prefix backend run build
-`
+```
 
-## Build frontend
+Frontend :
 
-`ash
-npm --prefix frontend run build
-`
-
-## Lint frontend
-
-`ash
+```bash
 npm --prefix frontend run lint
-`
+npm --prefix frontend run build
+```
 
-Avant une fusion vers main, la Pull Request doit être revue et la CI GitHub doit être verte.
+Règles d'intégration utilisées par l'équipe :
 
-
----
-
-# Démonstration Sprint 1
-
-Scénario recommandé :
-
-1. Créer un compte et se connecter.
-2. Créer un foyer et vérifier le rôle OWNER.
-3. Inviter un second utilisateur par courriel et vérifier le statut PENDING.
-4. Vérifier que les membres actifs et les invitations en attente sont affichés séparément.
-5. Ajouter un aliment avec nom, quantité, unité, emplacement et date d'expiration.
-6. Modifier l'aliment et vérifier la mise à jour dans l'inventaire partagé.
-7. Supprimer l'aliment et confirmer sa disparition de l'inventaire.
-
-Remarque : l'invitation est actuellement enregistrée dans l'application ; aucun service d'envoi réel de courriel n'est requis pour cette démonstration. Le parcours complet d'acceptation de l'invitation dans l'interface reste en validation finale.
-
-# Répartition officielle - Sprint 1
-
-| Récit | Titre | Responsable | Statut Jira |
-|---|---|---|---|
-| MEALSAVER-24 | Se connecter au compte | Hafedh | Done |
-| MEALSAVER-25 | Créer un compte | Hafedh | Done |
-| MEALSAVER-26 | Se déconnecter du compte | Hafedh | Done |
-| MEALSAVER-27 | Créer un foyer | Kevin | Done |
-| MEALSAVER-28 | Inviter un membre | Kevin | Done |
-| MEALSAVER-29 | Consulter les membres du foyer | Danensky | Done |
-| MEALSAVER-30 | Ajouter un aliment | Danensky | Done |
-| MEALSAVER-31 | Modifier un aliment | Jean Jacques | Done |
-| MEALSAVER-32 | Supprimer un aliment | Jean Jacques | Done |
-
-Les contributions Git et les Pull Requests sont conservées afin de préserver la traçabilité du travail de chaque membre.
-
+- une contribution est développée sur une branche dédiée ;
+- tests/lint/build avant intégration ;
+- Pull Request ;
+- revue croisée par un autre membre ;
+- CI verte avant fusion dans `main` ;
+- aucun secret dans Git.
 
 ---
 
-# Sprint 2 - Fonctionnalités anti-gaspillage
+# Utilisation de l'IA — Sprint 2
 
-Le Sprint 2 est en cours de développement. Les récits ci-dessous ne sont pas considérés comme livrés tant que leurs critères d'acceptation, la revue croisée et la CI ne sont pas validés.
+L'utilisation des outils d'IA générative est déclarée :
 
-| Récit | Titre | Responsable | Priorité | Statut Jira |
-|---|---|---|---|---|
-| MEALSAVER-33 | Scanner ou téléverser un aliment | Hafedh | Medium | To Do |
-| MEALSAVER-34 | Valider ou corriger le résultat du scan | Hafedh | High | To Do |
-| MEALSAVER-35 | Utiliser une saisie manuelle si le scan échoue | Hafedh | Medium | To Do |
-| MEALSAVER-36 | Recevoir une recette | Kevin | Highest | To Do |
-| MEALSAVER-37 | Voir les ingrédients disponibles et manquants | Kevin | High | To Do |
-| MEALSAVER-38 | Prioriser les aliments proches de l’expiration | Kevin | Medium | To Do |
-| MEALSAVER-39 | Ajouter un article à la liste | Jean Jacques | High | To Do |
-| MEALSAVER-40 | Ajouter les ingrédients manquants d’une recette à la liste | Jean Jacques | Medium | To Do |
-| MEALSAVER-41 | Cocher un article acheté | Jean Jacques | High | To Do |
-| MEALSAVER-42 | Recevoir une alerte d’expiration | Danensky | Medium | To Do |
-| MEALSAVER-43 | Voir les alertes dans le tableau de bord | Danensky | Medium | To Do |
-| MEALSAVER-44 | Relier une alerte à une recette | Danensky | Medium | To Do |
+- **ChatGPT** : assistance à l'analyse, à la revue de code, au débogage, à la documentation et à la préparation des tests ;
+- **Google Gemini** : proposition d'identification d'un aliment à partir d'une image dans le parcours Scan.
 
-## Utilisation de l'IA - Sprint 2
+Gemini ne crée jamais automatiquement un aliment. Sa sortie est une proposition qui doit être vérifiée et validée par l'utilisateur avant ajout à l'inventaire.
 
-Pour MEALSAVER-33, ChatGPT a été utilisé comme assistant de développement pour l'analyse, la revue de code, le débogage et la préparation des tests. Les modifications ont été exécutées et vérifiées par le responsable du récit.
+Les clés et secrets sont conservés hors du dépôt dans des variables d'environnement.
 
-Google Gemini est utilisé par la fonctionnalité de scan pour proposer l'identification de l'aliment à partir d'une image. Le résultat demeure une proposition et une validation manuelle est obligatoire avant tout ajout à l'inventaire. Les clés et secrets nécessaires sont conservés dans des variables d'environnement et ne sont pas versionnés.
+---
 
-## Statut du projet
+# Revue Sprint 2 — 11 septembre 2026
 
-- Sprint 0 : terminé.
-- Sprint 1 : implémenté et en validation finale.
-- Sprint 2 : en cours de développement ; MEALSAVER-33 est en validation avant revue croisée et CI.
+Documents de préparation :
 
-La priorité reste le respect du livrable, des critères d'acceptation Jira, de la revue croisée et de la CI avant fusion vers main.
+- `docs/SPRINT2_LIVRABLE.md` — checklist de conformité, preuves et écarts ;
+- `docs/SPRINT2_PRESENTATION.md` — scénario de démonstration et répartition de la parole.
+
+La version présentée doit correspondre à la version réellement validée et intégrée dans `main`.
