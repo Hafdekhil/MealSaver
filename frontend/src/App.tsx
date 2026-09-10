@@ -13,26 +13,28 @@ import { HouseholdPage } from "./pages/HouseholdPage";
 import { InventoryPage } from "./pages/InventoryPage";
 import { RecipesPage } from "./pages/RecipesPage";
 import { ScanPage } from "./pages/ScanPage";
+import { SmartFridgePage } from "./pages/SmartFridgePage";
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route element={<Layout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
-          <Route element={<ProtectedRoute />}>
-            <Route path="/household" element={<HouseholdPage />} />
-            <Route path="/inventory" element={<InventoryPage />} />
-            <Route path="/recipes" element={<RecipesPage />} />
-            <Route path="/scan" element={<ScanPage />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/household" element={<HouseholdPage />} />
+              <Route path="/inventory" element={<InventoryPage />} />
+              <Route path="/recipes" element={<RecipesPage />} />
+              <Route path="/scan" element={<ScanPage />} />
+              <Route path="/smart-fridge" element={<SmartFridgePage />} />
+            </Route>
+
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
-
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
         </Routes>
       </AuthProvider>
     </BrowserRouter>
