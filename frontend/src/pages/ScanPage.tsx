@@ -1,5 +1,6 @@
-﻿import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
+import { AddFoodForm } from "../AddFoodForm";
 
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = new Set([
@@ -13,6 +14,12 @@ type IdentificationResult = {
   requiresManualValidation: boolean;
 };
 
+type Household = {
+  id: number;
+  name: string;
+  role: "OWNER" | "MEMBER";
+};
+
 export function ScanPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -22,8 +29,59 @@ export function ScanPage() {
     useState<IdentificationResult | null>(null);
   const [isIdentifying, setIsIdentifying] = useState(false);
 
+  const [households, setHouseholds] = useState<Household[]>([]);
+  const [householdId, setHouseholdId] = useState<number | null>(null);
+  const [householdError, setHouseholdError] = useState("");
+  const [isLoadingHouseholds, setIsLoadingHouseholds] = useState(true);
+
   const uploadInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadHouseholds() {
+      try {
+        const response = await fetch("/api/households", {
+          credentials: "include",
+        });
+
+        const body = await response.json().catch(() => null);
+
+        if (!active) return;
+
+        if (!response.ok) {
+          setHouseholdError(
+            body?.error ?? "Impossible de charger les foyers.",
+          );
+          return;
+        }
+
+        const availableHouseholds = Array.isArray(body?.households)
+          ? (body.households as Household[])
+          : [];
+
+        setHouseholds(availableHouseholds);
+        setHouseholdId(availableHouseholds[0]?.id ?? null);
+      } catch {
+        if (active) {
+          setHouseholdError(
+            "Impossible de communiquer avec le serveur MealSaver.",
+          );
+        }
+      } finally {
+        if (active) {
+          setIsLoadingHouseholds(false);
+        }
+      }
+    }
+
+    void loadHouseholds();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -92,7 +150,8 @@ export function ScanPage() {
 
       if (!response.ok) {
         setError(
-          body?.error ?? "Impossible d'obtenir une proposition d'identification.",
+          body?.error ??
+            "Impossible d'obtenir une proposition d'identification.",
         );
         return;
       }
@@ -188,7 +247,7 @@ export function ScanPage() {
             {error && <p role="alert">{error}</p>}
           </section>
 
-          <aside className="panel result-panel">
+          <aside className="panel result-panel scan-result-panel">
             <div className="panel-head">
               <div>
                 <h2>Identification proposée</h2>
@@ -205,6 +264,55 @@ export function ScanPage() {
                   Cette identification est une proposition. Une validation
                   manuelle est obligatoire avant tout ajout à l'inventaire.
                 </p>
+
+                <hr />
+
+                <h3>Valider ou corriger le résultat</h3>
+                <p>
+                  Vérifiez le nom proposé et renseignez la quantité avant de
+                  confirmer l'ajout.
+                </p>
+
+                {isLoadingHouseholds ? (
+                  <p>Chargement de vos foyers...</p>
+                ) : householdError ? (
+                  <p role="alert">{householdError}</p>
+                ) : households.length === 0 ? (
+                  <p role="alert">
+                    Vous devez appartenir à un foyer avant d'ajouter cet
+                    aliment à l'inventaire.
+                  </p>
+                ) : (
+                  <>
+                    {households.length > 1 && (
+                      <div>
+                        <label htmlFor="scan-household">Foyer</label>
+                        <select
+                          id="scan-household"
+                          value={householdId ?? ""}
+                          onChange={(event) =>
+                            setHouseholdId(Number(event.target.value))
+                          }
+                        >
+                          {households.map((household) => (
+                            <option key={household.id} value={household.id}>
+                              {household.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {householdId !== null && (
+                      <AddFoodForm
+                        key={`${identification.suggestion}-${householdId}`}
+                        householdId={householdId}
+                        initialName={identification.suggestion}
+                        submitLabel="Valider et ajouter à l'inventaire"
+                      />
+                    )}
+                  </>
+                )}
               </>
             ) : (
               <p>
