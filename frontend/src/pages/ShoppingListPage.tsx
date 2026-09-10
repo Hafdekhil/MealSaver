@@ -1,4 +1,5 @@
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 type Household = {
@@ -81,10 +82,7 @@ export function ShoppingListPage() {
   }, [navigate]);
 
   useEffect(() => {
-    if (householdId === null) {
-      setItems([]);
-      return;
-    }
+    if (householdId === null) return;
 
     let active = true;
 
