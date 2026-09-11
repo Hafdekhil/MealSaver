@@ -875,3 +875,224 @@ body:has(.scan-layout) .page-shell {
     grid-column: auto;
   }
 }
+
+
+/* ===== Sprint 2 - Home responsive final ===== */
+
+/* Titre du Hero plus equilibre sur grand ecran */
+@media (min-width: 1101px) {
+  .mp-hero h1 {
+    max-width: 650px;
+    font-size: clamp(2.9rem, 3.6vw, 4.15rem);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+  }
+}
+
+/* Accueil mobile */
+@media (max-width: 720px) {
+  .mp-hero {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding-top: 22px;
+    padding-bottom: 28px;
+  }
+
+  /*
+   * Les enfants du bloc texte participent directement
+   * a la grille afin de placer l'image juste sous le titre.
+   */
+  .mp-hero-copy {
+    display: contents;
+  }
+
+  .mp-hero-copy .kicker {
+    order: 1;
+  }
+
+  .mp-hero-copy h1 {
+    order: 2;
+    max-width: 100%;
+    margin-bottom: 18px;
+    font-size: clamp(2.1rem, 9vw, 2.8rem);
+    line-height: 1.04;
+    letter-spacing: -0.04em;
+  }
+
+  .mp-hero > .mp-visual {
+    order: 3;
+    display: flex;
+    width: 100%;
+    margin: 0 0 22px;
+  }
+
+  .mp-hero .mp-device-card {
+    width: 100%;
+    max-width: 100%;
+    transform: none;
+    padding: 8px;
+    border-radius: 22px;
+  }
+
+  .mp-hero .mp-device-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+  }
+
+  .mp-hero-copy .lead {
+    order: 4;
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .mp-hero-copy .hero-actions {
+    order: 5;
+    margin: 20px 0 14px;
+  }
+
+  .mp-hero-copy .mp-pills {
+    order: 6;
+    margin-top: 0;
+    margin-bottom: 22px;
+  }
+
+  .panel-head {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .panel-head h2 {
+    font-size: clamp(1.55rem, 7vw, 2rem);
+    line-height: 1.12;
+  }
+
+  .alert-feed {
+    width: 100%;
+  }
+
+  .alert-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 14px;
+    width: 100%;
+    padding: 16px;
+  }
+
+  .alert-row > div:first-child strong,
+  .alert-row > div:first-child small {
+    display: block;
+  }
+
+  .alert-row > div:first-child small {
+    margin-top: 5px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  .alert-row > div:last-child {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .alert-row > div:last-child .status {
+    justify-self: start;
+  }
+
+  .alert-row > div:last-child .btn {
+    width: 100%;
+    white-space: normal;
+    line-height: 1.25;
+  }
+}
+
+
+/* ===== Sprint 2 - Alertes responsive final ===== */
+@media (max-width: 1024px) {
+  .alert-feed {
+    display: grid;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .alert-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    width: 100%;
+    padding: 16px;
+    align-items: stretch;
+  }
+
+  .alert-row > div:first-child {
+    min-width: 0;
+  }
+
+  .alert-row > div:first-child strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+
+  .alert-row > div:first-child small {
+    display: block;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  .alert-row > div:last-child {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .alert-row > div:last-child .status {
+    justify-self: start;
+    width: fit-content;
+  }
+
+  .alert-row > div:last-child .btn {
+    width: 100%;
+    min-height: 42px;
+    padding: 11px 14px;
+    white-space: normal;
+    line-height: 1.2;
+    text-align: center;
+  }
+}
+
+@media (max-width: 560px) {
+  .panel:has(.alert-feed) {
+    padding: 14px;
+    border-radius: 22px;
+  }
+
+  .panel:has(.alert-feed) .panel-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: start;
+  }
+
+  .panel:has(.alert-feed) .panel-head h2 {
+    font-size: 1.45rem;
+    line-height: 1.08;
+  }
+
+  .panel:has(.alert-feed) .panel-head .kicker {
+    margin-bottom: 8px;
+    font-size: 0.7rem;
+  }
+
+  .alert-row {
+    padding: 14px;
+    border-radius: 17px;
+  }
+}

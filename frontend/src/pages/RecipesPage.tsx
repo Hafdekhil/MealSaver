@@ -49,10 +49,12 @@ export function RecipesPage() {
   const [household, setHousehold] = useState<Household | null>(null);
   const [suggestions, setSuggestions] = useState<RecipeSuggestion[]>([]);
   const [selectedMissingIngredients, setSelectedMissingIngredients] = useState<
-    string[]
-  >([]);
-  const [selectionMessage, setSelectionMessage] = useState("");
-  const [isAddingToList, setIsAddingToList] = useState(false);
+    Record<string, string[]>
+  >({});
+  const [selectionMessages, setSelectionMessages] = useState<
+    Record<string, string>
+  >({});
+  const [addingRecipeId, setAddingRecipeId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -63,7 +65,7 @@ export function RecipesPage() {
       try {
         setIsLoading(true);
         setError("");
-        setSelectionMessage("");
+        setSelectionMessages({});
 
         const householdsResponse = await fetch("/api/households", {
           credentials: "include",
@@ -129,7 +131,8 @@ export function RecipesPage() {
 
         if (active) {
           setSuggestions(recipesData.suggestions as RecipeSuggestion[]);
-          setSelectedMissingIngredients([]);
+          setSelectedMissingIngredients({});
+          setSelectionMessages({});
         }
       } catch (caughtError) {
         if (active) {
@@ -153,30 +156,57 @@ export function RecipesPage() {
     };
   }, [navigate, requestedHouseholdId, requestedIngredient]);
 
-  function toggleMissingIngredient(ingredient: string) {
-    setSelectionMessage("");
+  function toggleMissingIngredient(
+    recipeId: string,
+    ingredient: string,
+  ) {
+    setSelectionMessages((current) => ({
+      ...current,
+      [recipeId]: "",
+    }));
 
     setSelectedMissingIngredients((current) => {
-      if (current.includes(ingredient)) {
-        return current.filter((item) => item !== ingredient);
+      const recipeSelection = current[recipeId] ?? [];
+
+      if (recipeSelection.includes(ingredient)) {
+        return {
+          ...current,
+          [recipeId]: recipeSelection.filter(
+            (item) => item !== ingredient,
+          ),
+        };
       }
 
-      return [...current, ingredient];
+      return {
+        ...current,
+        [recipeId]: [...recipeSelection, ingredient],
+      };
     });
   }
 
-  async function addSelectionToShoppingList() {
-    if (selectedMissingIngredients.length === 0) {
-      setSelectionMessage("Choisissez au moins un ingrédient manquant.");
+  async function addSelectionToShoppingList(recipeId: string) {
+    const recipeSelection =
+      selectedMissingIngredients[recipeId] ?? [];
+
+    if (recipeSelection.length === 0) {
+      setSelectionMessages((current) => ({
+        ...current,
+        [recipeId]:
+          "Choisissez au moins un ingr\u00e9dient manquant.",
+      }));
       return;
     }
 
-    if (!household || isAddingToList) return;
+    if (!household || addingRecipeId !== null) return;
 
     try {
-      setIsAddingToList(true);
+      setAddingRecipeId(recipeId);
       setError("");
-      setSelectionMessage("");
+
+      setSelectionMessages((current) => ({
+        ...current,
+        [recipeId]: "",
+      }));
 
       const response = await fetch("/api/shopping-list/from-recipe", {
         method: "POST",
@@ -184,9 +214,10 @@ export function RecipesPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           householdId: household.id,
-          items: selectedMissingIngredients.map((name) => ({ name })),
+          items: recipeSelection.map((name) => ({ name })),
         }),
       });
+
       const data = await response.json();
 
       if (response.status === 401) {
@@ -196,25 +227,34 @@ export function RecipesPage() {
 
       if (!response.ok) {
         throw new Error(
-          data.error ?? "Impossible d'ajouter les ingrédients à la liste.",
+          data.error ??
+            "Impossible d'ajouter les ingr\u00e9dients \u00e0 la liste.",
         );
       }
 
       const addedCount = Number(data.addedCount ?? 0);
       const mergedCount = Number(data.mergedCount ?? 0);
 
-      setSelectedMissingIngredients([]);
-      setSelectionMessage(
-        `${addedCount} ingrédient(s) ajouté(s) et ${mergedCount} fusionné(s) dans la liste d'épicerie.`,
-      );
+      setSelectedMissingIngredients((current) => ({
+        ...current,
+        [recipeId]: [],
+      }));
+
+      setSelectionMessages((current) => ({
+        ...current,
+        [recipeId]:
+          `${addedCount} ingr\u00e9dient(s) ajout\u00e9(s) et ${mergedCount} fusionn\u00e9(s) dans la liste d'\u00e9picerie.`,
+      }));
     } catch (caughtError) {
-      setError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : "Impossible d'ajouter les ingrédients à la liste.",
-      );
+      setSelectionMessages((current) => ({
+        ...current,
+        [recipeId]:
+          caughtError instanceof Error
+            ? caughtError.message
+            : "Impossible d'ajouter les ingr\u00e9dients \u00e0 la liste.",
+      }));
     } finally {
-      setIsAddingToList(false);
+      setAddingRecipeId(null);
     }
   }
 
@@ -267,14 +307,14 @@ export function RecipesPage() {
 
         {!isLoading &&
           !error &&
-          suggestions.map((recipe) => (
+          suggestions.map((recipe, recipeIndex) => (
             <article className="panel" key={recipe.id}>
               <div className="panel-head">
                 <div>
                   <p className="eyebrow">
-                    {recipe.isFallback
-                      ? "Idée anti-gaspillage"
-                      : "Suggestion prioritaire"}
+                    {recipeIndex === 0
+                      ? "Suggestion prioritaire"
+                      : "Autre suggestion"}
                   </p>
 
                   <h2>{recipe.name}</h2>
@@ -348,10 +388,12 @@ export function RecipesPage() {
                         >
                           <input
                             type="checkbox"
-                            checked={selectedMissingIngredients.includes(
-                              ingredient,
-                            )}
-                            onChange={() => toggleMissingIngredient(ingredient)}
+                            checked={(
+                              selectedMissingIngredients[recipe.id] ?? []
+                            ).includes(ingredient)}
+                            onChange={() =>
+                              toggleMissingIngredient(recipe.id, ingredient)
+                            }
                           />{" "}
                           {ingredient}
                         </label>
@@ -361,17 +403,21 @@ export function RecipesPage() {
                     <button
                       type="button"
                       className="btn btn-primary"
-                      onClick={() => void addSelectionToShoppingList()}
-                      disabled={isAddingToList}
+                      onClick={() =>
+                        void addSelectionToShoppingList(recipe.id)
+                      }
+                      disabled={addingRecipeId !== null}
                     >
-                      {isAddingToList
-                        ? "Ajout à la liste..."
-                        : "Ajouter à la liste d'épicerie"}
+                      {addingRecipeId === recipe.id
+                        ? "Ajout \u00e0 la liste..."
+                        : "Ajouter \u00e0 la liste d'\u00e9picerie"}
                     </button>
 
-                    {selectionMessage && (
+                    {selectionMessages[recipe.id] && (
                       <>
-                        <p role="status">{selectionMessage}</p>
+                        <p role="status">
+                          {selectionMessages[recipe.id]}
+                        </p>
                         <button
                           type="button"
                           className="btn btn-ghost"

@@ -10,6 +10,13 @@ const password = "MealSaver1";
 
 let householdId: number;
 
+function dateFromToday(days: number) {
+  const date = new Date();
+  date.setUTCHours(0, 0, 0, 0);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date;
+}
+
 async function cleanupTestData() {
   const users = await prisma.user.findMany({
     where: {
@@ -137,7 +144,7 @@ beforeEach(async () => {
         quantity: 4,
         unit: "unité",
         storageLocation: "FRIDGE",
-        expiresAt: new Date("2026-09-09T00:00:00.000Z"),
+        expiresAt: dateFromToday(1),
         addedBy: owner.id,
       },
       {
@@ -146,7 +153,7 @@ beforeEach(async () => {
         quantity: 6,
         unit: "unité",
         storageLocation: "FRIDGE",
-        expiresAt: new Date("2026-09-17T00:00:00.000Z"),
+        expiresAt: dateFromToday(7),
         addedBy: owner.id,
       },
       {
@@ -155,7 +162,7 @@ beforeEach(async () => {
         quantity: 1,
         unit: "kg",
         storageLocation: "PANTRY",
-        expiresAt: new Date("2026-10-06T00:00:00.000Z"),
+        expiresAt: dateFromToday(25),
         addedBy: owner.id,
       },
     ],
@@ -199,17 +206,9 @@ describe("GET /api/recipes", () => {
 
     const suggestion = response.body.suggestions[0];
 
-    expect(suggestion.name).toBe(
-      "Riz aux tomates et aux œufs",
-    );
-
-    expect(suggestion.inventoryIngredients).toEqual(
-      expect.arrayContaining([
-        "riz",
-        "tomates",
-        "oeufs",
-      ]),
-    );
+    expect(suggestion.ingredients).toContain("tomates");
+    expect(suggestion.inventoryIngredients).toContain("tomates");
+    expect(suggestion.isFallback).toBe(false);
   });
 
   it("priorise une recette utilisant l'aliment le plus urgent", async () => {
@@ -247,7 +246,7 @@ describe("GET /api/recipes", () => {
     const agent = await loginAs(ownerEmail);
 
     const response = await agent.get(
-      `/api/recipes?householdId=${householdId}`,
+      `/api/recipes?householdId=${householdId}&ingredient=${encodeURIComponent("Riz")}`,
     );
 
     expect(response.status).toBe(200);
@@ -264,7 +263,7 @@ describe("GET /api/recipes", () => {
 
     expect(suggestion.missingIngredients).toEqual([
       "oignon",
-      "huile",
+      "huile d'olive",
     ]);
   });
 
@@ -307,7 +306,7 @@ describe("GET /api/recipes", () => {
           quantity: 2,
           unit: "unité",
           storageLocation: "FRIDGE",
-          expiresAt: new Date("2026-09-08T00:00:00.000Z"),
+          expiresAt: dateFromToday(-1),
           addedBy: ownerMembership.userId,
         },
         {
@@ -316,7 +315,7 @@ describe("GET /api/recipes", () => {
           quantity: 6,
           unit: "unité",
           storageLocation: "FRIDGE",
-          expiresAt: new Date("2026-09-17T00:00:00.000Z"),
+          expiresAt: dateFromToday(7),
           addedBy: ownerMembership.userId,
         },
         {
@@ -325,7 +324,7 @@ describe("GET /api/recipes", () => {
           quantity: 1,
           unit: "kg",
           storageLocation: "PANTRY",
-          expiresAt: new Date("2026-10-06T00:00:00.000Z"),
+          expiresAt: dateFromToday(25),
           addedBy: ownerMembership.userId,
         },
       ],
@@ -348,7 +347,7 @@ describe("GET /api/recipes", () => {
     expect(suggestion.recommendationReason).not.toContain("Courgette");
   });
 
-  it("reste utilisable lorsqu'aucune recette exacte n'est trouvée", async () => {
+  it("retourne aucune fausse recette lorsqu'aucune recette réelle ne correspond", async () => {
     const ownerMembership = await prisma.householdMember.findFirstOrThrow({
       where: {
         householdId,
@@ -365,11 +364,11 @@ describe("GET /api/recipes", () => {
     await prisma.foodItem.create({
       data: {
         householdId,
-        name: "Courgette",
+        name: "Mangue",
         quantity: 2,
         unit: "unité",
         storageLocation: "FRIDGE",
-        expiresAt: new Date("2026-09-08T00:00:00.000Z"),
+        expiresAt: dateFromToday(5),
         addedBy: ownerMembership.userId,
       },
     });
@@ -381,15 +380,6 @@ describe("GET /api/recipes", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(response.body.suggestions).toHaveLength(1);
-
-    const suggestion = response.body.suggestions[0];
-
-    expect(suggestion.isFallback).toBe(true);
-    expect(suggestion.name).toContain("Courgette");
-    expect(suggestion.availableIngredients).toContain("Courgette");
-    expect(suggestion.recommendationReason).toContain(
-      "Aucune recette exacte",
-    );
+    expect(response.body.suggestions).toEqual([]);
   });
 });
