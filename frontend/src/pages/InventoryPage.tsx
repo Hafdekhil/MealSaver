@@ -21,6 +21,15 @@ type FoodItem = {
   storageLocation: StorageLocation | null;
 };
 
+type ExpirationAlert = {
+  foodItemId: number;
+  name: string;
+  expiresAt: string;
+  daysRemaining: number;
+  status: "EXPIRED" | "TODAY" | "SOON";
+  message: string;
+};
+
 type EditDraft = {
   name: string;
   quantity: string;
@@ -43,6 +52,18 @@ function formatExpiration(value: string | null) {
     month: "short",
     day: "numeric",
   }).format(new Date(value));
+}
+
+function formatAlertLabel(alert: ExpirationAlert) {
+  if (alert.daysRemaining < 0) return "Expiré";
+  if (alert.daysRemaining === 0) return "Expire aujourd'hui";
+  if (alert.daysRemaining === 1) return "Expire demain";
+
+  return `Expire dans ${alert.daysRemaining} jours`;
+}
+
+function isUsableForRecipe(alert: ExpirationAlert | undefined) {
+  return alert !== undefined && alert.daysRemaining >= 0;
 }
 
 function getPositiveIntegerParam(value: string | null): number | null {
@@ -70,6 +91,7 @@ export function InventoryPage() {
   const [households, setHouseholds] = useState<Household[]>([]);
   const [householdId, setHouseholdId] = useState<number | null>(null);
   const [items, setItems] = useState<FoodItem[]>([]);
+  const [alerts, setAlerts] = useState<ExpirationAlert[]>([]);
 
   const [isLoadingHouseholds, setIsLoadingHouseholds] = useState(true);
   const [isLoadingItems, setIsLoadingItems] = useState(false);
@@ -84,28 +106,49 @@ export function InventoryPage() {
   const selectedHousehold =
     households.find((household) => household.id === householdId) ?? null;
 
+  const alertsByItemId = new Map(
+    alerts.map((alert) => [alert.foodItemId, alert]),
+  );
+
   const loadItems = useCallback(async (targetHouseholdId: number) => {
     setIsLoadingItems(true);
     setLoadError("");
+    setAlerts([]);
 
     try {
-      const response = await fetch(
-        `/api/inventory?householdId=${targetHouseholdId}`,
-        { credentials: "include" },
-      );
+      const [inventoryResponse, alertsResponse] = await Promise.all([
+        fetch(`/api/inventory?householdId=${targetHouseholdId}`, {
+          credentials: "include",
+        }),
+        fetch(`/api/alerts?householdId=${targetHouseholdId}`, {
+          credentials: "include",
+        }),
+      ]);
 
-      if (response.status === 401) {
+      if (inventoryResponse.status === 401 || alertsResponse.status === 401) {
         navigate("/", { replace: true });
         return;
       }
 
-      const data = await response.json();
+      const [inventoryData, alertsData] = await Promise.all([
+        inventoryResponse.json(),
+        alertsResponse.json(),
+      ]);
 
-      if (!response.ok) {
-        throw new Error(data.error ?? "Impossible de charger l'inventaire.");
+      if (!inventoryResponse.ok) {
+        throw new Error(
+          inventoryData.error ?? "Impossible de charger l'inventaire.",
+        );
       }
 
-      setItems(data.items as FoodItem[]);
+      if (!alertsResponse.ok) {
+        throw new Error(
+          alertsData.error ?? "Impossible de charger les alertes d'expiration.",
+        );
+      }
+
+      setItems(inventoryData.items as FoodItem[]);
+      setAlerts(alertsData.alerts as ExpirationAlert[]);
     } catch (error) {
       setLoadError(
         error instanceof Error
@@ -276,6 +319,10 @@ export function InventoryPage() {
         ),
       );
 
+      if (householdId !== null) {
+        await loadItems(householdId);
+      }
+
       cancelEdit();
     } catch (error) {
       setActionError(
@@ -311,6 +358,9 @@ export function InventoryPage() {
 
       setItems((current) =>
         current.filter((currentItem) => currentItem.id !== item.id),
+      );
+      setAlerts((current) =>
+        current.filter((alert) => alert.foodItemId !== item.id),
       );
 
       if (editingId === item.id) {
@@ -544,9 +594,9 @@ export function InventoryPage() {
                           <div>
                             <strong>{item.name}</strong>
 
-                            {targetedItemId === item.id && (
+                            {alertsByItemId.has(item.id) && (
                               <span className="status urgent">
-                                Alerte d'expiration
+                                {formatAlertLabel(alertsByItemId.get(item.id)!)}
                               </span>
                             )}
 
@@ -563,6 +613,21 @@ export function InventoryPage() {
                         </div>
 
                         <div>
+                          {householdId !== null &&
+                            isUsableForRecipe(alertsByItemId.get(item.id)) && (
+                              <button
+                                type="button"
+                                className="btn btn-soft"
+                                onClick={() =>
+                                  navigate(
+                                    `/recipes?householdId=${householdId}&ingredient=${encodeURIComponent(item.name)}`,
+                                  )
+                                }
+                              >
+                                Trouver une recette
+                              </button>
+                            )}
+
                           <button
                             type="button"
                             className="btn btn-soft"

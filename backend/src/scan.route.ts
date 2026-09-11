@@ -20,6 +20,31 @@ type GeminiResponse = {
   }>;
 };
 
+function normalizeModelSuggestion(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/[_-]+/g, " ")
+    .replace(/[^a-z0-9\s']/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isNoFoodSuggestion(value: string) {
+  const normalized = normalizeModelSuggestion(value);
+
+  return (
+    normalized === "no food" ||
+    normalized.includes("no food visible") ||
+    normalized.includes("no identifiable food") ||
+    normalized.includes("aucun aliment") ||
+    normalized.includes("aucune nourriture") ||
+    normalized.includes("pas d aliment") ||
+    normalized.includes("pas de nourriture")
+  );
+}
+
 function detectImageType(buffer: Buffer): AcceptedImageType | null {
   if (
     buffer.length >= 3 &&
@@ -107,6 +132,7 @@ scanRouter.post(
         "Réponds en français avec un nom court et précis.",
         "Ne donne ni quantité, ni date d'expiration, ni conseil.",
         "Cette réponse est seulement une proposition et devra être validée manuellement par l'utilisateur.",
+        "Si aucun aliment n'est clairement visible ou identifiable, r\u00e9ponds exactement NO_FOOD.",
       ].join(" ");
 
       const geminiResponse = await fetch(
@@ -159,6 +185,12 @@ scanRouter.post(
       if (!suggestion) {
         return res.status(502).json({
           error: "Aucune proposition d'identification reçue",
+        });
+      }
+
+      if (isNoFoodSuggestion(suggestion)) {
+        return res.status(422).json({
+          error: "Aucun aliment identifiable dans l'image",
         });
       }
 

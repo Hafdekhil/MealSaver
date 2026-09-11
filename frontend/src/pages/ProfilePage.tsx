@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../components/auth-context";
+import "../profile-page.css";
 
 type PreferencesResponse = {
   preferences: {
@@ -9,16 +10,74 @@ type PreferencesResponse = {
   };
 };
 
+type DietaryPreference =
+  | "none"
+  | "vegetarian"
+  | "vegan"
+  | "mediterranean";
+
+const dietaryOptions: Array<{
+  value: DietaryPreference;
+  title: string;
+  description: string;
+}> = [
+  {
+    value: "none",
+    title: "Aucune préférence particulière",
+    description: "MealSaver privilégie simplement les aliments à utiliser en priorité.",
+  },
+  {
+    value: "vegetarian",
+    title: "Végétarien",
+    description: "Préférer des recettes sans viande ni poisson.",
+  },
+  {
+    value: "vegan",
+    title: "Végétalien",
+    description: "Préférer des recettes sans produits d'origine animale.",
+  },
+  {
+    value: "mediterranean",
+    title: "Méditerranéen",
+    description: "Préférer des recettes inspirées de l'alimentation méditerranéenne.",
+  },
+];
+
+function getStoredDietaryPreference(values: string[]): DietaryPreference {
+  const value = values[0]?.trim().toLowerCase();
+
+  if (
+    value === "vegetarian" ||
+    value === "vegan" ||
+    value === "mediterranean"
+  ) {
+    return value;
+  }
+
+  return "none";
+}
+
 export function ProfilePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [preferredIngredients, setPreferredIngredients] = useState("");
-  const [expirationAlertsEnabled, setExpirationAlertsEnabled] = useState(true);
+
+  const [dietaryPreference, setDietaryPreference] =
+    useState<DietaryPreference>("none");
+  const [savedDietaryPreference, setSavedDietaryPreference] =
+    useState<DietaryPreference>("none");
+
+  const [expirationAlertsEnabled, setExpirationAlertsEnabled] =
+    useState(true);
+  const [savedExpirationAlertsEnabled, setSavedExpirationAlertsEnabled] =
+    useState(true);
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingDietary, setIsSavingDietary] = useState(false);
   const [isSavingNotifications, setIsSavingNotifications] = useState(false);
+
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+  const [dietaryMessage, setDietaryMessage] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -28,6 +87,7 @@ export function ProfilePage() {
         const response = await fetch("/api/preferences", {
           credentials: "include",
         });
+
         const data = (await response.json()) as PreferencesResponse & {
           error?: string;
         };
@@ -38,27 +98,38 @@ export function ProfilePage() {
         }
 
         if (!response.ok) {
-          throw new Error(data.error ?? "Impossible de charger le profil.");
+          throw new Error(
+            data.error ?? "Impossible de charger le profil.",
+          );
         }
 
-        if (active) {
-          setPreferredIngredients(
-            data.preferences.preferredIngredients.join(", "),
-          );
-          setExpirationAlertsEnabled(
-            data.preferences.expirationAlertsEnabled,
-          );
-        }
+        if (!active) return;
+
+        const storedPreference = getStoredDietaryPreference(
+          data.preferences.preferredIngredients,
+        );
+
+        setDietaryPreference(storedPreference);
+        setSavedDietaryPreference(storedPreference);
+
+        setExpirationAlertsEnabled(
+          data.preferences.expirationAlertsEnabled,
+        );
+        setSavedExpirationAlertsEnabled(
+          data.preferences.expirationAlertsEnabled,
+        );
       } catch (caughtError) {
-        if (active) {
-          setError(
-            caughtError instanceof Error
-              ? caughtError.message
-              : "Impossible de charger le profil.",
-          );
-        }
+        if (!active) return;
+
+        setError(
+          caughtError instanceof Error
+            ? caughtError.message
+            : "Impossible de charger le profil.",
+        );
       } finally {
-        if (active) setIsLoading(false);
+        if (active) {
+          setIsLoading(false);
+        }
       }
     }
 
@@ -75,34 +146,41 @@ export function ProfilePage() {
     try {
       setIsSavingDietary(true);
       setError("");
-      setMessage("");
+      setDietaryMessage("");
 
-      const values = preferredIngredients
-        .split(",")
-        .map((value) => value.trim())
-        .filter(Boolean);
+      const preferredIngredients =
+        dietaryPreference === "none" ? [] : [dietaryPreference];
 
       const response = await fetch("/api/preferences/dietary", {
         method: "PATCH",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ preferredIngredients: values }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ preferredIngredients }),
       });
+
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error ?? "Impossible de sauvegarder les préférences.");
+        throw new Error(
+          data.error ??
+            "Impossible de sauvegarder les préférences alimentaires.",
+        );
       }
 
-      setPreferredIngredients(
-        (data.preferredIngredients as string[]).join(", "),
+      const storedPreference = getStoredDietaryPreference(
+        data.preferredIngredients as string[],
       );
-      setMessage("Préférences alimentaires sauvegardées.");
+
+      setDietaryPreference(storedPreference);
+      setSavedDietaryPreference(storedPreference);
+      setDietaryMessage("Préférence alimentaire sauvegardée.");
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
           ? caughtError.message
-          : "Impossible de sauvegarder les préférences.",
+          : "Impossible de sauvegarder les préférences alimentaires.",
       );
     } finally {
       setIsSavingDietary(false);
@@ -115,22 +193,35 @@ export function ProfilePage() {
     try {
       setIsSavingNotifications(true);
       setError("");
-      setMessage("");
+      setNotificationMessage("");
 
       const response = await fetch("/api/preferences/notifications", {
         method: "PATCH",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ expirationAlertsEnabled }),
       });
+
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error ?? "Impossible de sauvegarder les notifications.");
+        throw new Error(
+          data.error ??
+            "Impossible de sauvegarder les notifications.",
+        );
       }
 
-      setExpirationAlertsEnabled(Boolean(data.expirationAlertsEnabled));
-      setMessage("Préférences de notification sauvegardées.");
+      const savedValue = Boolean(data.expirationAlertsEnabled);
+
+      setExpirationAlertsEnabled(savedValue);
+      setSavedExpirationAlertsEnabled(savedValue);
+      setNotificationMessage(
+        savedValue
+          ? "Alertes d'expiration activées."
+          : "Alertes d'expiration désactivées.",
+      );
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
@@ -142,90 +233,212 @@ export function ProfilePage() {
     }
   }
 
+  const dietaryHasChanges =
+    dietaryPreference !== savedDietaryPreference;
+
+  const notificationHasChanges =
+    expirationAlertsEnabled !== savedExpirationAlertsEnabled;
+
   return (
     <main className="page-shell">
-      <section className="content-page">
-        <p className="eyebrow">Profil</p>
-        <h1>Votre profil MealSaver</h1>
+      <section className="profile-page">
+        <header className="profile-page-header">
+          <p className="eyebrow">Profil</p>
+          <h1>Votre profil MealSaver</h1>
+          <p>
+            Consultez vos informations et personnalisez les préférences
+            utilisées par MealSaver.
+          </p>
+        </header>
 
         {isLoading && <p>Chargement du profil...</p>}
-        {error && <p role="alert">{error}</p>}
-        {message && <p role="status">{message}</p>}
+
+        {error && (
+          <p className="profile-error-message" role="alert">
+            {error}
+          </p>
+        )}
 
         {!isLoading && user && (
-          <>
-            <section className="panel">
-              <h2>Informations personnelles</h2>
-              <p>
-                <strong>Nom :</strong> {user.name}
-              </p>
-              <p>
-                <strong>Courriel :</strong> {user.email}
-              </p>
+          <div className="profile-grid">
+            <section className="profile-card">
+              <div className="profile-card-header">
+                <div>
+                  <h2>Informations personnelles</h2>
+                  <p>Informations associées à votre compte MealSaver.</p>
+                </div>
+                <div className="profile-icon" aria-hidden="true">
+                  👤
+                </div>
+              </div>
+
+              <div className="profile-info-list">
+                <div className="profile-info-row">
+                  <span>Nom</span>
+                  <strong>{user.name}</strong>
+                </div>
+
+                <div className="profile-info-row">
+                  <span>Courriel</span>
+                  <strong>{user.email}</strong>
+                </div>
+              </div>
             </section>
 
-            <section className="panel" id="preferences-alimentaires">
-              <h2>Préférences alimentaires</h2>
-              <p>
-                Indiquez des ingrédients que vous appréciez. MealSaver peut les
-                utiliser pour départager des recettes lorsque cela est possible,
-                sans remplacer la priorité anti-gaspillage.
-              </p>
+            <section
+              className="profile-card"
+              id="preferences-alimentaires"
+            >
+              <div className="profile-card-header">
+                <div>
+                  <h2>Préférences alimentaires</h2>
+                  <p>
+                    Choisissez le type d'alimentation que MealSaver doit
+                    privilégier lorsque plusieurs recettes conviennent.
+                  </p>
+                </div>
+                <div className="profile-icon" aria-hidden="true">
+                  🍽️
+                </div>
+              </div>
 
-              <label htmlFor="preferred-ingredients">
-                Ingrédients préférés (séparés par des virgules)
-              </label>
-              <input
-                id="preferred-ingredients"
-                value={preferredIngredients}
-                onChange={(event) => setPreferredIngredients(event.target.value)}
-                placeholder="ex. tomates, fromage, riz"
-                maxLength={500}
-              />
-
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => void saveDietaryPreferences()}
-                disabled={isSavingDietary}
+              <div
+                className="dietary-options"
+                role="radiogroup"
+                aria-label="Préférence alimentaire"
               >
-                {isSavingDietary
-                  ? "Sauvegarde..."
-                  : "Sauvegarder les préférences"}
-              </button>
-            </section>
+                {dietaryOptions.map((option) => (
+                  <label
+                    className="dietary-option"
+                    key={option.value}
+                  >
+                    <input
+                      type="radio"
+                      name="dietary-preference"
+                      value={option.value}
+                      checked={dietaryPreference === option.value}
+                      onChange={() => {
+                        setDietaryPreference(option.value);
+                        setDietaryMessage("");
+                      }}
+                    />
 
-            <section className="panel" id="notifications">
-              <h2>Notifications</h2>
-              <p>
-                Contrôlez les alertes d'expiration affichées dans MealSaver.
-              </p>
+                    <span className="dietary-option-content">
+                      <strong>{option.title}</strong>
+                      <span>{option.description}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
 
-              <label>
-                <input
-                  type="checkbox"
-                  checked={expirationAlertsEnabled}
-                  onChange={(event) =>
-                    setExpirationAlertsEnabled(event.target.checked)
-                  }
-                />{" "}
-                Activer les alertes d'expiration
-              </label>
-
-              <div>
+              <div className="profile-actions">
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={() => void saveNotificationPreferences()}
-                  disabled={isSavingNotifications}
+                  onClick={() => void saveDietaryPreferences()}
+                  disabled={isSavingDietary || !dietaryHasChanges}
+                >
+                  {isSavingDietary
+                    ? "Sauvegarde..."
+                    : dietaryHasChanges
+                      ? "Sauvegarder la préférence"
+                      : "Préférence enregistrée"}
+                </button>
+
+                {dietaryMessage && (
+                  <p
+                    className="profile-save-message"
+                    role="status"
+                  >
+                    ✓ {dietaryMessage}
+                  </p>
+                )}
+              </div>
+            </section>
+
+            <section
+              className="profile-card profile-card-wide"
+              id="notifications"
+            >
+              <div className="profile-card-header">
+                <div>
+                  <h2>Notifications</h2>
+                  <p>
+                    Choisissez si MealSaver doit afficher les alertes pour
+                    les aliments proches de leur date d'expiration.
+                  </p>
+                </div>
+                <div className="profile-icon" aria-hidden="true">
+                  🔔
+                </div>
+              </div>
+
+              <div className="notification-control">
+                <div className="notification-control-copy">
+                  <strong>Alertes d'expiration</strong>
+                  <span>
+                    Recevoir les alertes MealSaver concernant les aliments
+                    à consommer prochainement.
+                  </span>
+
+                  <div
+                    className={`notification-status ${
+                      expirationAlertsEnabled
+                        ? "enabled"
+                        : "disabled"
+                    }`}
+                  >
+                    {expirationAlertsEnabled
+                      ? "Alertes activées"
+                      : "Alertes désactivées"}
+                  </div>
+                </div>
+
+                <label className="notification-switch">
+                  <input
+                    type="checkbox"
+                    aria-label="Activer les alertes d'expiration"
+                    checked={expirationAlertsEnabled}
+                    onChange={(event) => {
+                      setExpirationAlertsEnabled(
+                        event.target.checked,
+                      );
+                      setNotificationMessage("");
+                    }}
+                  />
+                  <span className="notification-switch-track" />
+                </label>
+              </div>
+
+              <div className="profile-actions">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() =>
+                    void saveNotificationPreferences()
+                  }
+                  disabled={
+                    isSavingNotifications || !notificationHasChanges
+                  }
                 >
                   {isSavingNotifications
                     ? "Sauvegarde..."
-                    : "Sauvegarder les notifications"}
+                    : notificationHasChanges
+                      ? "Sauvegarder les notifications"
+                      : "Notifications enregistrées"}
                 </button>
+
+                {notificationMessage && (
+                  <p
+                    className="profile-save-message"
+                    role="status"
+                  >
+                    ✓ {notificationMessage}
+                  </p>
+                )}
               </div>
             </section>
-          </>
+          </div>
         )}
       </section>
     </main>

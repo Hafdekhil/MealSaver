@@ -127,6 +127,63 @@ describe("POST /api/scan/identify", () => {
 
     expect(response.status).toBe(413);
   });
+  it("retourne 422 lorsqu'aucun aliment n'est identifiable", async () => {
+    const agent = await login();
+
+    const geminiFetch = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          candidates: [
+            {
+              content: {
+                parts: [{ text: "Aucun aliment visible" }],
+              },
+            },
+          ],
+        }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+    );
+
+    vi.stubGlobal("fetch", geminiFetch);
+
+    const countBefore = await prisma.foodItem.count({
+      where: { addedBy: userId },
+    });
+
+    const image = Buffer.from([
+      0xff,
+      0xd8,
+      0xff,
+      0xdb,
+      0x00,
+      0x43,
+      0x00,
+      0x01,
+    ]);
+
+    const response = await agent
+      .post("/api/scan/identify")
+      .set("Content-Type", "image/jpeg")
+      .send(image);
+
+    expect(response.status).toBe(422);
+    expect(response.body.error).toBe(
+      "Aucun aliment identifiable dans l'image",
+    );
+
+    expect(geminiFetch).toHaveBeenCalledTimes(1);
+
+    const countAfter = await prisma.foodItem.count({
+      where: { addedBy: userId },
+    });
+
+    expect(countAfter).toBe(countBefore);
+  });
+
   it("retourne une proposition sans ajouter automatiquement un aliment", async () => {
     const agent = await login();
 
