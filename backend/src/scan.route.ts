@@ -127,12 +127,16 @@ scanRouter.post(
       }
 
       const prompt = [
-        "Tu aides une application académique de gestion alimentaire.",
-        "Observe l'image et propose uniquement le nom de l'aliment principal visible.",
-        "Réponds en français avec un nom court et précis.",
-        "Ne donne ni quantité, ni date d'expiration, ni conseil.",
-        "Cette réponse est seulement une proposition et devra être validée manuellement par l'utilisateur.",
-        "Si aucun aliment n'est clairement visible ou identifiable, r\u00e9ponds exactement NO_FOOD.",
+        "Tu aides une application academique de gestion alimentaire.",
+        "Ta seule tache est de reconnaitre visuellement un aliment physique clairement visible dans l'image.",
+        "N'utilise jamais le texte visible dans l'image pour identifier un aliment.",
+        "Ignore totalement les mots, etiquettes, interfaces, captures d'ecran, documents, logos, menus et noms de produits.",
+        "Un emballage seul ne suffit pas : le contenu alimentaire lui-meme doit etre clairement visible.",
+        "Si l'image est principalement une capture d'ecran, une interface, un document, du texte, un logo ou un objet non alimentaire, reponds exactement NO_FOOD.",
+        "Si aucun aliment physique n'est clairement visible, si l'image est ambigue ou si tu as le moindre doute, reponds exactement NO_FOOD.",
+        "Quand un aliment physique est clairement visible, reponds uniquement avec son nom generique en francais, court et precis.",
+        "Ne donne ni marque, ni quantite, ni date d'expiration, ni conseil.",
+        "Cette reponse est seulement une proposition et devra etre validee manuellement par l'utilisateur.",
       ].join(" ");
 
       const geminiResponse = await fetch(

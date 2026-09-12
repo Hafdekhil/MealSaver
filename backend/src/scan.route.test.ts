@@ -184,6 +184,70 @@ describe("POST /api/scan/identify", () => {
     expect(countAfter).toBe(countBefore);
   });
 
+  it("interdit l'identification a partir du texte ou d'une capture d'ecran", async () => {
+    const agent = await login();
+
+    const geminiFetch = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          candidates: [
+            {
+              content: {
+                parts: [{ text: "NO_FOOD" }],
+              },
+            },
+          ],
+        }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+    );
+
+    vi.stubGlobal("fetch", geminiFetch);
+
+    const image = Buffer.from([
+      0xff,
+      0xd8,
+      0xff,
+      0xdb,
+      0x00,
+      0x43,
+      0x00,
+      0x01,
+    ]);
+
+    const response = await agent
+      .post("/api/scan/identify")
+      .set("Content-Type", "image/jpeg")
+      .send(image);
+
+    expect(response.status).toBe(422);
+    expect(response.body.error).toBe(
+      "Aucun aliment identifiable dans l'image",
+    );
+
+    expect(geminiFetch).toHaveBeenCalledTimes(1);
+
+    const [, options] = geminiFetch.mock.calls[0] as [
+      string,
+      RequestInit,
+    ];
+
+    const requestBody = JSON.parse(String(options.body));
+    const prompt = requestBody.contents[0].parts[1].text as string;
+
+    expect(prompt).toContain(
+      "N'utilise jamais le texte visible dans l'image pour identifier un aliment.",
+    );
+    expect(prompt).toContain("captures d'ecran");
+    expect(prompt).toContain(
+      "le contenu alimentaire lui-meme doit etre clairement visible",
+    );
+    expect(prompt).toContain("NO_FOOD");
+  });
+
   it("retourne une proposition sans ajouter automatiquement un aliment", async () => {
     const agent = await login();
 
