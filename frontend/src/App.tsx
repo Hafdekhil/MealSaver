@@ -15,6 +15,7 @@ import { ProfilePage } from "./pages/ProfilePage";
 import { RecipesPage } from "./pages/RecipesPage";
 import { ScanPage } from "./pages/ScanPage";
 import { ShoppingListPage } from "./pages/ShoppingListPage";
+import BudgetPage  from "./pages/BudgetPage";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
               <Route path="/recipes" element={<RecipesPage />} />
               <Route path="/shopping-list" element={<ShoppingListPage />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/budget" element={<BudgetPage />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

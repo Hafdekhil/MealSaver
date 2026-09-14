@@ -80,6 +80,10 @@ export function Header() {
                 Liste
               </NavLink>
 
+              <NavLink to="/budget" onClick={closeMenu}>
+                Budget partagé
+              </NavLink>
+
               <NavLink to="/profile" onClick={closeMenu}>
                 Profil
               </NavLink>
