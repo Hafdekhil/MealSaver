@@ -1,6 +1,6 @@
 // backend/src/expense-totals.test.ts
 import { describe, it, expect } from 'vitest';
-import { calculateExpenseTotals } from './expense-totals';
+import { calculateExpenseTotals } from './expense-totals.js';
 
 describe('calculateExpenseTotals', () => {
   it('returns zeros for empty array', () => {
