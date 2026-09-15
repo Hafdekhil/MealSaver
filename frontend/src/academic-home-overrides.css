@@ -409,7 +409,7 @@
     min-height: 72px;
     margin: 12px auto 0;
     padding: 8px 14px 8px 18px;
-    gap: 28px;
+    gap: 18px;
     border: 1px solid rgba(3, 99, 70, 0.10);
     border-radius: 18px;
     background: rgba(255, 255, 255, 0.96);
@@ -432,6 +432,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex: 1;
+    min-width: 0;
     gap: 4px;
     padding: 0;
     border: 0;
@@ -440,8 +442,9 @@
   }
 
   .desktop-nav a {
-    padding: 10px 14px;
+    padding: 10px 10px;
     border-radius: 10px;
+    white-space: nowrap;
     color: #315f50;
     font-size: 0.94rem;
     font-weight: 750;
@@ -465,6 +468,7 @@
   .header-actions {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
     gap: 8px;
   }
 
@@ -596,6 +600,8 @@
     border-radius: 18px;
     background: #ffffff;
     box-shadow: 0 18px 46px rgba(3, 39, 28, 0.12);
+    max-height: calc(100vh - 110px);
+    overflow-y: auto;
     z-index: 100;
   }
 
@@ -605,6 +611,8 @@
     padding: 12px 14px;
     border-radius: 10px;
     text-align: left;
+    white-space: normal;
+    line-height: 1.25;
     font-weight: 800;
   }
 
@@ -1094,5 +1102,189 @@ body:has(.scan-layout) .page-shell {
   .alert-row {
     padding: 14px;
     border-radius: 17px;
+  }
+}
+
+/* ===== Dashboard — Actions rapides ===== */
+.dashboard-quick-actions {
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin: 0;
+}
+
+.dashboard-quick-actions article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "title action"
+    "description action";
+  align-items: center;
+  gap: 4px 18px;
+  padding: 18px 20px;
+}
+
+.dashboard-quick-actions h3 {
+  grid-area: title;
+  min-height: 0;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.dashboard-quick-actions p {
+  grid-area: description;
+  margin: 0;
+}
+
+.dashboard-quick-actions .btn {
+  grid-area: action;
+  align-self: center;
+}
+
+@media (max-width: 720px) {
+  .dashboard-quick-actions article {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "title"
+      "description"
+      "action";
+    gap: 10px;
+  }
+
+  .dashboard-quick-actions .btn {
+    justify-self: start;
+  }
+}
+
+/* ===== Dashboard — Alertes importantes ===== */
+.dashboard-alerts .alert-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 16px 18px;
+}
+
+.dashboard-alerts .alert-row > div:first-child {
+  min-width: 0;
+}
+
+.dashboard-alerts .alert-row > div:first-child strong {
+  display: block;
+  margin-bottom: 4px;
+  line-height: 1.25;
+}
+
+.dashboard-alerts .alert-row > div:first-child small {
+  display: block;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-alerts .alert-row > div:last-child {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: auto;
+}
+
+.dashboard-alerts .alert-row > div:last-child .status {
+  width: fit-content;
+  flex-shrink: 0;
+}
+
+.dashboard-alerts .alert-row > div:last-child .btn {
+  width: auto;
+  min-height: 40px;
+  padding: 10px 14px;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .dashboard-alerts .alert-row {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .dashboard-alerts .alert-row > div:last-child {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .dashboard-alerts .alert-row > div:last-child .btn {
+    width: 100%;
+    white-space: normal;
+  }
+}
+
+/* ===== Inventaire — lignes et actions ===== */
+.inventory-layout .food-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.inventory-layout .food-left,
+.inventory-layout .food-left > div {
+  min-width: 0;
+}
+
+.inventory-layout .food-left strong {
+  display: block;
+  margin-bottom: 6px;
+  line-height: 1.25;
+}
+
+.inventory-layout .food-left .status {
+  display: inline-flex;
+  margin-bottom: 8px;
+}
+
+.inventory-layout .food-left small {
+  display: block;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.inventory-item-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.inventory-item-actions .btn {
+  min-height: 40px;
+  padding: 10px 14px;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .inventory-layout .food-row {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .inventory-item-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .inventory-item-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .inventory-item-actions .btn {
+    width: 100%;
+    white-space: normal;
   }
 }

@@ -134,9 +134,9 @@ export function HomePage() {
                 <>
                   <Link
                     className="btn btn-primary btn-xl"
-                    to="/household"
+                    to="/dashboard"
                   >
-                    Accéder à mon foyer
+                    Voir mon tableau de bord
                   </Link>
 
                   <Link
@@ -294,7 +294,7 @@ export function HomePage() {
       </section>
 
       <section className="section-wrap mp-section-preview">
-        <Link to={isAuthenticated ? "/household" : "/register"}>
+        <Link to={isAuthenticated ? "/dashboard" : "/register"}>
           <strong>01</strong>
 
           <h3>

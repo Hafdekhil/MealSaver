@@ -243,7 +243,7 @@ export function ScanPage() {
   return (
     <main className="page-shell">
       <section className="content-page">
-        <p className="eyebrow">Scan</p>
+        <p className="eyebrow">Scanner un aliment</p>
         <h1>Identifiez un aliment à partir d'une photo.</h1>
         <p>
           Téléversez une image ou prenez une photo de l'aliment pour obtenir

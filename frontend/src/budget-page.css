@@ -1,0 +1,390 @@
+.budget-page {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+.budget-page-header {
+  margin-bottom: 28px;
+}
+
+.budget-page-header h1 {
+  margin: 0;
+  max-width: 820px;
+  font-size: clamp(2.1rem, 4vw, 3.5rem);
+  line-height: 1.02;
+  letter-spacing: -2px;
+  color: var(--ink);
+}
+
+.budget-page-header p:last-child {
+  max-width: 760px;
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.budget-feedback {
+  margin: 0 0 20px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  font-weight: 800;
+}
+
+.budget-feedback.success {
+  border: 1px solid #cce8da;
+  background: #edf9f3;
+  color: #07543a;
+}
+
+.budget-feedback.error {
+  border: 1px solid #efcaca;
+  background: #fff4f4;
+  color: #8b2525;
+}
+
+.budget-card,
+.budget-history-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  padding: 26px;
+  box-shadow: var(--shadow-soft);
+}
+
+.budget-household-card {
+  margin-bottom: 22px;
+}
+
+.budget-household-card label {
+  display: block;
+  margin-bottom: 8px;
+  color: #31594b;
+  font-weight: 850;
+}
+
+.budget-select {
+  width: 100%;
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid #cfe1d9;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.budget-main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  gap: 22px;
+  margin-bottom: 22px;
+}
+
+.budget-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.budget-card-icon {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: #eaf8f1;
+  color: var(--green-700);
+  font-size: 1.2rem;
+  font-weight: 950;
+}
+
+.budget-card-header h2 {
+  margin: 0 0 6px;
+  color: var(--ink);
+  font-size: 1.35rem;
+}
+
+.budget-card-header p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.budget-form {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(150px, 0.65fr);
+  gap: 14px;
+  align-items: end;
+}
+
+.budget-field {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.budget-field label {
+  color: #31594b;
+  font-size: 0.9rem;
+  font-weight: 850;
+}
+
+.budget-field input,
+.budget-field select {
+  width: 100%;
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid #cfe1d9;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.budget-field input:focus,
+.budget-field select:focus,
+.budget-select:focus {
+  outline: none;
+  border-color: var(--green-600);
+  box-shadow: 0 0 0 4px rgba(7, 150, 95, 0.1);
+}
+
+.budget-description-field,
+.budget-add-button {
+  grid-column: 1 / -1;
+}
+
+.budget-add-button {
+  width: fit-content;
+  min-width: 210px;
+}
+
+.budget-totals-card {
+  min-width: 0;
+}
+
+.budget-totals-content {
+  display: grid;
+  gap: 18px;
+}
+
+.budget-member-totals {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.budget-member-totals li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e3ece7;
+}
+
+.budget-member-totals li:first-child {
+  padding-top: 0;
+}
+
+.budget-member-totals span {
+  min-width: 0;
+  color: #31594b;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.budget-member-totals strong {
+  flex: 0 0 auto;
+  color: var(--ink);
+}
+
+.budget-general-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px;
+  border-radius: 17px;
+  background: #eaf8f1;
+  color: var(--green-700);
+  font-weight: 900;
+}
+
+.budget-general-total strong {
+  font-size: 1.15rem;
+}
+
+.budget-history-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.budget-history-heading h2 {
+  margin: 0 0 5px;
+  color: var(--ink);
+  font-size: 1.45rem;
+}
+
+.budget-history-heading p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.budget-count {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #eaf8f1;
+  color: var(--green-700);
+  font-size: 0.85rem;
+  font-weight: 900;
+}
+
+.budget-expenses {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.budget-expense-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 64px;
+  padding: 13px 16px;
+  border: 1px solid #e0ece6;
+  border-radius: 17px;
+  background: #fbfdfc;
+}
+
+.budget-expense-copy {
+  min-width: 0;
+}
+
+.budget-expense-copy strong {
+  display: block;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.budget-expense-copy span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.87rem;
+}
+
+.budget-expense-amount {
+  flex: 0 0 auto;
+  padding: 8px 11px;
+  border-radius: 999px;
+  background: #fff3d8;
+  color: #815f14;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.budget-empty {
+  margin: 0;
+  padding: 24px 18px;
+  border: 1px dashed #cbded5;
+  border-radius: 18px;
+  background: #f9fcfa;
+  color: var(--muted);
+  text-align: center;
+}
+
+@media (max-width: 850px) {
+  .budget-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .budget-page-header {
+    margin-bottom: 20px;
+  }
+
+  .budget-page-header h1 {
+    font-size: 2rem;
+    letter-spacing: -1.2px;
+  }
+
+  .budget-page-header p:last-child {
+    font-size: 0.94rem;
+  }
+
+  .budget-card,
+  .budget-history-card {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .budget-card-header {
+    gap: 12px;
+    margin-bottom: 17px;
+  }
+
+  .budget-card-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+  }
+
+  .budget-form {
+    grid-template-columns: 1fr;
+  }
+
+  .budget-description-field,
+  .budget-add-button {
+    grid-column: auto;
+  }
+
+  .budget-add-button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .budget-history-heading {
+    align-items: center;
+  }
+
+  .budget-expense-item {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 420px) {
+  .budget-history-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .budget-expense-item {
+    flex-direction: column;
+  }
+
+  .budget-expense-amount {
+    align-self: flex-end;
+  }
+
+  .budget-general-total {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+}

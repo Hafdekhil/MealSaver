@@ -69,7 +69,7 @@ export function Header() {
               </NavLink>
 
               <NavLink to="/scan" onClick={closeMenu}>
-                Scan
+                Scanner un aliment
               </NavLink>
 
               <NavLink to="/recipes" onClick={closeMenu}>

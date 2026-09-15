@@ -7,6 +7,7 @@ import { AuthProvider } from "./components/AuthProvider";
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { HomePage } from "./pages/HomePage";
+import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { HouseholdPage } from "./pages/HouseholdPage";
@@ -28,6 +29,7 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
 
             <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/household" element={<HouseholdPage />} />
               <Route path="/inventory" element={<InventoryPage />} />
               <Route path="/scan" element={<ScanPage />} />
