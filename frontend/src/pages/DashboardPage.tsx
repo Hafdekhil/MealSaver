@@ -334,7 +334,7 @@ export function DashboardPage() {
         )}
 
         <div className="app-grid two">
-          <section className="panel">
+          <section className="panel dashboard-alerts">
             <div className="panel-head">
               <div>
                 <p className="kicker">Priorités</p>
@@ -410,7 +410,7 @@ export function DashboardPage() {
               </div>
             </div>
 
-            <div className="app-stats">
+            <div className="app-stats dashboard-quick-actions">
               <article>
                 <h3>Inventaire</h3>
                 <p>Consulter et gérer les aliments du foyer.</p>
@@ -420,7 +420,7 @@ export function DashboardPage() {
               </article>
 
               <article>
-                <h3>Scan</h3>
+                <h3>Scanner un aliment</h3>
                 <p>Accéder à l'ajout rapide d'aliments.</p>
                 <Link className="btn btn-soft" to="/scan">
                   Ouvrir

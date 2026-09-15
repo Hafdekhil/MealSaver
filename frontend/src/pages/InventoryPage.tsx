@@ -612,7 +612,7 @@ export function InventoryPage() {
                           </div>
                         </div>
 
-                        <div>
+                        <div className="inventory-item-actions">
                           {householdId !== null &&
                             isUsableForRecipe(alertsByItemId.get(item.id)) && (
                               <button
