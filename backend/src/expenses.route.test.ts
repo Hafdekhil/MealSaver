@@ -385,4 +385,87 @@ describe("Dépenses du foyer", () => {
     expect(response.status).toBe(400);
     expect(response.body.error).toBe("Foyer invalide");
   });
+  it("retourne 401 sans session pour les totaux", async () => {
+    const response = await request(app).get(
+      `/api/expenses/totals?householdId=${householdId}`,
+    );
+
+    expect(response.status).toBe(401);
+  });
+
+  it("retourne 400 si le foyer des totaux est invalide", async () => {
+    const agent = await loginAs(ownerEmail);
+
+    const response = await agent.get(
+      "/api/expenses/totals?householdId=invalide",
+    );
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe("Foyer invalide");
+  });
+
+  it("interdit les totaux a un utilisateur exterieur au foyer", async () => {
+    const agent = await loginAs(outsiderEmail);
+
+    const response = await agent.get(
+      `/api/expenses/totals?householdId=${householdId}`,
+    );
+
+    expect(response.status).toBe(403);
+  });
+
+  it("retourne zero lorsqu aucune depense n existe", async () => {
+    const agent = await loginAs(ownerEmail);
+
+    const response = await agent.get(
+      `/api/expenses/totals?householdId=${householdId}`,
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      memberTotals: {},
+      generalTotal: 0,
+    });
+  });
+
+  it("retourne les totaux de depenses par membre", async () => {
+    await prisma.expense.createMany({
+      data: [
+        {
+          householdId,
+          paidByUserId: ownerUserId,
+          amount: 10.1,
+          description: "Owner 1",
+        },
+        {
+          householdId,
+          paidByUserId: memberUserId,
+          amount: 5.25,
+          description: "Member",
+        },
+        {
+          householdId,
+          paidByUserId: ownerUserId,
+          amount: 2.15,
+          description: "Owner 2",
+        },
+      ],
+    });
+
+    const agent = await loginAs(ownerEmail);
+
+    const response = await agent.get(
+      `/api/expenses/totals?householdId=${householdId}`,
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      memberTotals: {
+        "Expenses Owner": 12.25,
+        "Expenses Member": 5.25,
+      },
+      generalTotal: 17.5,
+    });
+  });
+
 });

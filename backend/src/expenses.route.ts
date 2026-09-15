@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "./lib/prisma.js";
+import { calculateExpenseTotals } from "./expense-totals.js";
 
 export const expensesRouter = Router();
 
@@ -82,6 +83,61 @@ expensesRouter.get("/", async (req, res, next) => {
     return res.status(200).json({
       expenses,
     });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+/*
+ * GET /api/expenses/totals?householdId=1
+ *
+ * Retourne le total général et les totaux par membre du foyer.
+ */
+expensesRouter.get("/totals", async (req, res, next) => {
+  try {
+    const userId = Number(res.locals["userId"]);
+    const householdId = Number(req.query["householdId"]);
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(401).json({
+        error: "Non authentifié",
+      });
+    }
+
+    if (!Number.isInteger(householdId) || householdId <= 0) {
+      return res.status(400).json({
+        error: "Foyer invalide",
+      });
+    }
+
+    if (!(await isHouseholdMember(userId, householdId))) {
+      return res.status(403).json({
+        error: "Vous devez appartenir à ce foyer pour consulter ses dépenses",
+      });
+    }
+
+    const expenses = await prisma.expense.findMany({
+      where: {
+        householdId,
+      },
+      select: {
+        amount: true,
+        paidByUser: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    const totals = calculateExpenseTotals(
+      expenses.map((expense) => ({
+        amount: expense.amount.toString(),
+        member: expense.paidByUser.name,
+      })),
+    );
+
+    return res.status(200).json(totals);
   } catch (error) {
     return next(error);
   }
