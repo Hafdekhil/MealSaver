@@ -20,6 +20,7 @@ model User {
   addedFoodItems          FoodItem[]        @relation("FoodItemsAdded")
   createdShoppingItems    ShoppingItem[]    @relation("ShoppingItemsCreated")
   purchasedShoppingItems  ShoppingItem[]    @relation("ShoppingItemsPurchased")
+  paidExpenses            Expense[]         @relation("ExpensesPaid")
 }
 
 enum HouseholdRole {
@@ -46,6 +47,7 @@ model Household {
   invitations   Invitation[]
   foodItems     FoodItem[]
   shoppingItems ShoppingItem[]
+  expenses      Expense[]
 }
 
 model HouseholdMember {
@@ -111,12 +113,27 @@ model ShoppingItem {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  household      Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
-  createdByUser  User?     @relation("ShoppingItemsCreated", fields: [createdBy], references: [id], onDelete: SetNull)
-  purchasedByUser User?    @relation("ShoppingItemsPurchased", fields: [purchasedBy], references: [id], onDelete: SetNull)
+  household       Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  createdByUser   User?     @relation("ShoppingItemsCreated", fields: [createdBy], references: [id], onDelete: SetNull)
+  purchasedByUser User?     @relation("ShoppingItemsPurchased", fields: [purchasedBy], references: [id], onDelete: SetNull)
 
   @@unique([householdId, normalizedName])
   @@index([householdId, purchased])
   @@index([createdBy])
   @@index([purchasedBy])
+}
+
+model Expense {
+  id           Int      @id @default(autoincrement())
+  householdId  Int
+  paidByUserId Int
+  amount       Decimal  @db.Decimal(10, 2)
+  description  String?
+  createdAt    DateTime @default(now())
+
+  household  Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  paidByUser User      @relation("ExpensesPaid", fields: [paidByUserId], references: [id], onDelete: Restrict)
+
+  @@index([householdId, createdAt])
+  @@index([paidByUserId])
 }

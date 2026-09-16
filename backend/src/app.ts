@@ -7,6 +7,7 @@ import { registerRouter } from "./auth/register.route.js";
 import { householdRouter } from "./households/household.route.js";
 import { householdMembershipRouter } from "./households/household.membership.route.js";
 import { invitationRouter } from "./households/invitation.route.js";
+import { expensesRouter } from "./expenses.route.js";
 import { inventoryRouter } from "./inventory.route.js";
 import { memberRouter } from "./member.route.js";
 import { inventoryDeleteRouter } from "./inventory/inventory.delete.route.js";
@@ -45,6 +46,7 @@ app.use("/api/recipes", requireAuth, recipesRouter);
 app.use("/api/scan", requireAuth, scanRouter);
 app.use("/api/shopping-list", requireAuth, shoppingListRouter);
 app.use("/api/preferences", requireAuth, preferencesRouter);
+app.use("/api/expenses", requireAuth, expensesRouter);
 
 app.use(
   (
