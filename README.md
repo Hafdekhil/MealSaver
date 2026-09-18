@@ -11,11 +11,12 @@ Le projet est développé progressivement par sprints dans le cadre du cours **4
 * **Sprint 0** — conception, maquettes, prototype et préparation du produit.
 * **Sprint 1** — authentification, foyer collaboratif et inventaire partagé.
 * **Sprint 2** — scan d'aliments, alertes d'expiration, recettes anti-gaspillage, liste d'épicerie collaborative, profil et préférences.
+* **Sprint 3** — tableau de bord du foyer, budget partagé, dépenses et totaux par membre.
 
 La validation locale actuelle réussit :
 
-* **18 fichiers de tests backend sur 18** ;
-* **103 tests backend sur 103** ;
+* **20 fichiers de tests backend sur 20** ;
+* **124 tests backend sur 124** ;
 * build TypeScript backend réussi ;
 * lint frontend : **0 erreur et 0 avertissement** ;
 * build TypeScript et Vite frontend réussi.
@@ -296,6 +297,52 @@ documents/sprint-2/README.md
 
 ---
 
+# Sprint 3 — Tableau de bord et budget du foyer
+
+Le Sprint 3 complète l'expérience MealSaver avec une vue synthétique du foyer et un module de suivi des dépenses partagées.
+
+## Tableau de bord
+
+Le tableau de bord permet notamment de :
+
+* sélectionner le foyer actif lorsque plusieurs foyers sont disponibles ;
+* consulter le nombre total d'aliments ;
+* voir les aliments à consommer bientôt ;
+* suivre les alertes importantes ;
+* identifier les aliments expirés ;
+* accéder rapidement à l'inventaire, au scan, aux recettes et à la liste d'épicerie.
+
+Les alertes peuvent conduire directement vers l'aliment concerné ou vers une recette lorsque l'aliment n'est pas expiré.
+
+Les récits confirmés dans l'historique Git sont :
+
+* **MEALSAVER-45 / MEALSAVER-46** — tableau de bord du foyer.
+
+## Budget et dépenses
+
+Le module Budget permet de :
+
+* enregistrer une dépense du foyer ;
+* identifier le membre ayant payé ;
+* conserver une description facultative ;
+* consulter l'historique des dépenses ;
+* calculer le total payé par chaque membre ;
+* afficher le total général du foyer.
+
+Les contrôles d'appartenance au foyer sont réalisés côté serveur pour la consultation et l'ajout des dépenses.
+
+Le récit confirmé dans l'historique Git est :
+
+* **MEALSAVER-52** — budget et dépenses du foyer.
+
+La documentation détaillée du Sprint 3 se trouve dans :
+
+```text
+documents/sprint-3/README.md
+```
+
+---
+
 # Architecture technique
 
 MealSaver est organisé en trois couches principales.
@@ -457,13 +504,15 @@ La suite de tests actuelle couvre notamment :
 * recettes ;
 * profil et préférences ;
 * liste d'épicerie collaborative ;
+* tableau de bord ;
+* budget et dépenses du foyer ;
 * contrôles d'autorisation et isolation entre foyers.
 
 Validation locale actuelle :
 
 ```text
-Test Files  18 passed (18)
-Tests       103 passed (103)
+Test Files  20 passed (20)
+Tests       124 passed (124)
 ```
 
 ## Build backend
@@ -574,7 +623,9 @@ documents/
 ├── sprint-0/
 ├── sprint-1/
 │   └── README.md
-└── sprint-2/
+├── sprint-2/
+│   └── README.md
+└── sprint-3/
     └── README.md
 ```
 
@@ -588,7 +639,7 @@ Le Sprint 0 contient notamment les documents de :
 * environnement de travail ;
 * responsabilités des membres.
 
-Les README des Sprint 1 et Sprint 2 décrivent les incréments réellement développés et les validations correspondantes.
+Les README des Sprint 1, Sprint 2 et Sprint 3 décrivent les incréments réellement développés et les validations correspondantes.
 
 ---
 
@@ -600,5 +651,6 @@ Les README des Sprint 1 et Sprint 2 décrivent les incréments réellement déve
 * **Documentation Sprint 0 :** `documents/sprint-0/`
 * **Documentation Sprint 1 :** `documents/sprint-1/`
 * **Documentation Sprint 2 :** `documents/sprint-2/`
+* **Documentation Sprint 3 :** `documents/sprint-3/`
 
 L'adresse active de l'environnement de démonstration peut être transmise séparément à l'enseignant avec les autres éléments du livrable.
